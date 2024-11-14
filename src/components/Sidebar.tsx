@@ -34,13 +34,13 @@ const Sidebar: React.FC = () => {
         id: "consultas",
         label: "Consultas",
         icon: <RiBuildingLine className="text-xl mr-3" />,
-        href: "/dashboard/consulta",
+        href: "/dashboard/consultas",
       },
       {
         id: "generar alta",
         label: "Generar Alta",
         icon: <RiBriefcaseLine className="text-xl mr-3" />,
-        href: "/dashboard/generar",
+        href: "/dashboard/generar-alta",
       },
       {
         id: "administrar usuario",
@@ -52,7 +52,7 @@ const Sidebar: React.FC = () => {
         id: "administrar parametros",
         label: "Administrar Parametros",
         icon: <RiProductHuntLine className="text-xl mr-3" />,
-        href: "/dashboard/administrar-parametro",
+        href: "/dashboard/administrar-parametros",
       },
       {
         id: "ajustes",
@@ -82,8 +82,8 @@ const Sidebar: React.FC = () => {
                 <div
                   className={`flex items-center p-4 cursor-pointer ${
                     activeToggle === item.id
-                      ? "bg-gray-400"
-                      : "hover:bg-gray-300"
+                      ? "bg-gray-300"
+                      : "hover:bg-gray-200"
                   }`}
                 >
                   {item.icon}
