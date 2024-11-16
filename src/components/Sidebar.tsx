@@ -11,6 +11,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UiContext } from "@/context/SidebarContext";
 import { UiContextType } from "@/types/SidebarOpen";
+import Image from "next/image";
 
 const Sidebar: React.FC = () => {
   const context = useContext(UiContext) as UiContextType;
@@ -23,6 +24,7 @@ const Sidebar: React.FC = () => {
 
   const [activeToggle, setActiveToggle] = useState<string | null>(null);
   const pathname = usePathname();
+  console.log(pathname.split("/")[2]);
 
   useEffect(() => {
     setActiveToggle(pathname.split("/")[2] || null);
@@ -37,19 +39,19 @@ const Sidebar: React.FC = () => {
         href: "/dashboard/consultas",
       },
       {
-        id: "generar alta",
+        id: "generar-alta",
         label: "Generar Alta",
         icon: <RiBriefcaseLine className="text-xl mr-3" />,
         href: "/dashboard/generar-alta",
       },
       {
-        id: "administrar usuario",
+        id: "administrar-usuario",
         label: "Administrar Usuario",
         icon: <RiDashboardLine className="text-xl mr-3" />,
         href: "/dashboard/administrar-usuario",
       },
       {
-        id: "administrar parametros",
+        id: "administrar-parametros",
         label: "Administrar Parametros",
         icon: <RiProductHuntLine className="text-xl mr-3" />,
         href: "/dashboard/administrar-parametros",
@@ -72,7 +74,10 @@ const Sidebar: React.FC = () => {
       style={{ maxWidth: "16rem", minWidth: "16rem" }}
     >
       <div className="p-6 text-center border-b border-gray-300">
-        <div className="text-2xl font-bold">Sis. Forzado</div>
+        <div className="text-2xl font-bold flex items-center justify-center space-x-2">
+          <Image src={"/images/icon.png"} height={24} width={24} alt="Icono" />
+          <span>Sist. Forzado</span>
+        </div>
       </div>
       <nav className="flex-1">
         <ul>
@@ -80,9 +85,9 @@ const Sidebar: React.FC = () => {
             <li key={item.id} className="relative group">
               <Link href={item.href}>
                 <div
-                  className={`flex items-center p-4 cursor-pointer ${
+                  className={`flex items-center p-4 cursor-pointer text-gray-600 ${
                     activeToggle === item.id
-                      ? "bg-gray-300"
+                      ? "bg-gray-300 text-gray-400"
                       : "hover:bg-gray-200"
                   }`}
                 >

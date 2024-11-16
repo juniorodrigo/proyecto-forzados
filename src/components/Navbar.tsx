@@ -1,12 +1,12 @@
 "use client";
 import React, { useContext, useState } from "react";
 import {
-  FiMenu,
   FiSearch,
   FiChevronDown,
   FiUser,
   FiSettings,
   FiLogOut,
+  FiChevronsLeft,
 } from "react-icons/fi";
 import SearchModal from "./SearchModal";
 import Link from "next/link";
@@ -43,11 +43,13 @@ const Navbar: React.FC = () => {
       <div className="max-h-[80px] min-h-[80px] flex items-center justify-between px-4 mx-auto">
         {/* Icono para desplegar/ocultar sidebar */}
         <button
-          className="text-3xl text-gray-400 focus:outline-none"
+          className={`text-3xl text-gray-400 focus:outline-none transition-transform duration-300 ${
+            open ? "rotate-0" : "rotate-180"
+          }`}
           onClick={toggleSidebar}
           aria-label="Toggle Sidebar"
         >
-          <FiMenu />
+          <FiChevronsLeft />
         </button>
 
         {/* Barra de búsqueda */}
@@ -63,7 +65,7 @@ const Navbar: React.FC = () => {
             <input
               type="text"
               placeholder="Buscar..."
-              className="w-full bg-slate-50 rounded-md py-2 px-4 focus:outline-none focus:ring-0 placeholder-gray-400"
+              className="w-full bg-slate-50 rounded-md py-2 px-4 focus:outline-none focus:ring-0 placeholder-gray-400 border border-gray-400"
             />
             <div className="absolute inset-y-0 right-0 flex items-center pr-3">
               <FiSearch className="text-gray-400 text-xl" />
@@ -82,8 +84,8 @@ const Navbar: React.FC = () => {
             aria-expanded={dropdownOpen}
           >
             <div className="text-left">
-              <p className="text-sm font-semibold">Juan Carranza</p>
-              <p className="text-xs text-gray-400 text-right">Peru</p>
+              <p className="text-base font-medium">Juan Carranza</p>
+              <p className="text-sm text-gray-400 text-right">Peru</p>
             </div>
             <Image
               src="/images/login.png"
@@ -92,7 +94,11 @@ const Navbar: React.FC = () => {
               height={40}
               width={40}
             />
-            <FiChevronDown className="text-xl ml-1" />
+            <FiChevronDown
+              className={`text-xl ml-1 transition-transform duration-300 ${
+                dropdownOpen ? "rotate-180" : "rotate-0"
+              }`}
+            />
           </button>
 
           {/* Dropdown para el usuario */}

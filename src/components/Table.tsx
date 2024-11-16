@@ -53,61 +53,69 @@ const Table: React.FC<TableProps> = ({
     <div className="overflow-auto rounded-lg shadow-lg mt-4">
       <table className="min-w-full bg-white">
         <thead>
-          <tr className="border-b-2 border-gray-200">
+          <tr className="border-b-2 border-gray-200 text-sm text-left">
             {columns.map((column) => (
-              <th
-                key={column.key}
-                className="p-3 text-left font-semibold text-gray-600"
-              >
+              <th key={column.key} className="p-3 font-semibold text-gray-600">
                 {column.label}
               </th>
             ))}
-            <th className="p-3 text-left font-semibold text-gray-600">
-              Acciones
-            </th>
+            <th className="p-3 font-semibold text-gray-600">Acciones</th>
           </tr>
         </thead>
         <tbody>
-          {rows.map((row) => (
-            <tr
-              key={row.id}
-              className="border-b border-gray-200 hover:bg-gray-100"
-            >
-              {columns.map((column) => (
-                <td
-                  key={column.key}
-                  className={`p-3 ${
-                    column.key === "estado"
-                      ? getStatusClass(row[column.key] as Status) +
-                        " rounded-lg px-2 py-1 text-center"
-                      : ""
-                  }`}
-                >
-                  {row[column.key]}
+          {rows.length > 0 ? (
+            rows.map((row) => (
+              <tr
+                key={row.id}
+                className="border-b border-gray-200 hover:bg-gray-100"
+              >
+                {columns.map((column) => (
+                  <td key={column.key} className="p-3 text-sm">
+                    {column.key === "estado" ? (
+                      <span
+                        className={`inline-block px-6 py-2 font-semibold rounded-full ${getStatusClass(
+                          row[column.key] as Status
+                        )}`}
+                      >
+                        {row[column.key]}
+                      </span>
+                    ) : (
+                      row[column.key]
+                    )}
+                  </td>
+                ))}
+                <td className="p-3 flex space-x-2">
+                  <button
+                    onClick={() => onView(row.id as number)}
+                    className="text-blue-600 hover:text-blue-800"
+                  >
+                    <FaEye />
+                  </button>
+                  <button
+                    onClick={() => onEdit(row.id as number)}
+                    className="text-yellow-600 hover:text-yellow-800"
+                  >
+                    <FaEdit />
+                  </button>
+                  <button
+                    onClick={() => onDelete(row.id as number)}
+                    className="text-red-600 hover:text-red-800"
+                  >
+                    <FaTrashAlt />
+                  </button>
                 </td>
-              ))}
-              <td className="p-3 flex space-x-2">
-                <button
-                  onClick={() => onView(row.id as number)}
-                  className="text-blue-600 hover:text-blue-800"
-                >
-                  <FaEye />
-                </button>
-                <button
-                  onClick={() => onEdit(row.id as number)}
-                  className="text-yellow-600 hover:text-yellow-800"
-                >
-                  <FaEdit />
-                </button>
-                <button
-                  onClick={() => onDelete(row.id as number)}
-                  className="text-red-600 hover:text-red-800"
-                >
-                  <FaTrashAlt />
-                </button>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td
+                colSpan={columns.length + 1}
+                className="p-3 text-center text-gray-500"
+              >
+                No se encontraron registros.
               </td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
     </div>
