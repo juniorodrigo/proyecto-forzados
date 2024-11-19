@@ -5,24 +5,24 @@ import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
-  title: "Sistema Forzado",
-  description: "Sistema Forzado",
+	title: "Sistema de  Forzados",
+	description: "Sistema de Forzados",
 };
 
 export default function RootLayout({
-  children,
+	children,
 }: Readonly<{
-  children: React.ReactNode;
+	children: React.ReactNode;
 }>) {
-  return (
-    <UiProvider>
-      <div className="flex h-screen bg-gray-100 overflow-hidden">
-        <Sidebar />
-        <div className="flex-1 flex flex-col overflow-y-auto">
-          <Navbar />
-          <main className="flex-1 p-4 overflow-y-auto">{children}</main>
-        </div>
-      </div>
-    </UiProvider>
-  );
+	return (
+		<UiProvider>
+			<div className="flex h-screen bg-gray-100 overflow-hidden">
+				<Sidebar />
+				<div className="flex-1 flex flex-col overflow-y-auto">
+					<Navbar />
+					<main className="flex-1 p-4 overflow-y-auto">{children}</main>
+				</div>
+			</div>
+		</UiProvider>
+	);
 }

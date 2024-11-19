@@ -91,7 +91,7 @@ const Login = () => {
 				<div className="w-full max-w-md space-y-6 relative">
 					<h2 className="text-2xl font-semibold text-center text-gray-800">
 						Bienvenido al <br />
-						<span className="text-sky-800 text-4xl">Sistema Forzado</span>
+						<span className="text-sky-800 text-4xl">Sistema de control de Forzados</span>
 					</h2>
 
 					<div className="space-y-6">

@@ -56,7 +56,6 @@ const Navbar: React.FC = () => {
 				{/* Sección de usuario */}
 				<div className="flex items-center space-x-4 relative">
 					{/* Botón de usuario que muestra el dropdown */}
-					{/*TODO: Corregir error button aria-expanded es una expresión */}
 					<button type="button" className="flex items-center focus:outline-none space-x-2" onClick={toggleDropdown} aria-haspopup="true" aria-expanded={dropdownOpen}>
 						<div className="text-left">
 							<p className="text-base font-medium">Juan Carranza</p>
