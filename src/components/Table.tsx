@@ -17,12 +17,15 @@ interface TableRow {
   [key: string]: string | number | Status;
 }
 
+type Action = "view" | "edit" | "delete";
+
 interface TableProps {
   columns: TableColumn[];
   rows: TableRow[];
-  onView: (id: number) => void;
-  onEdit: (id: number) => void;
-  onDelete: (id: number) => void;
+  onView?: (id: number) => void;
+  onEdit?: (id: number) => void;
+  onDelete?: (id: number) => void;
+  actions?: Action[]; // Define qué acciones mostrar
 }
 
 const Table: React.FC<TableProps> = ({
@@ -31,6 +34,7 @@ const Table: React.FC<TableProps> = ({
   onView,
   onEdit,
   onDelete,
+  actions = ["view", "edit", "delete"], // Acciones predeterminadas
 }) => {
   const getStatusClass = (status: Status) => {
     switch (status) {
@@ -59,7 +63,9 @@ const Table: React.FC<TableProps> = ({
                 {column.label}
               </th>
             ))}
-            <th className="p-3 font-semibold text-gray-600">Acciones</th>
+            {actions.length > 0 && ( // Solo muestra la columna de acciones si hay acciones definidas
+              <th className="p-3 font-semibold text-gray-600">Acciones</th>
+            )}
           </tr>
         </thead>
         <tbody>
@@ -84,32 +90,40 @@ const Table: React.FC<TableProps> = ({
                     )}
                   </td>
                 ))}
-                <td className="p-3 flex space-x-2">
-                  <button
-                    onClick={() => onView(row.id as number)}
-                    className="text-blue-600 hover:text-blue-800"
-                  >
-                    <FaEye />
-                  </button>
-                  <button
-                    onClick={() => onEdit(row.id as number)}
-                    className="text-yellow-600 hover:text-yellow-800"
-                  >
-                    <FaEdit />
-                  </button>
-                  <button
-                    onClick={() => onDelete(row.id as number)}
-                    className="text-red-600 hover:text-red-800"
-                  >
-                    <FaTrashAlt />
-                  </button>
-                </td>
+                {actions.length > 0 && (
+                  <td className="p-3 flex space-x-2">
+                    {actions.includes("view") && onView && (
+                      <button
+                        onClick={() => onView(row.id as number)}
+                        className="text-blue-600 hover:text-blue-800"
+                      >
+                        <FaEye />
+                      </button>
+                    )}
+                    {actions.includes("edit") && onEdit && (
+                      <button
+                        onClick={() => onEdit(row.id as number)}
+                        className="text-yellow-600 hover:text-yellow-800"
+                      >
+                        <FaEdit />
+                      </button>
+                    )}
+                    {actions.includes("delete") && onDelete && (
+                      <button
+                        onClick={() => onDelete(row.id as number)}
+                        className="text-red-600 hover:text-red-800"
+                      >
+                        <FaTrashAlt />
+                      </button>
+                    )}
+                  </td>
+                )}
               </tr>
             ))
           ) : (
             <tr>
               <td
-                colSpan={columns.length + 1}
+                colSpan={columns.length + (actions.length > 0 ? 1 : 0)}
                 className="p-3 text-center text-gray-500"
               >
                 No se encontraron registros.

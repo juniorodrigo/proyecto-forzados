@@ -1,39 +1,49 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { FaEnvelope, FaLock, FaSignInAlt } from "react-icons/fa";
+import { FaUser, FaLock, FaSignInAlt } from "react-icons/fa";
 
 const Login = () => {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
-  const [errors, setErrors] = useState({ email: "", password: "" });
+  const [errors, setErrors] = useState({ username: "", password: "" });
   const [showPopover, setShowPopover] = useState(false);
 
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+  // Validaciones
+  const validateUsername = (username: string) => {
+    const usernameRegex = /^[A-ZÑ]{10,15}$/;
+    return usernameRegex.test(username);
+  };
+
+  const validatePassword = (password: string) => {
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    return passwordRegex.test(password);
   };
 
   const handleLogin = () => {
-    const newErrors = { email: "", password: "" };
+    const upperUsername = username.toUpperCase(); // Convertir a mayúsculas
+    const newErrors = { username: "", password: "" };
 
-    // Validación de correo
-    if (!email) {
-      newErrors.email = "El correo es obligatorio";
-    } else if (!validateEmail(email)) {
-      newErrors.email = "El correo no es válido";
+    // Validación de usuario
+    if (!upperUsername) {
+      newErrors.username = "El usuario es obligatorio";
+    } else if (!validateUsername(upperUsername)) {
+      newErrors.username =
+        "El usuario debe tener entre 10 y 15 letras mayúsculas";
     }
 
     // Validación de contraseña
     if (!password) {
       newErrors.password = "La contraseña es obligatoria";
+    } else if (!validatePassword(password)) {
+      newErrors.password =
+        "La contraseña debe tener al menos 8 caracteres alfanuméricos";
     }
 
     // Verificar credenciales
-    if (email === "admin@gmail.com" && password === "admin") {
-      setErrors({ email: "", password: "" });
+    if (upperUsername === "ADMINISTRADOR" && password === "admin1234") {
+      setErrors({ username: "", password: "" });
       setShowPopover(true); // Mostrar el popover
 
       // Redirigir después de 2 segundos
@@ -41,15 +51,15 @@ const Login = () => {
         setShowPopover(false);
         router.push("/dashboard");
       }, 2000);
-    } else if (!newErrors.email && !newErrors.password) {
+    } else if (!newErrors.username && !newErrors.password) {
       newErrors.password = "Credenciales incorrectas";
     }
 
     setErrors(newErrors);
-    // Limpiar mensaje de éxito o error después de 2 segundos
-    if (newErrors.password || newErrors.email) {
+    // Limpiar mensajes de error después de 2 segundos
+    if (newErrors.password || newErrors.username) {
       setTimeout(() => {
-        setErrors({ email: "", password: "" });
+        setErrors({ username: "", password: "" });
       }, 2000);
     }
   };
@@ -71,20 +81,19 @@ const Login = () => {
           </h2>
 
           <div className="space-y-6">
-            {/* Campo de Correo */}
+            {/* Campo de Usuario */}
             <div className="relative">
-              <FaEnvelope className="absolute left-4 top-5 text-gray-400" />
+              <FaUser className="absolute left-4 top-5 text-gray-400" />
               <input
-                type="email"
-                placeholder="Correo"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type="text"
+                placeholder="Usuario"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 className="w-full pl-10 pr-6 py-4 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-gray-600"
                 required
-                autoComplete="false"
               />
-              {errors.email && (
-                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+              {errors.username && (
+                <p className="text-red-500 text-sm mt-1">{errors.username}</p>
               )}
             </div>
 
@@ -98,22 +107,10 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full pl-10 pr-6 py-4 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-gray-600"
                 required
-                autoComplete="false"
               />
               {errors.password && (
                 <p className="text-red-500 text-sm mt-1">{errors.password}</p>
               )}
-            </div>
-
-            {/* Checkbox de Recordar sesión */}
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={() => setRememberMe(!rememberMe)}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-              />
-              <label className="text-gray-600">Recordar sesión</label>
             </div>
 
             {/* Popover de éxito */}

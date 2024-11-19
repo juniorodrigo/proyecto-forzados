@@ -8,6 +8,26 @@ import { FaArrowLeft } from "react-icons/fa";
 const ForcedRegistration: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1);
 
+  // Estados para cada paso
+  const [tagPrefijo, setTagPrefijo] = useState("");
+  const [tagCentro, setTagCentro] = useState("");
+  const [tagSubfijo, setTagSubfijo] = useState("");
+  const [descripcion, setDescripcion] = useState("");
+  const [disciplina, setDisciplina] = useState("");
+  const [turno, setTurno] = useState("");
+
+  const [interlockSeguridad, setInterlockSeguridad] = useState("");
+  const [responsable, setResponsable] = useState("");
+  const [riesgo, setRiesgo] = useState("");
+  const [probabilidad, setProbabilidad] = useState("");
+  const [impacto, setImpacto] = useState("");
+  const [solicitante, setSolicitante] = useState("");
+
+  const [aprobador, setAprobador] = useState("");
+  const [ejecutor, setEjecutor] = useState("");
+  const [autorizacion, setAutorizacion] = useState("");
+  const [tipoForzado, setTipoForzado] = useState("");
+
   const steps = [
     { id: 1, title: "Paso 1" },
     { id: 2, title: "Paso 2" },
@@ -25,13 +45,81 @@ const ForcedRegistration: React.FC = () => {
   const renderStep = () => {
     switch (currentStep) {
       case 1:
-        return <StepOne />;
+        return (
+          <StepOne
+            tagPrefijo={tagPrefijo}
+            setTagPrefijo={setTagPrefijo}
+            tagCentro={tagCentro}
+            setTagCentro={setTagCentro}
+            tagSubfijo={tagSubfijo}
+            setTagSubfijo={setTagSubfijo}
+            descripcion={descripcion}
+            setDescripcion={setDescripcion}
+            disciplina={disciplina}
+            setDisciplina={setDisciplina}
+            turno={turno}
+            setTurno={setTurno}
+          />
+        );
       case 2:
-        return <StepTwo />;
+        return (
+          <StepTwo
+            interlockSeguridad={interlockSeguridad}
+            setInterlockSeguridad={setInterlockSeguridad}
+            responsable={responsable}
+            setResponsable={setResponsable}
+            riesgo={riesgo}
+            setRiesgo={setRiesgo}
+            probabilidad={probabilidad}
+            setProbabilidad={setProbabilidad}
+            impacto={impacto}
+            setImpacto={setImpacto}
+            solicitante={solicitante}
+            setSolicitante={setSolicitante}
+          />
+        );
       case 3:
-        return <StepThree />;
+        return (
+          <StepThree
+            aprobador={aprobador}
+            setAprobador={setAprobador}
+            ejecutor={ejecutor}
+            setEjecutor={setEjecutor}
+            autorizacion={autorizacion}
+            setAutorizacion={setAutorizacion}
+            tipoForzado={tipoForzado}
+            setTipoForzado={setTipoForzado}
+          />
+        );
       default:
         return null;
+    }
+  };
+
+  const isStepValid = (step: number) => {
+    switch (step) {
+      case 1:
+        return (
+          tagPrefijo &&
+          tagCentro &&
+          tagSubfijo &&
+          descripcion &&
+          disciplina &&
+          turno
+        );
+      case 2:
+        return (
+          interlockSeguridad &&
+          responsable &&
+          riesgo &&
+          probabilidad &&
+          impacto &&
+          solicitante
+        );
+      case 3:
+        return aprobador && ejecutor && autorizacion && tipoForzado;
+      default:
+        return false;
     }
   };
 
@@ -41,10 +129,8 @@ const ForcedRegistration: React.FC = () => {
         Alta Forzado
       </h1>
 
-      {/* Barra de pasos con retroceso al costado */}
       <div className="flex items-center justify-between mb-8">
         <div className="relative flex-1 flex justify-center items-center">
-          {/* Flecha de retroceso */}
           <button
             onClick={prevStep}
             disabled={currentStep === 1}
@@ -55,28 +141,22 @@ const ForcedRegistration: React.FC = () => {
             <FaArrowLeft className="text-blue-500 text-2xl" />
           </button>
 
-          {/* Paso actual */}
           {steps.map((step, index) => (
             <div
               key={step.id}
               className="flex items-center justify-center relative"
             >
-              {/* Círculo */}
-              <div className="flex items-center justify-center w-14 h-14 rounded-full border-4 transition-all duration-300">
-                <span
-                  className={`text-lg font-medium rounded-full flex items-center justify-center w-full h-full ${
-                    step.id < currentStep
-                      ? "bg-blue-600 text-white border-blue-600"
-                      : step.id === currentStep
-                      ? "bg-blue-500 text-white border-blue-500"
-                      : "bg-gray-200 text-gray-400 border-gray-300"
-                  }`}
-                >
-                  {step.id}
-                </span>
+              <div
+                className={`flex items-center justify-center w-14 h-14 rounded-full border-4 transition-all duration-300 ${
+                  step.id < currentStep
+                    ? "bg-blue-600 text-white border-blue-600"
+                    : step.id === currentStep
+                    ? "bg-blue-500 text-white border-blue-500"
+                    : "bg-gray-200 text-gray-400 border-gray-300"
+                }`}
+              >
+                <span>{step.id}</span>
               </div>
-
-              {/* Línea de separación */}
               {index < steps.length - 1 && (
                 <div
                   className={`w-20 h-1 rounded-full ${
@@ -89,16 +169,14 @@ const ForcedRegistration: React.FC = () => {
         </div>
       </div>
 
-      {/* Formulario del paso actual */}
       <div>{renderStep()}</div>
 
-      {/* Botones de navegación centrados */}
       <div className="flex justify-center mt-10 space-x-6">
         <button
           onClick={nextStep}
-          disabled={currentStep === steps.length}
+          disabled={!isStepValid(currentStep)}
           className={`px-6 py-3 text-white rounded-md flex items-center gap-2 ${
-            currentStep === steps.length
+            !isStepValid(currentStep)
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-blue-500 hover:bg-blue-600"
           }`}
