@@ -1,5 +1,8 @@
 "use client";
 import React, { useState, useMemo } from "react";
+import { format } from "date-fns";
+import { DayPicker, DateRange } from "react-day-picker";
+import "react-day-picker/dist/style.css";
 import Table from "@/components/Table";
 
 type Status =
@@ -10,7 +13,8 @@ type Status =
   | "finalizado";
 
 const Page = () => {
-  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedRange, setSelectedRange] = useState<DateRange | undefined>();
+  const [isPickerOpen, setIsPickerOpen] = useState(false); // Estado para manejar la visibilidad del picker
   const [selectedSolicitante, setSelectedSolicitante] = useState("");
   const [selectedEstado, setSelectedEstado] = useState<Status | "">("");
 
@@ -45,7 +49,7 @@ const Page = () => {
         id: 3,
         nombre: "Proyecto C",
         area: "Finanzas",
-        solicitante: "Carlos Frank ventura",
+        solicitante: "Carlos Frank Ventura",
         estado: "rechazado",
         fecha: "2024-11-16",
       },
@@ -79,7 +83,10 @@ const Page = () => {
 
   const filteredRows = useMemo(() => {
     return rows.filter((row) => {
-      const matchesDate = selectedDate ? row.fecha === selectedDate : true;
+      const rowDate = new Date(row.fecha);
+      const isWithinDateRange =
+        (!selectedRange?.from || rowDate >= selectedRange.from) &&
+        (!selectedRange?.to || rowDate <= selectedRange.to);
       const matchesSolicitante = selectedSolicitante
         ? row.solicitante
             .toLowerCase()
@@ -88,9 +95,10 @@ const Page = () => {
       const matchesEstado = selectedEstado
         ? row.estado === selectedEstado
         : true;
-      return matchesDate && matchesSolicitante && matchesEstado;
+
+      return isWithinDateRange && matchesSolicitante && matchesEstado;
     });
-  }, [rows, selectedDate, selectedSolicitante, selectedEstado]);
+  }, [rows, selectedRange, selectedSolicitante, selectedEstado]);
 
   const handleView = (id: number) => {
     alert(`Ver detalles de ${id}`);
@@ -107,17 +115,39 @@ const Page = () => {
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div>
+        {/* Rango de Fechas */}
+        <div className="relative">
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Fecha
+            Rango de Fechas
           </label>
           <input
-            type="date"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            type="text"
+            readOnly
+            value={
+              selectedRange?.from && selectedRange?.to
+                ? `${format(selectedRange.from, "yyyy-MM-dd")} - ${format(
+                    selectedRange.to,
+                    "yyyy-MM-dd"
+                  )}`
+                : "Seleccione un rango"
+            }
+            onClick={() => setIsPickerOpen((prev) => !prev)}
+            placeholder="Seleccione un rango"
+            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
           />
+          {isPickerOpen && (
+            <div className="absolute z-10 bg-white border border-gray-300 rounded shadow-lg p-2 mt-2">
+              <DayPicker
+                mode="range"
+                selected={selectedRange}
+                onSelect={setSelectedRange}
+                onDayClick={() => setIsPickerOpen(false)} // Cierra el picker al seleccionar una fecha
+              />
+            </div>
+          )}
         </div>
+
+        {/* Solicitante */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Solicitante
@@ -130,6 +160,8 @@ const Page = () => {
             className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
+
+        {/* Estado */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Estado
@@ -149,6 +181,7 @@ const Page = () => {
         </div>
       </div>
 
+      {/* Tabla */}
       <Table
         columns={columns}
         rows={filteredRows}
