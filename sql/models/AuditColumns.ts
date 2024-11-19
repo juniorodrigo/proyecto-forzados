@@ -1,22 +1,7 @@
 import { Column, DataType } from "sequelize-typescript";
 
 export abstract class AuditColumns {
-	@Column({
-		type: DataType.DATE,
-		allowNull: false,
-		defaultValue: DataType.NOW,
-		comment: "Fecha y hora de creación del registro",
-	})
-	createdAt!: Date;
-
-	@Column({
-		type: DataType.DATE,
-		allowNull: false,
-		defaultValue: DataType.NOW,
-		comment: "Fecha y hora de la última actualización",
-	})
-	updatedAt!: Date;
-
+	// Usuario que creó el registro
 	@Column({
 		type: DataType.STRING,
 		allowNull: true,
@@ -24,6 +9,7 @@ export abstract class AuditColumns {
 	})
 	createdBy?: string;
 
+	// Usuario que actualizó el registro
 	@Column({
 		type: DataType.STRING,
 		allowNull: true,

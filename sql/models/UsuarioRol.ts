@@ -1,12 +1,13 @@
-import { Table, Column, Model, ForeignKey, DataType } from "sequelize-typescript";
+import { Table, Column, ForeignKey, DataType } from "sequelize-typescript";
 import { Usuario } from "./Usuario";
 import { Rol } from "./Rol";
+import { BaseModel } from "./BaseModel";
 
 @Table({
 	tableName: "USUARIO_ROL",
-	timestamps: false,
+	timestamps: true,
 })
-export class UsuarioRol extends Model {
+export class UsuarioRol extends BaseModel<UsuarioRol> {
 	@Column({ primaryKey: true, autoIncrement: true })
 	ID_UROL!: number;
 

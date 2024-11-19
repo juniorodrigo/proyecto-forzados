@@ -2,7 +2,7 @@ import { Table, Column, Model, DataType } from "sequelize-typescript";
 
 @Table({
 	tableName: "MATRIZ_RIESGO",
-	timestamps: false,
+	timestamps: true,
 })
 export class MatrizRiesgo extends Model {
 	@Column({ primaryKey: true, autoIncrement: true })

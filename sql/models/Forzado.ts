@@ -4,7 +4,7 @@ import { Usuario } from "./Usuario";
 
 @Table({
 	tableName: "FORZADO",
-	timestamps: false,
+	timestamps: true,
 })
 export class Forzado extends Model {
 	@Column({ primaryKey: true, autoIncrement: true })

@@ -27,4 +27,12 @@ const sequelize = new Sequelize({
 
 sequelize.addModels([Forzado, Adjunto, Usuario, UsuarioRol, Rol, MatrizRiesgo, Area]);
 
+// sequelize.addHook("beforeCreate", (instance: any, options: any) => {
+// 	instance.createdBy = options.user || "system";
+// });
+
+// sequelize.addHook("beforeUpdate", (instance: any, options: any) => {
+// 	instance.updatedBy = options.user || "system";
+// });
+
 export default sequelize;
