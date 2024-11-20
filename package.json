@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@types/sequelize": "^4.28.20",
+    "mssql": "^11.0.1",
     "next": "15.0.3",
     "next-auth": "^4.24.10",
     "react": "19.0.0-rc-66855b96-20241106",
@@ -23,6 +24,7 @@
     "tedious": "^18.6.1"
   },
   "devDependencies": {
+    "@types/mssql": "^9.1.5",
     "@types/node": "^20.17.6",
     "@types/react": "^18",
     "@types/react-date-range": "^1.4.9",
@@ -32,6 +34,7 @@
     "postcss": "^8",
     "sequelize-auto": "^0.8.8",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3"
   }
 }
