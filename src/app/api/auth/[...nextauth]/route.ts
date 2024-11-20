@@ -19,20 +19,27 @@ const handler = NextAuth({
 				const validPassword = "ADMINADMIN1";
 
 				const pool = await poolPromise;
-				const result = await pool.request().query(`SELECT * FROM USUARIO WHERE USERNAME = '${username}'`);
+				const result = await pool.request().query(`SELECT u.*, A.AREA FROM USUARIO as u
+         INNER JOIN AREA A on u.ID_AREA = A.ID_AREA
+         WHERE USERNAME = '${username}'`);
 
-				const saltRounds = 10;
-				const hashedPassword = await bcrypt.hash(password ?? "", saltRounds);
+				if (result.recordset.length === 0) {
+					throw new Error("Invalid username");
+				}
 
 				const registeredHash = result.recordset[0].CONTRASENAHASH;
 
-				if (await bcrypt.compare(hashedPassword ?? "", registeredHash)) {
+				if (await bcrypt.compare(password ?? "", registeredHash)) {
 					console.log("Password match");
-					// return {
-					// 	id: result.recordset[0].ID,
-					// 	name: result.recordset[0].NOMBRE,
-					// 	email: result.recordset[0].CORREO,
-					// };
+					console.log(result.recordset[0]);
+					return {
+						id: result.recordset[0].ID,
+						name: result.recordset[0].NOMBRE,
+						email: result.recordset[0].CORREO,
+						area: result.recordset[0].AREA,
+					};
+				} else {
+					console.log("Password does not match");
 				}
 
 				if (typeof username === "string" && username.toUpperCase() === validUsername && password === validPassword) {

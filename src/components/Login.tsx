@@ -61,7 +61,6 @@ const Login = () => {
 		});
 
 		if (result?.error) {
-			console.log("ENTRÓ A ERROR", result.error);
 			// Mostrar error si las credenciales son incorrectas
 			setErrors({ ...newErrors, password: "Credenciales incorrectas" });
 
@@ -79,7 +78,7 @@ const Login = () => {
 		// Redirigir después de 2 segundos
 		setTimeout(() => {
 			setShowPopover(false);
-			router.push("/dashboard");
+			router.push("/dashboard/consultas");
 		}, 2000);
 	};
 

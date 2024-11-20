@@ -11,6 +11,7 @@
   "dependencies": {
     "@types/sequelize": "^4.28.20",
     "bcrypt": "^5.1.1",
+    "jotai": "^2.10.3",
     "mssql": "^11.0.1",
     "next": "15.0.3",
     "next-auth": "^4.24.10",
