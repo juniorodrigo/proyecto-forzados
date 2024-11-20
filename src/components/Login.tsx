@@ -57,9 +57,11 @@ const Login = () => {
 			redirect: false,
 			username: upperUsername,
 			password,
+			callbackUrl: "/dashboard",
 		});
 
 		if (result?.error) {
+			console.log("ENTRÓ A ERROR", result.error);
 			// Mostrar error si las credenciales son incorrectas
 			setErrors({ ...newErrors, password: "Credenciales incorrectas" });
 

@@ -16,6 +16,8 @@ const handler = NextAuth({
 				const validUsername = "ADMINADMIN";
 				const validPassword = "ADMINADMIN1";
 
+				console.log("credentials", credentials);
+
 				if (typeof username === "string" && username.toUpperCase() === validUsername && password === validPassword) {
 					return {
 						id: "1",
