@@ -1,5 +1,7 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { poolPromise } from "@sql/lib/db";
+import bcrypt from "bcrypt";
 
 const handler = NextAuth({
 	providers: [
@@ -16,7 +18,22 @@ const handler = NextAuth({
 				const validUsername = "ADMINADMIN";
 				const validPassword = "ADMINADMIN1";
 
-				console.log("credentials", credentials);
+				const pool = await poolPromise;
+				const result = await pool.request().query(`SELECT * FROM USUARIO WHERE USERNAME = '${username}'`);
+
+				const saltRounds = 10;
+				const hashedPassword = await bcrypt.hash(password ?? "", saltRounds);
+
+				const registeredHash = result.recordset[0].CONTRASENAHASH;
+
+				if (await bcrypt.compare(hashedPassword ?? "", registeredHash)) {
+					console.log("Password match");
+					// return {
+					// 	id: result.recordset[0].ID,
+					// 	name: result.recordset[0].NOMBRE,
+					// 	email: result.recordset[0].CORREO,
+					// };
+				}
 
 				if (typeof username === "string" && username.toUpperCase() === validUsername && password === validPassword) {
 					return {
