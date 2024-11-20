@@ -55,6 +55,10 @@ const ForcedRegistration: React.FC = () => {
 
 			setRows([...rows, newRow]);
 
+			// Save to local storage
+			const storedRows = JSON.parse(localStorage.getItem("rows") || "[]");
+			localStorage.setItem("rows", JSON.stringify([...storedRows, newRow]));
+
 			setTimeout(() => {
 				alert("Solicitud realizada con éxito");
 				router.push("/dashboard/consultas");

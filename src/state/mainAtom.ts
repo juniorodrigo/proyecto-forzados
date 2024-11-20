@@ -10,7 +10,7 @@ export interface Row {
 	fecha: string;
 }
 
-export const rowsAtom = atom<Row[]>([
+const initialRows: Row[] = [
 	{
 		id: 1,
 		nombre: "Solicitud 1",
@@ -59,4 +59,8 @@ export const rowsAtom = atom<Row[]>([
 		estado: "pendiente",
 		fecha: "2024-11-19",
 	},
-]);
+];
+
+const storedRows = JSON.parse(localStorage.getItem("rows") || "[]");
+
+export const rowsAtom = atom<Row[]>([...initialRows, ...storedRows]);
