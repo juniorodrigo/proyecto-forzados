@@ -4,12 +4,8 @@ import StepThree from "@/components/StepThree";
 import StepTwo from "@/components/StepTwo";
 import React, { useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
-import { useAtom } from "jotai";
-import { rowsAtom } from "@/state/mainAtom";
-import { useRouter } from "next/navigation";
 
 const ForcedRegistration: React.FC = () => {
-	const router = useRouter();
 	const [currentStep, setCurrentStep] = useState(1);
 
 	// Estados para cada paso
@@ -38,32 +34,8 @@ const ForcedRegistration: React.FC = () => {
 		{ id: 3, title: "Paso 3" },
 	];
 
-	const [rows, setRows] = useAtom(rowsAtom);
-
 	const nextStep = () => {
-		if (currentStep < steps.length) {
-			setCurrentStep(currentStep + 1);
-		} else {
-			const newRow = {
-				id: rows.length + 1,
-				nombre: `${tagPrefijo}-${tagCentro}-${tagSubfijo}`,
-				area: disciplina,
-				solicitante: solicitante,
-				estado: "pendiente",
-				fecha: new Date().toISOString().split("T")[0],
-			};
-
-			setRows([...rows, newRow]);
-
-			// Save to local storage
-			const storedRows = JSON.parse(localStorage.getItem("rows") || "[]");
-			localStorage.setItem("rows", JSON.stringify([...storedRows, newRow]));
-
-			setTimeout(() => {
-				alert("Solicitud realizada con éxito");
-				router.push("/dashboard/consultas");
-			}, 2000);
-		}
+		if (currentStep < steps.length) setCurrentStep(currentStep + 1);
 	};
 
 	const prevStep = () => {
@@ -171,7 +143,7 @@ const ForcedRegistration: React.FC = () => {
 					className={`px-6 py-3 text-white rounded-md flex items-center gap-2 ${!isStepValid(currentStep) ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"}`}
 				>
 					{currentStep === steps.length ? (
-						<span>Realizar solicitud</span>
+						<span>Aprobar</span>
 					) : (
 						<>
 							Continuar

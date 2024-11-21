@@ -11,7 +11,7 @@ export const config = {
 	// restricted routes
 	matcher: [
 		"/",
-		"/dashboard/:path*",
+		// "/dashboard/:path*",
 		// "/financial",
 		// "/analytics",
 		// "/logistics/:path*",

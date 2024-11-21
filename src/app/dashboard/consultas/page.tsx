@@ -4,34 +4,14 @@ import { format } from "date-fns";
 import { DayPicker, DateRange } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import Table from "@/components/Table";
-import { useAtom } from "jotai";
-import { rowsAtom } from "@/state/mainAtom";
 
 type Status = "rechazado" | "pendiente" | "aprobado" | "ejecutado" | "finalizado";
 
 const Page = () => {
 	const [selectedRange, setSelectedRange] = useState<DateRange | undefined>();
-	const [isPickerOpen, setIsPickerOpen] = useState(false); // Estado para manejar la visibilidad del picker
+	const [isPickerOpen, setIsPickerOpen] = useState(false);
 	const [selectedSolicitante, setSelectedSolicitante] = useState("");
 	const [selectedEstado, setSelectedEstado] = useState<Status | "">("");
-
-	// useEffect(() => {
-	// 	// Llamada a la API para obtener los datos
-	// 	const fetchData = async () => {
-	// 		try {
-	// 			const response = await fetch("/api/solicitudes/alta", {
-	// 				method: "GET",
-	// 			});
-	// 			const data = await response.json();
-	// 			console.log(data, "Esta es información de prueba");
-	// 			// setRows(data);
-	// 		} catch (error) {
-	// 			console.error("Error fetching data:", error);
-	// 		}
-	// 	};
-
-	// 	fetchData();
-	// }, []);
 
 	const columns = [
 		{ key: "id", label: "ID" },
@@ -42,7 +22,17 @@ const Page = () => {
 		{ key: "fecha", label: "Fecha" },
 	];
 
-	const [rows] = useAtom(rowsAtom);
+	const rows = useMemo(
+		() => [
+			{ id: 1, nombre: "Proyecto A", area: "Desarrollo", solicitante: "Juan Carlos Carranza", estado: "aprobado", fecha: "2024-11-14" },
+			{ id: 2, nombre: "Proyecto B", area: "Marketing", solicitante: "Ana Karina Rodriguez", estado: "pendiente", fecha: "2024-11-15" },
+			{ id: 3, nombre: "Proyecto C", area: "Finanzas", solicitante: "Carlos Frank Ventura", estado: "rechazado", fecha: "2024-11-16" },
+			{ id: 4, nombre: "Proyecto D", area: "Recursos Humanos", solicitante: "Laura Stephany Loyola", estado: "ejecutado", fecha: "2024-11-17" },
+			{ id: 5, nombre: "Proyecto E", area: "IT", solicitante: "Pedro Suarez Vertiz", estado: "finalizado", fecha: "2024-11-18" },
+			{ id: 6, nombre: "Proyecto F", area: "Ventas", solicitante: "María Pia Copelo", estado: "pendiente", fecha: "2024-11-19" },
+		],
+		[]
+	);
 
 	const filteredRows = useMemo(() => {
 		return rows.filter((row) => {
@@ -55,15 +45,6 @@ const Page = () => {
 		});
 	}, [rows, selectedRange, selectedSolicitante, selectedEstado]);
 
-	const mappedRows = filteredRows.map((row) => ({
-		id: row.id,
-		nombre: row.nombre,
-		area: row.area,
-		solicitante: row.solicitante,
-		estado: row.estado,
-		fecha: row.fecha,
-	}));
-
 	const handleView = (id: number) => {
 		alert(`Ver detalles de ${id}`);
 	};
@@ -74,6 +55,12 @@ const Page = () => {
 
 	const handleDelete = (id: number) => {
 		alert(`Eliminar ${id}`);
+	};
+
+	const handleClearFilters = () => {
+		setSelectedRange(undefined);
+		setSelectedSolicitante("");
+		setSelectedEstado("");
 	};
 
 	return (
@@ -92,12 +79,7 @@ const Page = () => {
 					/>
 					{isPickerOpen && (
 						<div className="absolute z-10 bg-white border border-gray-300 rounded shadow-lg p-2 mt-2">
-							<DayPicker
-								mode="range"
-								selected={selectedRange}
-								onSelect={setSelectedRange}
-								onDayClick={() => setIsPickerOpen(false)} // Cierra el picker al seleccionar una fecha
-							/>
+							<DayPicker mode="range" selected={selectedRange} onSelect={setSelectedRange} onDayClick={() => setIsPickerOpen(false)} />
 						</div>
 					)}
 				</div>
@@ -132,8 +114,15 @@ const Page = () => {
 				</div>
 			</div>
 
+			{/* Botón para limpiar filtros */}
+			<div className="mb-6">
+				<button onClick={handleClearFilters} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none">
+					Limpiar Filtros
+				</button>
+			</div>
+
 			{/* Tabla */}
-			<Table columns={columns} rows={mappedRows} onView={handleView} onEdit={handleEdit} onDelete={handleDelete} />
+			<Table columns={columns} rows={filteredRows} onView={handleView} onEdit={handleEdit} onDelete={handleDelete} />
 		</div>
 	);
 };

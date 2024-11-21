@@ -11,7 +11,7 @@
   "dependencies": {
     "@types/sequelize": "^4.28.20",
     "bcrypt": "^5.1.1",
-    "jotai": "^2.10.3",
+    "date-fns": "^4.1.0",
     "mssql": "^11.0.1",
     "next": "15.0.3",
     "next-auth": "^4.24.10",
@@ -29,14 +29,14 @@
     "@types/bcrypt": "^5.0.2",
     "@types/mssql": "^9.1.5",
     "@types/node": "^20.17.6",
-    "@types/react": "^18",
+    "@types/react": "^18.3.12",
     "@types/react-date-range": "^1.4.9",
-    "@types/react-dom": "^18",
-    "eslint": "^8",
+    "@types/react-dom": "^18.3.1",
+    "eslint": "^8.57.1",
     "eslint-config-next": "15.0.3",
-    "postcss": "^8",
+    "postcss": "^8.4.49",
     "sequelize-auto": "^0.8.8",
-    "tailwindcss": "^3.4.1",
+    "tailwindcss": "^3.4.15",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.3"
   }
