@@ -65,9 +65,10 @@ const Page = () => {
 
 	return (
 		<div className="p-6 bg-gray-50 min-h-screen">
-			<div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+			{/* Contenedor de filtros y botón */}
+			<div className="flex flex-wrap items-end gap-4 mb-6">
 				{/* Rango de Fechas */}
-				<div className="relative">
+				<div className="flex-1 min-w-[200px]">
 					<label className="block text-sm font-medium text-gray-700 mb-1">Rango de Fechas</label>
 					<input
 						type="text"
@@ -85,7 +86,7 @@ const Page = () => {
 				</div>
 
 				{/* Solicitante */}
-				<div>
+				<div className="flex-1 min-w-[200px]">
 					<label className="block text-sm font-medium text-gray-700 mb-1">Solicitante</label>
 					<input
 						type="text"
@@ -97,7 +98,7 @@ const Page = () => {
 				</div>
 
 				{/* Estado */}
-				<div>
+				<div className="flex-1 min-w-[200px]">
 					<label className="block text-sm font-medium text-gray-700 mb-1">Estado</label>
 					<select
 						value={selectedEstado}
@@ -112,13 +113,13 @@ const Page = () => {
 						<option value="finalizado">Finalizado</option>
 					</select>
 				</div>
-			</div>
 
-			{/* Botón para limpiar filtros */}
-			<div className="mb-6">
-				<button onClick={handleClearFilters} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none">
-					Limpiar Filtros
-				</button>
+				{/* Botón para limpiar filtros */}
+				<div className="max-w-[140px]">
+					<button onClick={handleClearFilters} className="w-full px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none">
+						Limpiar Filtros
+					</button>
+				</div>
 			</div>
 
 			{/* Tabla */}
