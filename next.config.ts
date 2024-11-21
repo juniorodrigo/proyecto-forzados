@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
 		return [
 			{
 				source: "/",
-				destination: "/dashboard", // Cambia por la ruta deseada
+				destination: "/dashboard/consultas", // Cambia por la ruta deseada
 				permanent: true, // `true` para redirección 301, `false` para 302
 			},
 		];

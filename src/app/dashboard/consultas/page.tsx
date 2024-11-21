@@ -9,7 +9,7 @@ type Status = "rechazado" | "pendiente" | "aprobado" | "ejecutado" | "finalizado
 
 const Page = () => {
 	const [selectedRange, setSelectedRange] = useState<DateRange | undefined>();
-	const [isPickerOpen, setIsPickerOpen] = useState(false); // Estado para manejar la visibilidad del picker
+	const [isPickerOpen, setIsPickerOpen] = useState(false);
 	const [selectedSolicitante, setSelectedSolicitante] = useState("");
 	const [selectedEstado, setSelectedEstado] = useState<Status | "">("");
 
@@ -24,54 +24,12 @@ const Page = () => {
 
 	const rows = useMemo(
 		() => [
-			{
-				id: 1,
-				nombre: "Proyecto A",
-				area: "Desarrollo",
-				solicitante: "Juan Carlos Carranza",
-				estado: "aprobado",
-				fecha: "2024-11-14",
-			},
-			{
-				id: 2,
-				nombre: "Proyecto B",
-				area: "Marketing",
-				solicitante: "Ana Karina Rodriguez",
-				estado: "pendiente",
-				fecha: "2024-11-15",
-			},
-			{
-				id: 3,
-				nombre: "Proyecto C",
-				area: "Finanzas",
-				solicitante: "Carlos Frank Ventura",
-				estado: "rechazado",
-				fecha: "2024-11-16",
-			},
-			{
-				id: 4,
-				nombre: "Proyecto D",
-				area: "Recursos Humanos",
-				solicitante: "Laura Stephany Loyola",
-				estado: "ejecutado",
-				fecha: "2024-11-17",
-			},
-			{
-				id: 5,
-				nombre: "Proyecto E",
-				area: "IT",
-				solicitante: "Pedro Suarez Vertiz",
-				estado: "finalizado",
-				fecha: "2024-11-18",
-			},
-			{
-				id: 6,
-				nombre: "Proyecto F",
-				area: "Ventas",
-				solicitante: "María Pia Copelo",
-				estado: "pendiente",
-				fecha: "2024-11-19",
-			},
+			{ id: 1, nombre: "Proyecto A", area: "Desarrollo", solicitante: "Juan Carlos Carranza", estado: "aprobado", fecha: "2024-11-14" },
+			{ id: 2, nombre: "Proyecto B", area: "Marketing", solicitante: "Ana Karina Rodriguez", estado: "pendiente", fecha: "2024-11-15" },
+			{ id: 3, nombre: "Proyecto C", area: "Finanzas", solicitante: "Carlos Frank Ventura", estado: "rechazado", fecha: "2024-11-16" },
+			{ id: 4, nombre: "Proyecto D", area: "Recursos Humanos", solicitante: "Laura Stephany Loyola", estado: "ejecutado", fecha: "2024-11-17" },
+			{ id: 5, nombre: "Proyecto E", area: "IT", solicitante: "Pedro Suarez Vertiz", estado: "finalizado", fecha: "2024-11-18" },
+			{ id: 6, nombre: "Proyecto F", area: "Ventas", solicitante: "María Pia Copelo", estado: "pendiente", fecha: "2024-11-19" },
 		],
 		[]
 	);
@@ -121,12 +79,7 @@ const Page = () => {
 					/>
 					{isPickerOpen && (
 						<div className="absolute z-10 bg-white border border-gray-300 rounded shadow-lg p-2 mt-2">
-							<DayPicker
-								mode="range"
-								selected={selectedRange}
-								onSelect={setSelectedRange}
-								onDayClick={() => setIsPickerOpen(false)} // Cierra el picker al seleccionar una fecha
-							/>
+							<DayPicker mode="range" selected={selectedRange} onSelect={setSelectedRange} onDayClick={() => setIsPickerOpen(false)} />
 						</div>
 					)}
 				</div>
@@ -160,6 +113,7 @@ const Page = () => {
 					</select>
 				</div>
 			</div>
+
 			{/* Botón para limpiar filtros */}
 			<div className="mb-6">
 				<button onClick={handleClearFilters} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none">
