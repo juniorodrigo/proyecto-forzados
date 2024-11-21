@@ -39,6 +39,12 @@ const Sidebar: React.FC = () => {
 				href: "/dashboard/generar-alta",
 			},
 			{
+				id: "generar-baja",
+				label: "Generar Baja",
+				icon: <RiBriefcaseLine className="text-xl mr-3" />,
+				href: "/dashboard/generar-baja",
+			},
+			{
 				id: "administrar-usuario",
 				label: "Administrar Usuario",
 				icon: <RiDashboardLine className="text-xl mr-3" />,
