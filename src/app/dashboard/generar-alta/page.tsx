@@ -4,6 +4,7 @@ import StepThree from "@/components/StepThree";
 import StepTwo from "@/components/StepTwo";
 import React, { useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 
 const ForcedRegistration: React.FC = () => {
 	const [currentStep, setCurrentStep] = useState(1);
@@ -28,6 +29,8 @@ const ForcedRegistration: React.FC = () => {
 	const [autorizacion, setAutorizacion] = useState("");
 	const [tipoForzado, setTipoForzado] = useState("");
 
+	const router = useRouter();
+
 	const steps = [
 		{ id: 1, title: "Paso 1" },
 		{ id: 2, title: "Paso 2" },
@@ -36,6 +39,46 @@ const ForcedRegistration: React.FC = () => {
 
 	const nextStep = () => {
 		if (currentStep < steps.length) setCurrentStep(currentStep + 1);
+		else {
+			console.log("ETAPA FINAL");
+			fetch("/api/solicitudes/alta", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					tagPrefijo,
+					tagCentro,
+					tagSubfijo,
+					descripcion,
+					disciplina,
+					turno,
+					interlockSeguridad,
+					responsable,
+					riesgo,
+					probabilidad,
+					impacto,
+					solicitante,
+					aprobador,
+					ejecutor,
+					autorizacion,
+					tipoForzado,
+				}),
+			})
+				.then((response) => response.json())
+				.then((data) => {
+					if (data.success) {
+						alert("Solicitud enviada exitosamente");
+						router.push("/dashboard/consultas");
+					} else {
+						alert("Error al enviar la solicitud");
+					}
+				})
+				.catch((error) => {
+					console.error("Error:", error);
+					alert("Error al enviar la solicitud");
+				});
+		}
 	};
 
 	const prevStep = () => {
