@@ -404,15 +404,16 @@ create table RESPONSABLE (
 )
 go
 
-create table RIESGO (
+create table RIESGO_A (
    RIESGO_ID            int                  identity,
    DESCRIPCION          varchar(30)          null,
-   constraint PK_RIESGO primary key (RIESGO_ID)
+   constraint PK_RIESGO_A primary key (RIESGO_ID)
 )
 go
 
 create table SUB_AREA (
    SUBAREA_ID           int                  identity,
+   CODIGO               varchar(30)         null,
    DESCRIPCION          varchar(30)         null,
    constraint PK_SUB_AREA primary key (SUBAREA_ID)
 )
@@ -420,6 +421,7 @@ go
 
 create table TAG_CENTRO (
    TAGCENTRO_ID         int                  identity,
+   CODIGO               varchar(30)         null,
    DESCRIPCION          varchar(30)         null,
    constraint PK_TAG_CENTRO primary key (TAGCENTRO_ID)
 )
@@ -466,20 +468,27 @@ go
 /*==============================================================*/
 -- INSERCIÓN DE DATOS
 
-insert into DISCIPLINA (DESCRIPCION) values ('Disciplina 1')
+insert into DISCIPLINA (DESCRIPCION) values ('comisionamiento'),
+('dcs'),
+('eléctrica'),
+('instrumentación'),
+('mantenimiento'),
+('mecánica'),
+('metalurgia'),
+('operaciones')
 go
 
-insert into IMPACTO (DESCRIPCION) values ('Impacto 1')
+insert into IMPACTO (DESCRIPCION) values ('insignificante'),('menor'),('moderado'),('mayor'), ('extremo')
 go
 
-insert into MAE_AREA (DESCRIPCION, ESTADO, USUARIO__CREACION, FECHA_CREACION, USUARIO_MODIFICACION, FECHA_MODIFICACION) 
+insert into MAE_AREA (DESCRIPCION, ESTADO, USUARIO__CREACION, FECHA_CREACION, USUARIO_MODIFICACION, FECHA_MODIFICACION)
 values ('Area 1', 1, 'user1', getdate(), 'user2', getdate())
 go
 
 insert into MAE_OPCIONES (DESCRIPCION, ESTADO) values ('Opcion 1', 1)
 go
 
-insert into MAE_PERMISO (ROL_ID, OPCIONES_ID, CREAR, EDITAR, CONSULTAR, ESTADO) 
+insert into MAE_PERMISO (ROL_ID, OPCIONES_ID, CREAR, EDITAR, CONSULTAR, ESTADO)
 values (1, 1, 1, 1, 1, 1)
 go
 
@@ -489,32 +498,32 @@ go
 insert into MAE_RIESGO_A (DESCRIPCION) values ('Riesgo A 1')
 go
 
-insert into MAE_ROL (DESCRIPCION, ESTADO, FECHA_CREACION, USUARIO_CREACION, USUARIO_MODIFICACION, FECHA__MODIFICACION) 
+insert into MAE_ROL (DESCRIPCION, ESTADO, FECHA_CREACION, USUARIO_CREACION, USUARIO_MODIFICACION, FECHA__MODIFICACION)
 values ('Rol 1', 1, getdate(), 'user1', 'user2', getdate())
 go
 
-insert into MAE_USUARIO (AREA_ID, PUESTO_ID, USUARIO, PASSWORD, NOMBRE, APEPATERNO, APEMATERNO, CORREO, ESTADO, USUARIO_CREACION, FECHA_CREACION, USUARIO_MODIFICACION, FECHA_MODIFICACION) 
+insert into MAE_USUARIO (AREA_ID, PUESTO_ID, USUARIO, PASSWORD, NOMBRE, APEPATERNO, APEMATERNO, CORREO, ESTADO, USUARIO_CREACION, FECHA_CREACION, USUARIO_MODIFICACION, FECHA_MODIFICACION)
 values (1, 1, 'usuario1', 'pass1234', 'Nombre 1', 'Apellido Paterno', 'Apellido Materno', 'correo@example.com', 1, 'user1', getdate(), 'user2', getdate())
 go
 
-insert into MAE_USUARIO_ROL (USUARIO_ID, ROL_ID, SOLICITUD_ID) 
+insert into MAE_USUARIO_ROL (USUARIO_ID, ROL_ID, SOLICITUD_ID)
 values (1, 1, 1)
 go
 
-insert into MATRIZ_RIESGO (IMPACTO_ID, RIESGO_ID, PROBABILIDAD_ID, NIVEL) 
+insert into MATRIZ_RIESGO (IMPACTO_ID, RIESGO_ID, PROBABILIDAD_ID, NIVEL)
 values (1, 1, 1, 1)
 go
 
 insert into MOTIVO_RECHAZO (DESCRIPCION) values ('Motivo Rechazo 1')
 go
 
-insert into PROBABILIDAD (DESCRIPCION) values ('Probabilidad 1')
+insert into PROBABILIDAD (DESCRIPCION) values ('raro'), ('improbable'), ('posible'), ('probable'), ('casi seguro')
 go
 
-insert into RESPONSABLE (NOMBRE) values ('Responsable 1')
+insert into RESPONSABLE (NOMBRE) values ('gerencia asset. performance'), ('gerencia planta')
 go
 
-insert into RIESGO (DESCRIPCION) values ('Riesgo 1')
+insert into RIESGO (DESCRIPCION) values ('equipos'), ('personas'), ('procesos')
 go
 
 insert into SUB_AREA (DESCRIPCION) values ('Sub Area 1')
@@ -523,14 +532,14 @@ go
 insert into TAG_CENTRO (DESCRIPCION) values ('Tag Centro 1')
 go
 
-insert into TIPO_FORZADO (DESCRIPCION) values ('Tipo Forzado 1')
+insert into TIPO_FORZADO (DESCRIPCION) values ('hardware'), ('logico')
 go
 
-insert into TRS_SOLICITUD_FORZADO (SUBAREA_ID, DISCIPLINA_ID, TURNO_ID, MOTIVORECHAZO_ID, TIPOFORZADO_ID, TAGCENTRO_ID, RESPONSABLE_ID, RIESGOA_ID, TIPOSOLICITUD, INTERLOCK, DESCRIPCIONFORZADO, ESTADOSOLICITUD, FECHAREALIZACION, FECHACIERRE, USUARIO_CREACION, FECHA_CREACION, USUARIO_MODIFICACION, FECHA_MODIFICACION) 
+insert into TRS_SOLICITUD_FORZADO (SUBAREA_ID, DISCIPLINA_ID, TURNO_ID, MOTIVORECHAZO_ID, TIPOFORZADO_ID, TAGCENTRO_ID, RESPONSABLE_ID, RIESGOA_ID, TIPOSOLICITUD, INTERLOCK, DESCRIPCIONFORZADO, ESTADOSOLICITUD, FECHAREALIZACION, FECHACIERRE, USUARIO_CREACION, FECHA_CREACION, USUARIO_MODIFICACION, FECHA_MODIFICACION)
 values (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 'Descripcion Forzado 1', 1, getdate(), getdate(), 'user1', getdate(), 'user2', getdate())
 go
 
-insert into TURNO (DESCRIPCION) values ('Turno 1')
+insert into TURNO (DESCRIPCION) values ('a'), ('b')
 go
 
 /*==============================================================*/

@@ -23,6 +23,28 @@ const Page = () => {
 		}
 
 		if (modalType === "create") {
+			console.log(newRecord.categoria.toLowerCase(), "___________________________");
+
+			// TODO: Evaluar la integridad del nombre de categoría para no vulnerar las apis existentes
+			fetch(`/api/maestras/${newRecord.categoria.toLowerCase()}`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					// codigo: newRecord.codigo,
+					descripcion: newRecord.descripcion,
+				}),
+			})
+				.then((response) => response.json())
+				.then((data) => {
+					console.log("Success:", data);
+				})
+				.catch((error) => {
+					console.error("Error:", error);
+				});
+
+			// XDDDDDDDDDDDDDDDDDDDDDDDDDD
 			setData((prevData) => ({
 				...prevData,
 				[newRecord.categoria]: [...prevData[newRecord.categoria], { id: Math.random(), codigo: newRecord.codigo, descripcion: newRecord.descripcion }],
