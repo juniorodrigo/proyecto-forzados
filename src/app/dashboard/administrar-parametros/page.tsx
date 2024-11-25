@@ -1,17 +1,25 @@
 "use client";
 import Table from "@/components/Table";
+import Popover from "@/components/Popover";
 import React, { useState, useEffect } from "react";
 
 const Page = () => {
-	const categories = ["Disciplina", "Turno", "Responsable", "Riesgo-a", "Tipo-forzado", "Impacto"];
+	const categories = [
+		{ label: "Disciplina", value: "disciplina", needsCode: true },
+		{ label: "Turno", value: "turno", needsCode: false },
+		{ label: "Responsable", value: "responsable", needsCode: false },
+		{ label: "Riesgo", value: "riesgo-a", needsCode: true },
+		{ label: "Tipo de forzado", value: "tipo-forzado", needsCode: true },
+		{ label: "Impacto", value: "impacto", needsCode: false },
+	];
 	const [selectedCategory, setSelectedCategory] = useState("");
 	const [data, setData] = useState<Record<string, { id: number; codigo: string; descripcion: string }[]>>({
-		Disciplina: [],
-		Turno: [],
-		Responsable: [],
-		Riesgo: [],
-		"Tipo-forzado": [],
-		Impacto: [],
+		disciplina: [],
+		turno: [],
+		responsable: [],
+		riesgo: [],
+		"tipo-forzado": [],
+		impacto: [],
 	});
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [modalType, setModalType] = useState<"create" | "edit">("create");
@@ -23,7 +31,7 @@ const Page = () => {
 
 	const fetchData = async (category: string) => {
 		try {
-			const response = await fetch(`/api/maestras/${category.toLowerCase()}`);
+			const response = await fetch(`/api/maestras/${category}`);
 			const result = await response.json();
 			const normalizedData = result.values.map((item: { id: number; descripcion?: string; nombre?: string }) => ({
 				id: item.id,
@@ -159,14 +167,16 @@ const Page = () => {
 		}
 	};
 
+	const selectedCategoryObject = categories.find((category) => category.value === selectedCategory);
+
 	return (
 		<div className="p-4">
 			<div className="mb-4 flex items-center space-x-4 justify-between">
 				<select className="p-2 border rounded-lg w-1/3" value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
 					<option value="">Seleccionar categoría</option>
 					{categories.map((category) => (
-						<option key={category} value={category}>
-							{category}
+						<option key={category.value} value={category.value}>
+							{category.label}
 						</option>
 					))}
 				</select>
@@ -203,10 +213,12 @@ const Page = () => {
 				<div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
 					<div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
 						<h2 className="text-lg font-semibold mb-4">{modalType === "create" ? "Crear nuevo registro" : "Editar registro"}</h2>
-						<div className="mb-4">
-							<label className="block text-sm font-medium mb-2">Código</label>
-							<input type="text" className="w-full p-2 border rounded-lg" value={newRecord.codigo} onChange={(e) => setNewRecord({ ...newRecord, codigo: e.target.value })} />
-						</div>
+						{selectedCategoryObject?.needsCode && (
+							<div className="mb-4">
+								<label className="block text-sm font-medium mb-2">Código</label>
+								<input type="text" className="w-full p-2 border rounded-lg" value={newRecord.codigo} onChange={(e) => setNewRecord({ ...newRecord, codigo: e.target.value })} />
+							</div>
+						)}
 						<div className="mb-4">
 							<label className="block text-sm font-medium mb-2">Descripción</label>
 							<input type="text" className="w-full p-2 border rounded-lg" value={newRecord.descripcion} onChange={(e) => setNewRecord({ ...newRecord, descripcion: e.target.value })} />
@@ -217,8 +229,8 @@ const Page = () => {
 								<select className="w-full p-2 border rounded-lg" value={newRecord.categoria} onChange={(e) => setNewRecord({ ...newRecord, categoria: e.target.value })}>
 									<option value="">Seleccionar categoría</option>
 									{categories.map((category) => (
-										<option key={category} value={category}>
-											{category}
+										<option key={category.value} value={category.value}>
+											{category.label}
 										</option>
 									))}
 								</select>
@@ -236,16 +248,7 @@ const Page = () => {
 				</div>
 			)}
 
-			{showPopover && (
-				<div
-					className={`fixed top-10 left-1/2 transform -translate-x-1/2 transition-transform ${popoverType === "success" ? "bg-green-500" : "bg-red-500"}`}
-					style={{
-						transition: "transform 0.5s ease-out",
-					}}
-				>
-					<div className="text-white text-center py-2 px-4 rounded-lg shadow-lg">{popoverMessage}</div>
-				</div>
-			)}
+			{showPopover && <Popover message={popoverMessage} type={popoverType} show={showPopover} />}
 		</div>
 	);
 };
