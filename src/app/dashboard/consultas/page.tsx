@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useMemo } from "react";
-import { format } from "date-fns";
-import { DayPicker, DateRange } from "react-day-picker";
+import { DateRange } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import Table from "@/components/Table";
 
@@ -18,7 +17,6 @@ interface Row {
 
 const Page = () => {
 	const [selectedRange, setSelectedRange] = useState<DateRange | undefined>();
-	const [isPickerOpen, setIsPickerOpen] = useState(false);
 	const [selectedSolicitante, setSelectedSolicitante] = useState("");
 	const [selectedEstado, setSelectedEstado] = useState<Status | "">("");
 	const [isModalOpen, setIsModalOpen] = useState(false);
@@ -29,8 +27,8 @@ const Page = () => {
 		{ key: "nombre", label: "Nombre" },
 		{ key: "area", label: "Área" },
 		{ key: "solicitante", label: "Solicitante" },
-		{ key: "estado", label: "Estado" },
-		{ key: "fecha", label: "Fecha" },
+		{ key: "estado", label: "Estado", filterable: true },
+		{ key: "fecha", label: "Fecha", filterable: true },
 	];
 
 	const rows = useMemo(
@@ -55,6 +53,15 @@ const Page = () => {
 			return isWithinDateRange && matchesSolicitante && matchesEstado;
 		});
 	}, [rows, selectedRange, selectedSolicitante, selectedEstado]);
+
+	const handleFilterChange = (key: string, value: string) => {
+		if (key === "fecha") {
+			const date = value ? new Date(value) : undefined;
+			setSelectedRange({ from: date, to: date });
+		} else if (key === "estado") {
+			setSelectedEstado(value as Status);
+		}
+	};
 
 	const handleView = (id: number) => {
 		const row = rows.find((row) => row.id === id); // Encuentra la fila seleccionada
@@ -87,26 +94,8 @@ const Page = () => {
 		<div className="p-6 bg-gray-50 min-h-screen">
 			{/* Contenedor de filtros y botón */}
 			<div className="flex flex-wrap items-end gap-4 mb-6">
-				{/* Rango de Fechas */}
-				<div className="flex-1 min-w-[200px]">
-					<label className="block text-sm font-medium text-gray-700 mb-1">Rango de Fechas</label>
-					<input
-						type="text"
-						readOnly
-						value={selectedRange?.from && selectedRange?.to ? `${format(selectedRange.from, "yyyy-MM-dd")} - ${format(selectedRange.to, "yyyy-MM-dd")}` : "Seleccione un rango"}
-						onClick={() => setIsPickerOpen((prev) => !prev)}
-						placeholder="Seleccione un rango"
-						className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
-					/>
-					{isPickerOpen && (
-						<div className="absolute z-10 bg-white border border-gray-300 rounded shadow-lg p-2 mt-2">
-							<DayPicker mode="range" selected={selectedRange} onSelect={setSelectedRange} onDayClick={() => setIsPickerOpen(false)} />
-						</div>
-					)}
-				</div>
-
 				{/* Solicitante */}
-				<div className="flex-1 min-w-[200px]">
+				<div className="flex-1 max-w-[300px]">
 					<label className="block text-sm font-medium text-gray-700 mb-1">Solicitante</label>
 					<input
 						type="text"
@@ -115,23 +104,6 @@ const Page = () => {
 						placeholder="Nombre del solicitante"
 						className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
 					/>
-				</div>
-
-				{/* Estado */}
-				<div className="flex-1 min-w-[200px]">
-					<label className="block text-sm font-medium text-gray-700 mb-1">Estado</label>
-					<select
-						value={selectedEstado}
-						onChange={(e) => setSelectedEstado(e.target.value as Status)}
-						className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-					>
-						<option value="">Todos</option>
-						<option value="rechazado">Rechazado</option>
-						<option value="pendiente">Pendiente</option>
-						<option value="aprobado">Aprobado</option>
-						<option value="ejecutado">Ejecutado</option>
-						<option value="finalizado">Finalizado</option>
-					</select>
 				</div>
 
 				{/* Botón para limpiar filtros */}
@@ -143,7 +115,7 @@ const Page = () => {
 			</div>
 
 			{/* Tabla */}
-			<Table columns={columns} rows={filteredRows} onView={handleView} onEdit={handleEdit} onDelete={handleDelete} />
+			<Table columns={columns} rows={filteredRows} onView={handleView} onEdit={handleEdit} onDelete={handleDelete} onFilterChange={handleFilterChange} />
 			{/* Modal */}
 			{isModalOpen && (
 				<div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
