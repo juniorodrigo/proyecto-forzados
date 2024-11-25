@@ -11,7 +11,7 @@ export async function GET() {
 
 		const turnos = recordset.map((singleValue) => {
 			return {
-				codigo: singleValue.SUBAREA_ID,
+				id: singleValue.SUBAREA_ID,
 				descripcion: singleValue.DESCRIPCION,
 			};
 		});
@@ -37,5 +37,23 @@ export async function POST(request: Request) {
 	} catch (error) {
 		console.error("Error processing POST:", error);
 		return NextResponse.json({ success: false, message: "Error inserting data" }, { status: 500 });
+	}
+}
+
+// Manejo del método DELETE
+export async function DELETE(request: Request) {
+	try {
+		const pool = await poolPromise;
+		const { id } = await request.json();
+		const result = await pool.request().input("ID", id).query("DELETE FROM SUB_AREA WHERE SUBAREA_ID = @ID");
+
+		if (result.rowsAffected[0] > 0) {
+			return NextResponse.json({ success: true, message: "Record deleted successfully" });
+		} else {
+			return NextResponse.json({ success: false, message: "No record found to delete" }, { status: 404 });
+		}
+	} catch (error) {
+		console.error("Error processing DELETE:", error);
+		return NextResponse.json({ success: false, message: "Error deleting data" }, { status: 500 });
 	}
 }

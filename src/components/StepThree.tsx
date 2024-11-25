@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 interface StepThreeProps {
 	aprobador: string;
@@ -11,7 +11,28 @@ interface StepThreeProps {
 	setTipoForzado: React.Dispatch<React.SetStateAction<string>>;
 }
 
+interface TipoForzado {
+	id: string;
+	descripcion: string;
+}
+
 const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor, setEjecutor, autorizacion, setAutorizacion, tipoForzado, setTipoForzado }) => {
+	const [tiposForzado, setTiposForzado] = useState<TipoForzado[]>([]);
+
+	useEffect(() => {
+		const fetchTiposForzado = async () => {
+			try {
+				const response = await fetch("/api/maestras/tipo-forzado");
+				const data = await response.json();
+				setTiposForzado(data.values);
+			} catch (error) {
+				console.error("Error fetching tipos de forzado:", error);
+			}
+		};
+
+		fetchTiposForzado();
+	}, []);
+
 	return (
 		<form className="space-y-6">
 			{/* Aprobador */}
@@ -52,8 +73,8 @@ const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor
 					required
 				>
 					<option value="">Seleccione Autorización</option>
-					<option value="Autorizado">Autorizado</option>
-					<option value="Rechazdo">Rechazado</option>
+					<option value="autorizado">Autorizado</option>
+					<option value="rechazado">Rechazado</option>
 				</select>
 			</div>
 
@@ -67,8 +88,11 @@ const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor
 					required
 				>
 					<option value="">Seleccione Tipo de Forzado</option>
-					<option value="Hardware">Hardware</option>
-					<option value="Lógico">Lógico</option>
+					{tiposForzado.map((tipo) => (
+						<option key={tipo.id} value={tipo.id}>
+							{tipo.descripcion}
+						</option>
+					))}
 				</select>
 			</div>
 		</form>

@@ -1,15 +1,17 @@
 import { NextResponse } from "next/server";
-import { poolPromise } from "@sql/lib/db"; // Tu conexión a la base de datos
+import { poolPromise } from "@sql/lib/db";
+
+// TAG CENTRO_______________________________________________________________
 
 // Manejo del método GET
 export async function GET() {
 	try {
 		const pool = await poolPromise;
-		const { recordset } = await pool.request().query("SELECT * FROM TURNO");
+		const { recordset } = await pool.request().query("SELECT * FROM PROBABILIDAD");
 
 		const turnos = recordset.map((singleValue) => {
 			return {
-				id: singleValue.TURNO_ID,
+				id: singleValue.PROBABILIDAD_ID,
 				descripcion: singleValue.DESCRIPCION,
 			};
 		});
@@ -25,7 +27,7 @@ export async function POST(request: Request) {
 	try {
 		const pool = await poolPromise;
 		const { descripcion } = await request.json();
-		const result = await pool.request().input("descripcion", descripcion).query("INSERT INTO TURNO ( descripcion) VALUES (@descripcion)");
+		const result = await pool.request().input("descripcion", descripcion).query("INSERT INTO PROBABILIDAD ( DESCRIPCION) VALUES ( @descripcion)");
 
 		if (result.rowsAffected[0] > 0) {
 			return NextResponse.json({ success: true, message: "values inserted into database" });
@@ -43,7 +45,7 @@ export async function DELETE(request: Request) {
 	try {
 		const pool = await poolPromise;
 		const { id } = await request.json();
-		const result = await pool.request().input("id", id).query("DELETE FROM TURNO WHERE TURNO_ID = @id");
+		const result = await pool.request().input("id", id).query("DELETE FROM PROBABILIDAD WHERE PROBABILIDAD_ID = @id");
 
 		if (result.rowsAffected[0] > 0) {
 			return NextResponse.json({ success: true, message: "Record deleted successfully" });

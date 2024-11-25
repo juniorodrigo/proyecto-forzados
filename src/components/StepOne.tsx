@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 interface StepOneProps {
 	tagPrefijo: string;
@@ -15,6 +15,11 @@ interface StepOneProps {
 	setTurno: React.Dispatch<React.SetStateAction<string>>;
 }
 
+interface Option {
+	id: string;
+	descripcion: string;
+}
+
 const StepOne: React.FC<StepOneProps> = ({
 	tagPrefijo,
 	setTagPrefijo,
@@ -29,6 +34,40 @@ const StepOne: React.FC<StepOneProps> = ({
 	turno,
 	setTurno,
 }) => {
+	const [tagPrefijos, setTagPrefijos] = useState<Option[]>([]);
+	const [tagCentros, setTagCentros] = useState<Option[]>([]);
+	const [disciplinas, setDisciplinas] = useState<Option[]>([]);
+	const [turnos, setTurnos] = useState<Option[]>([]);
+
+	useEffect(() => {
+		const fetchData = async (url: string, setState: React.Dispatch<React.SetStateAction<Option[]>>) => {
+			try {
+				const response = await fetch(url);
+				const data = await response.json();
+
+				console.log(data, "data_____");
+
+				setState(data.values);
+				console.log(data.values, `data values from ${url}`);
+			} catch (error) {
+				console.error(`Error fetching data from ${url}:`, error);
+			}
+		};
+
+		fetchData("/api/maestras/subarea", setTagPrefijos);
+		fetchData("/api/maestras/activo", setTagCentros);
+		fetchData("/api/maestras/disciplina", setDisciplinas);
+		fetchData("/api/maestras/turno", setTurnos);
+	}, []);
+
+	useEffect(() => {
+		console.log(tagPrefijos, "tagPrefijos");
+	}, [tagPrefijos]);
+
+	useEffect(() => {
+		console.log(tagCentros, "tagCentros");
+	}, [tagCentros]);
+
 	return (
 		<form className="space-y-6">
 			{/* Tag (Prefijo) */}
@@ -42,9 +81,11 @@ const StepOne: React.FC<StepOneProps> = ({
 					required
 				>
 					<option value="">Prefijo del Tag o Sub Area</option>
-					<option value="CHANCADOR PRINCIPAL">CHANCADOR PRINCIPAL</option>
-					<option value="CORREA ALIMENTACION ACOPIO GRUESOS">CORREA ALIMENTACION ACOPIO GRUESOS</option>
-					<option value="ACOPIO DE GRUESOS Y SISTEMA DE RECUPERACION">ACOPIO DE GRUESOS Y SISTEMA DE RECUPERACION</option>
+					{tagPrefijos.map((option) => (
+						<option key={option.id} value={option.id}>
+							{option.descripcion}
+						</option>
+					))}
 				</select>
 			</div>
 
@@ -58,9 +99,11 @@ const StepOne: React.FC<StepOneProps> = ({
 					required
 				>
 					<option value="">Parte central del Tag asociado al Instrumento o Equipo</option>
-					<option value="AGITADOR">AGITADOR</option>
-					<option value="INDICADOR DE ANALIZADOR">INDICADOR DE ANALIZADOR</option>
-					<option value="CONTROL DE ANALIZADOR">CONTROL DE ANALIZADOR</option>
+					{tagCentros.map((option) => (
+						<option key={option.id} value={option.id}>
+							{option.descripcion}
+						</option>
+					))}
 				</select>
 			</div>
 
@@ -100,9 +143,11 @@ const StepOne: React.FC<StepOneProps> = ({
 					required
 				>
 					<option value="">Disciplina que solicita el forzado</option>
-					<option value="Comisionamiento">Comisionamiento</option>
-					<option value="Dcs">Dcs</option>
-					<option value="Eléctrica">Eléctrica</option>
+					{disciplinas.map((option) => (
+						<option key={option.id} value={option.id}>
+							{option.descripcion}
+						</option>
+					))}
 				</select>
 			</div>
 
@@ -111,8 +156,11 @@ const StepOne: React.FC<StepOneProps> = ({
 				<label className="block text-sm font-medium text-gray-600 mb-2">Turno</label>
 				<select value={turno} onChange={(e) => setTurno(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
 					<option value="">Turno que solicita el forzado</option>
-					<option value="Turno A">Turno A</option>
-					<option value="Turno B">Turno B</option>
+					{turnos.map((option) => (
+						<option key={option.id} value={option.id}>
+							{option.descripcion}
+						</option>
+					))}
 				</select>
 			</div>
 		</form>
