@@ -34,13 +34,8 @@ const Table: React.FC<TableProps> = ({ columns, rows, onView, onEdit, onDelete, 
 		area: false,
 	});
 
-	// Filtrar para que no se repita ninguna área
-	const filteredRows = rows.filter((value, index, self) => index === self.findIndex((t) => t.area === value.area));
-
-	console.log(filteredRows);
-
 	const [selectedEstado, setSelectedEstado] = useState<Status | "">("");
-	const [selectedDateRange, setSelectedDateRange] = useState<DateRange | undefined>();
+	const [selectedDateRange, setSelectedDateRange] = useState<DateRange | undefined>(undefined);
 	const [selectedArea, setSelectedArea] = useState<string | "">("");
 
 	const toggleFilter = (key: string) => {
@@ -57,17 +52,37 @@ const Table: React.FC<TableProps> = ({ columns, rows, onView, onEdit, onDelete, 
 
 		if (key === "estado") {
 			setSelectedEstado(value as Status);
+			setFiltersOpen({
+				estado: false,
+				fecha: false,
+				area: false,
+			});
 		} else if (key === "fecha") {
-			setSelectedDateRange(value as DateRange);
+			// Verifica que el valor sea un DateRange, no una cadena vacía
+			if (value && (value as DateRange).from && (value as DateRange).to) {
+				setSelectedDateRange(value as DateRange);
+				setFiltersOpen({
+					estado: false,
+					area: false,
+					fecha: true,
+				});
+				if (selectedDateRange !== undefined) {
+					setFiltersOpen({
+						estado: false,
+						fecha: false,
+						area: false,
+					});
+				}
+			}
+			console.log(selectedDateRange);
 		} else if (key === "area") {
 			setSelectedArea(value as string);
+			setFiltersOpen({
+				estado: false,
+				fecha: false,
+				area: false,
+			});
 		}
-
-		setFiltersOpen({
-			estado: false,
-			fecha: false,
-			area: false,
-		});
 	};
 
 	const getStatusClass = (status: Status) => {
