@@ -21,11 +21,12 @@ const Page = () => {
 	const [selectedEstado, setSelectedEstado] = useState<Status | "">("");
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [selectedRow, setSelectedRow] = useState<Row | null>(null);
+	const [selectedArea, setSelectedArea] = useState<string | "">("");
 
 	const columns = [
 		{ key: "id", label: "ID" },
 		{ key: "nombre", label: "Nombre" },
-		{ key: "area", label: "Área" },
+		{ key: "area", label: "Área", filterable: true },
 		{ key: "solicitante", label: "Solicitante" },
 		{ key: "estado", label: "Estado", filterable: true },
 		{ key: "fecha", label: "Fecha", filterable: true },
@@ -39,6 +40,12 @@ const Page = () => {
 			{ id: 4, nombre: "Proyecto D", area: "Recursos Humanos", solicitante: "Laura Stephany Loyola", estado: "ejecutado", fecha: "2024-11-17" },
 			{ id: 5, nombre: "Proyecto E", area: "IT", solicitante: "Pedro Suarez Vertiz", estado: "finalizado", fecha: "2024-11-18" },
 			{ id: 6, nombre: "Proyecto F", area: "Ventas", solicitante: "María Pia Copelo", estado: "pendiente", fecha: "2024-11-19" },
+			{ id: 7, nombre: "Proyecto G", area: "Desarrollo", solicitante: "Juan Francisco Zavaleta", estado: "aprobado", fecha: "2024-11-14" },
+			{ id: 8, nombre: "Proyecto H", area: "Marketing", solicitante: "Manuela Jose Rodriguez", estado: "pendiente", fecha: "2024-11-15" },
+			{ id: 9, nombre: "Proyecto I", area: "Finanzas", solicitante: "Cesar Anthony Valverde", estado: "rechazado", fecha: "2024-11-16" },
+			{ id: 10, nombre: "Proyecto J", area: "Recursos Humanos", solicitante: "Laura Pausini Sanchez", estado: "ejecutado", fecha: "2024-11-17" },
+			{ id: 11, nombre: "Proyecto K", area: "IT", solicitante: "Pedro Roberto Castillo", estado: "finalizado", fecha: "2024-11-18" },
+			{ id: 12, nombre: "Proyecto L", area: "Ventas", solicitante: "Antonella Camila Ferrel", estado: "pendiente", fecha: "2024-11-19" },
 		],
 		[]
 	);
@@ -49,17 +56,19 @@ const Page = () => {
 			const isWithinDateRange = (!selectedRange?.from || rowDate >= selectedRange.from) && (!selectedRange?.to || rowDate <= selectedRange.to);
 			const matchesSolicitante = selectedSolicitante ? row.solicitante.toLowerCase().includes(selectedSolicitante.toLowerCase()) : true;
 			const matchesEstado = selectedEstado ? row.estado === selectedEstado : true;
+			const matchesArea = selectedArea ? row.area === selectedArea : true;
 
-			return isWithinDateRange && matchesSolicitante && matchesEstado;
+			return isWithinDateRange && matchesSolicitante && matchesEstado && matchesArea;
 		});
-	}, [rows, selectedRange, selectedSolicitante, selectedEstado]);
+	}, [rows, selectedRange, selectedSolicitante, selectedEstado, selectedArea]);
 
-	const handleFilterChange = (key: string, value: string) => {
-		if (key === "fecha") {
-			const date = value ? new Date(value) : undefined;
-			setSelectedRange({ from: date, to: date });
-		} else if (key === "estado") {
+	const handleFilterChange = (key: string, value: string | DateRange) => {
+		if (key === "fecha" && typeof value !== "string") {
+			setSelectedRange(value);
+		} else if (key === "estado" && typeof value === "string") {
 			setSelectedEstado(value as Status);
+		} else if (key === "area" && typeof value === "string") {
+			setSelectedArea(value as string);
 		}
 	};
 
@@ -88,6 +97,7 @@ const Page = () => {
 		setSelectedRange(undefined);
 		setSelectedSolicitante("");
 		setSelectedEstado("");
+		setSelectedArea("");
 	};
 
 	return (
