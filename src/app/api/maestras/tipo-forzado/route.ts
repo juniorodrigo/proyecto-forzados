@@ -55,3 +55,21 @@ export async function DELETE(request: Request) {
 		return NextResponse.json({ success: false, message: "Error deleting data" }, { status: 500 });
 	}
 }
+
+// Manejo del método PUT
+export async function PUT(request: Request) {
+	try {
+		const pool = await poolPromise;
+		const { id, descripcion } = await request.json();
+		const result = await pool.request().input("id", id).input("descripcion", descripcion).query("UPDATE TIPO_FORZADO SET DESCRIPCION = @descripcion WHERE TIPOFORZADO_ID = @id");
+
+		if (result.rowsAffected[0] > 0) {
+			return NextResponse.json({ success: true, message: "Record updated successfully" });
+		} else {
+			return NextResponse.json({ success: false, message: "No record found with the given ID" }, { status: 404 });
+		}
+	} catch (error) {
+		console.error("Error processing PUT:", error);
+		return NextResponse.json({ success: false, message: "Error updating data" }, { status: 500 });
+	}
+}

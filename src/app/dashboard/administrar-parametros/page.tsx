@@ -5,12 +5,14 @@ import React, { useState, useEffect } from "react";
 
 const Page = () => {
 	const categories = [
-		{ label: "Disciplina", value: "disciplina", needsCode: true },
+		{ label: "Sub Área (Tag Prefijo)", value: "subarea", needsCode: true },
+		{ label: "Activo (Tag Centro)", value: "activo", needsCode: true },
+		{ label: "Disciplina", value: "disciplina", needsCode: false },
 		{ label: "Turno", value: "turno", needsCode: false },
 		{ label: "Responsable", value: "responsable", needsCode: false },
-		{ label: "Riesgo", value: "riesgo-a", needsCode: true },
-		{ label: "Tipo de forzado", value: "tipo-forzado", needsCode: true },
+		{ label: "Elemento de Riesgo", value: "riesgo-a", needsCode: false },
 		{ label: "Impacto", value: "impacto", needsCode: false },
+		{ label: "Tipo de forzado", value: "tipo-forzado", needsCode: false },
 	];
 	const [selectedCategory, setSelectedCategory] = useState("");
 	const [data, setData] = useState<Record<string, { id: number; codigo: string; descripcion: string }[]>>({
@@ -33,9 +35,10 @@ const Page = () => {
 		try {
 			const response = await fetch(`/api/maestras/${category}`);
 			const result = await response.json();
-			const normalizedData = result.values.map((item: { id: number; descripcion?: string; nombre?: string }) => ({
+			console.log("data fetched for", category, result.values);
+			const normalizedData = result.values.map((item: { id: number; codigo?: string; descripcion?: string; nombre?: string }) => ({
 				id: item.id,
-				codigo: item.id.toString(),
+				codigo: item.codigo || item.id.toString(),
 				descripcion: item.descripcion || item.nombre,
 			}));
 			setData((prevData) => ({
@@ -60,17 +63,14 @@ const Page = () => {
 		}
 
 		if (modalType === "create") {
-			console.log(newRecord.categoria.toLowerCase(), "___________________________");
-
-			// TODO: Evaluar la integridad del nombre de categoría para no vulnerar las apis existentes
 			fetch(`/api/maestras/${newRecord.categoria.toLowerCase()}`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({
-					// codigo: newRecord.codigo,
 					descripcion: newRecord.descripcion,
+					...(selectedCategoryObject?.needsCode && { codigo: newRecord.codigo }),
 				}),
 			})
 				.then((response) => response.json())
@@ -78,14 +78,13 @@ const Page = () => {
 					if (data.success) {
 						setPopoverMessage("Registro creado exitosamente.");
 						setPopoverType("success");
-						fetchData(newRecord.categoria); // Recargar datos desde el API
+						fetchData(newRecord.categoria);
 					} else {
 						setPopoverMessage("Error al crear el registro.");
 						setPopoverType("error");
 					}
-					setShowPopover(true); // Mostrar el popover
+					setShowPopover(true);
 
-					// Ocultar el popover después de 2 segundos
 					setTimeout(() => {
 						setShowPopover(false);
 					}, 2000);
@@ -94,7 +93,7 @@ const Page = () => {
 					console.error("Error:", error);
 					setPopoverMessage("Error al crear el registro.");
 					setPopoverType("error");
-					setShowPopover(true); // Mostrar el popover
+					setShowPopover(true);
 
 					// Ocultar el popover después de 2 segundos
 					setTimeout(() => {
@@ -102,10 +101,44 @@ const Page = () => {
 					}, 2000);
 				});
 		} else if (modalType === "edit" && editingRecordId !== null) {
-			setData((prevData) => ({
-				...prevData,
-				[selectedCategory]: prevData[selectedCategory].map((row) => (row.id === editingRecordId ? { ...row, codigo: newRecord.codigo, descripcion: newRecord.descripcion } : row)),
-			}));
+			fetch(`/api/maestras/${newRecord.categoria.toLowerCase()}`, {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					id: editingRecordId,
+					descripcion: newRecord.descripcion,
+					...(selectedCategoryObject?.needsCode && { codigo: newRecord.codigo }),
+				}),
+			})
+				.then((response) => response.json())
+				.then((data) => {
+					if (data.success) {
+						setPopoverMessage("Registro actualizado exitosamente.");
+						setPopoverType("success");
+						fetchData(newRecord.categoria);
+					} else {
+						setPopoverMessage("Error al actualizar el registro.");
+						setPopoverType("error");
+					}
+					setShowPopover(true);
+
+					// Ocultar el popover después de 2 segundos
+					setTimeout(() => {
+						setShowPopover(false);
+					}, 2000);
+				})
+				.catch((error) => {
+					console.error("Error:", error);
+					setPopoverMessage("Error al actualizar el registro.");
+					setPopoverType("error");
+					setShowPopover(true);
+					// Ocultar el popover después de 2 segundos
+					setTimeout(() => {
+						setShowPopover(false);
+					}, 2000);
+				});
 		}
 
 		setIsModalOpen(false);
@@ -148,7 +181,7 @@ const Page = () => {
 				setPopoverMessage("Error al eliminar el registro.");
 				setPopoverType("error");
 			}
-			setShowPopover(true); // Mostrar el popover
+			setShowPopover(true);
 
 			// Ocultar el popover después de 2 segundos
 			setTimeout(() => {
@@ -158,7 +191,7 @@ const Page = () => {
 			console.error("Error deleting record:", error);
 			setPopoverMessage("Error al eliminar el registro.");
 			setPopoverType("error");
-			setShowPopover(true); // Mostrar el popover
+			setShowPopover(true);
 
 			// Ocultar el popover después de 2 segundos
 			setTimeout(() => {
@@ -168,6 +201,11 @@ const Page = () => {
 	};
 
 	const selectedCategoryObject = categories.find((category) => category.value === selectedCategory);
+
+	const tableRows = (data[selectedCategory] || []).map((row) => ({
+		...row,
+		codigo: selectedCategoryObject?.needsCode ? row.codigo : row.id,
+	}));
 
 	return (
 		<div className="p-4">
@@ -199,10 +237,10 @@ const Page = () => {
 						{ key: "codigo", label: "Código" },
 						{ key: "descripcion", label: "Descripción" },
 					]}
-					rows={data[selectedCategory] || []}
+					rows={tableRows}
 					onEdit={handleEdit}
 					onDelete={handleDelete}
-					actions={["edit", "delete"]} // Solo editar y eliminar
+					actions={["edit", "delete"]}
 				/>
 			) : (
 				<p className="text-gray-500">Seleccione una categoría para ver sus registros.</p>

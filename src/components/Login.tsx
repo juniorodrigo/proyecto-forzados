@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { FaUser, FaLock, FaSignInAlt } from "react-icons/fa";
+import Popover from "@/components/Popover";
 
 const Login = () => {
 	const router = useRouter();
@@ -125,17 +126,7 @@ const Login = () => {
 						</div>
 
 						{/* Popover de éxito */}
-						{showPopover && (
-							<div
-								className="fixed top-10 inset-x-0 flex justify-center transition-transform transform translate-x-full"
-								style={{
-									transition: "transform 0.5s ease-out",
-									transform: "translateX(0)",
-								}}
-							>
-								<div className="bg-green-500 text-white text-center py-2 px-4 rounded-lg shadow-lg">Inicio de sesión exitoso. Redirigiendo...</div>
-							</div>
-						)}
+						<Popover message="Inicio de sesión exitoso. Redirigiendo..." type="success" show={showPopover} />
 
 						{/* Botón de Iniciar Sesión */}
 						<button onClick={handleLogin} className="w-full flex items-center justify-center px-4 py-4 text-white bg-sky-950 hover:bg-sky-800 rounded-lg transition duration-200 focus:outline-none">

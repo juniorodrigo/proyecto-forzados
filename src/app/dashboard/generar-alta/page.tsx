@@ -40,27 +40,6 @@ const ForcedRegistration: React.FC = () => {
 	const nextStep = () => {
 		if (currentStep < steps.length) setCurrentStep(currentStep + 1);
 		else {
-			console.log("ETAPA FINAL");
-
-			console.log({
-				tagPrefijo,
-				tagCentro,
-				tagSubfijo,
-				descripcion,
-				disciplina,
-				turno,
-				interlockSeguridad,
-				responsable,
-				riesgo,
-				probabilidad,
-				impacto,
-				solicitante,
-				aprobador,
-				ejecutor,
-				autorizacion,
-				tipoForzado,
-			});
-
 			fetch("/api/solicitudes/alta", {
 				method: "POST",
 				headers: {

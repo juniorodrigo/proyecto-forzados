@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { poolPromise } from "@sql/lib/db";
 
-// TAG CENTRO_______________________________________________________________
-
 // Manejo del método GET
 export async function GET() {
 	try {
@@ -55,5 +53,23 @@ export async function DELETE(request: Request) {
 	} catch (error) {
 		console.error("Error processing DELETE:", error);
 		return NextResponse.json({ success: false, message: "Error deleting data" }, { status: 500 });
+	}
+}
+
+// Manejo del método PUT
+export async function PUT(request: Request) {
+	try {
+		const pool = await poolPromise;
+		const { id, descripcion } = await request.json();
+		const result = await pool.request().input("id", id).input("descripcion", descripcion).query("UPDATE PROBABILIDAD SET DESCRIPCION = @descripcion WHERE PROBABILIDAD_ID = @id");
+
+		if (result.rowsAffected[0] > 0) {
+			return NextResponse.json({ success: true, message: "Record updated successfully" });
+		} else {
+			return NextResponse.json({ success: false, message: "No record found to update" }, { status: 404 });
+		}
+	} catch (error) {
+		console.error("Error processing PUT:", error);
+		return NextResponse.json({ success: false, message: "Error updating data" }, { status: 500 });
 	}
 }

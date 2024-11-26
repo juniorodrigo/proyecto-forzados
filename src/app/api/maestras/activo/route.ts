@@ -12,6 +12,7 @@ export async function GET() {
 		const turnos = recordset.map((singleValue) => {
 			return {
 				id: singleValue.TAGCENTRO_ID,
+				codigo: singleValue.CODIGO,
 				descripcion: singleValue.DESCRIPCION,
 			};
 		});
@@ -27,6 +28,9 @@ export async function POST(request: Request) {
 	try {
 		const pool = await poolPromise;
 		const { codigo, descripcion } = await request.json();
+
+		console.log("codigo", codigo, "descripcion", descripcion);
+
 		const result = await pool.request().input("codigo", codigo).input("descripcion", descripcion).query("INSERT INTO TAG_CENTRO (CODIGO, DESCRIPCION) VALUES (@codigo, @descripcion)");
 
 		if (result.rowsAffected[0] > 0) {

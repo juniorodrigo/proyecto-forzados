@@ -14,10 +14,6 @@ const handler = NextAuth({
 			async authorize(credentials) {
 				const { username, password } = credentials ?? {};
 
-				// Hardcoded credentials
-				const validUsername = "ADMINADMIN";
-				const validPassword = "ADMINADMIN1";
-
 				const pool = await poolPromise;
 				const result = await pool.request().query(`SELECT u.*, A.AREA FROM USUARIO as u
          INNER JOIN AREA A on u.ID_AREA = A.ID_AREA
@@ -41,16 +37,7 @@ const handler = NextAuth({
 				} else {
 					console.log("Password does not match");
 				}
-
-				if (typeof username === "string" && username.toUpperCase() === validUsername && password === validPassword) {
-					return {
-						id: "1",
-						name: "Admin User",
-						email: "admin@example.com",
-					};
-				}
-
-				throw new Error("Invalid credentials");
+				return null;
 			},
 		}),
 	],
