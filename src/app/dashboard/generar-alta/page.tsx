@@ -2,9 +2,9 @@
 import StepOne from "@/components/StepOne";
 import StepThree from "@/components/StepThree";
 import StepTwo from "@/components/StepTwo";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const ForcedRegistration: React.FC = () => {
 	const [currentStep, setCurrentStep] = useState(1);
@@ -30,93 +30,6 @@ const ForcedRegistration: React.FC = () => {
 	const [tipoForzado, setTipoForzado] = useState("");
 
 	const router = useRouter();
-	const searchParams = useSearchParams();
-	const id = searchParams.get("id");
-
-	useEffect(() => {
-		if (id) {
-			fetch(`/api/solicitudes/${id}`)
-				.then((response) => response.json())
-				.then((data) => {
-					// Simulación de datos de prueba si la API no responde
-					const mockData = {
-						tagPrefijo: "PRF",
-						tagCentro: "CTR",
-						tagSubfijo: "SFX",
-						descripcion: "Descripción de prueba",
-						disciplina: "Disciplina de prueba",
-						turno: "Turno de prueba",
-						interlockSeguridad: "Interlock de prueba",
-						responsable: "Responsable de prueba",
-						riesgo: "Riesgo de prueba",
-						probabilidad: "Alta",
-						impacto: "Alto",
-						solicitante: "Solicitante de prueba",
-						aprobador: "Aprobador de prueba",
-						ejecutor: "Ejecutor de prueba",
-						autorizacion: "Autorización de prueba",
-						tipoForzado: "Tipo de forzado de prueba",
-					};
-					const formData = data || mockData;
-
-					setTagPrefijo(formData.tagPrefijo);
-					setTagCentro(formData.tagCentro);
-					setTagSubfijo(formData.tagSubfijo);
-					setDescripcion(formData.descripcion);
-					setDisciplina(formData.disciplina);
-					setTurno(formData.turno);
-					setInterlockSeguridad(formData.interlockSeguridad);
-					setResponsable(formData.responsable);
-					setRiesgo(formData.riesgo);
-					setProbabilidad(formData.probabilidad);
-					setImpacto(formData.impacto);
-					setSolicitante(formData.solicitante);
-					setAprobador(formData.aprobador);
-					setEjecutor(formData.ejecutor);
-					setAutorizacion(formData.autorizacion);
-					setTipoForzado(formData.tipoForzado);
-				})
-				.catch((error) => {
-					console.error("Error:", error);
-					// Simulación de datos de prueba en caso de error
-					const mockData = {
-						tagPrefijo: "PRF",
-						tagCentro: "CTR",
-						tagSubfijo: "SFX",
-						descripcion: "Descripción de prueba",
-						disciplina: "Disciplina de prueba",
-						turno: "Turno de prueba",
-						interlockSeguridad: "Interlock de prueba",
-						responsable: "Responsable de prueba",
-						riesgo: "Riesgo de prueba",
-						probabilidad: "Alta",
-						impacto: "Alto",
-						solicitante: "Solicitante de prueba",
-						aprobador: "Aprobador de prueba",
-						ejecutor: "Ejecutor de prueba",
-						autorizacion: "Autorización de prueba",
-						tipoForzado: "Tipo de forzado de prueba",
-					};
-
-					setTagPrefijo(mockData.tagPrefijo);
-					setTagCentro(mockData.tagCentro);
-					setTagSubfijo(mockData.tagSubfijo);
-					setDescripcion(mockData.descripcion);
-					setDisciplina(mockData.disciplina);
-					setTurno(mockData.turno);
-					setInterlockSeguridad(mockData.interlockSeguridad);
-					setResponsable(mockData.responsable);
-					setRiesgo(mockData.riesgo);
-					setProbabilidad(mockData.probabilidad);
-					setImpacto(mockData.impacto);
-					setSolicitante(mockData.solicitante);
-					setAprobador(mockData.aprobador);
-					setEjecutor(mockData.ejecutor);
-					setAutorizacion(mockData.autorizacion);
-					setTipoForzado(mockData.tipoForzado);
-				});
-		}
-	}, [id]);
 
 	const steps = [
 		{ id: 1, title: "Paso 1" },

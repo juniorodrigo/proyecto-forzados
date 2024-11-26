@@ -71,6 +71,18 @@ const StepTwo: React.FC<StepTwoProps> = ({
 		fetchData("/api/maestras/impacto", setImpactos);
 	}, []);
 
+	useEffect(() => {
+		if (responsable && riesgo) {
+			fetch(`/api/etiquetas?responsable=${responsable}&riesgo=${riesgo}`)
+				.then((response) => response.json())
+				.then((labels) => {
+					setResponsable(labels.responsableLabel);
+					setRiesgo(labels.riesgoLabel);
+				})
+				.catch((error) => console.error("Error al obtener etiquetas:", error));
+		}
+	}, [responsable, riesgo, setResponsable, setRiesgo]);
+
 	return (
 		<form className="space-y-6">
 			{/* Interlock Seguridad */}

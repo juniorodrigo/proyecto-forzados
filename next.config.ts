@@ -5,8 +5,13 @@ const nextConfig: NextConfig = {
 		return [
 			{
 				source: "/",
-				destination: "/dashboard/consultas", // Cambia por la ruta deseada
-				permanent: true, // `true` para redirección 301, `false` para 302
+				destination: "/dashboard/consultas",
+				permanent: true,
+			},
+			{
+				source: "/dashboard",
+				destination: "/dashboard/consultas",
+				permanent: true,
 			},
 		];
 	},

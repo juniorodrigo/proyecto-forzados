@@ -61,6 +61,18 @@ const StepOne: React.FC<StepOneProps> = ({
 	}, []);
 
 	useEffect(() => {
+		if (tagPrefijo && tagCentro) {
+			fetch(`/api/etiquetas?tagPrefijo=${tagPrefijo}&tagCentro=${tagCentro}`)
+				.then((response) => response.json())
+				.then((labels) => {
+					setTagPrefijo(labels.tagPrefijoLabel);
+					setTagCentro(labels.tagCentroLabel);
+				})
+				.catch((error) => console.error("Error al obtener etiquetas:", error));
+		}
+	}, [tagPrefijo, tagCentro, setTagPrefijo, setTagCentro]);
+
+	useEffect(() => {
 		console.log(tagPrefijos, "tagPrefijos");
 	}, [tagPrefijos]);
 

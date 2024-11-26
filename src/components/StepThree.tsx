@@ -33,6 +33,18 @@ const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor
 		fetchTiposForzado();
 	}, []);
 
+	useEffect(() => {
+		if (aprobador && ejecutor) {
+			fetch(`/api/etiquetas?aprobador=${aprobador}&ejecutor=${ejecutor}`)
+				.then((response) => response.json())
+				.then((labels) => {
+					setAprobador(labels.aprobadorLabel);
+					setEjecutor(labels.ejecutorLabel);
+				})
+				.catch((error) => console.error("Error al obtener etiquetas:", error));
+		}
+	}, [aprobador, ejecutor, setAprobador, setEjecutor]);
+
 	return (
 		<form className="space-y-6">
 			{/* Aprobador */}
