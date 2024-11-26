@@ -3,8 +3,13 @@ import { poolPromise } from "@sql/lib/db";
 
 // Manejo del método GET
 export async function GET() {
-	// Obtener todas las solicitudes de alta
-	return NextResponse.json({ message: "GET request successful" });
+	try {
+		const solicitudes = await getAllSolicitudes();
+		return NextResponse.json({ success: true, message: "Records fetched successfully", data: solicitudes });
+	} catch (error) {
+		console.error("Error processing GET:", error);
+		return NextResponse.json({ success: false, message: "Failed to fetch records" }, { status: 500 });
+	}
 }
 
 // Manejo del método POST
@@ -15,6 +20,7 @@ export async function POST(request: Request) {
 
 		// generar el query
 		const query = generateInsertQuery(data);
+		console.log(query);
 
 		const pool = await poolPromise;
 		const result = await pool.query(query);
@@ -29,6 +35,31 @@ export async function POST(request: Request) {
 		return NextResponse.json({ success: false, message: "Invalid request data" }, { status: 400 });
 	}
 }
+
+const getAllSolicitudes = async () => {
+	const pool = await poolPromise;
+	const result = await pool.query(`
+		SELECT 
+			SF.SOLICITUD_ID,
+			SF.DESCRIPCIONFORZADO,
+			SF.ESTADOSOLICITUD,
+			SF.FECHA_CREACION,
+			SA.DESCRIPCION AS SUBAREA_DESCRIPCION,
+			SF.USUARIO_CREACION AS SOLICITANTE
+		FROM 
+			TRS_SOLICITUD_FORZADO SF
+		LEFT JOIN 
+			SUB_AREA SA ON SF.SUBAREA_ID = SA.SUBAREA_ID
+	`);
+	return result.recordset.map((record) => ({
+		id: record.SOLICITUD_ID,
+		nombre: record.DESCRIPCIONFORZADO,
+		area: record.SUBAREA_DESCRIPCION,
+		solicitante: record.SOLICITANTE,
+		estado: record.ESTADOSOLICITUD,
+		fecha: record.FECHA_CREACION,
+	}));
+};
 
 type InsertQueryParameters = {
 	tagPrefijo: string;
@@ -62,13 +93,13 @@ const generateInsertQuery = (parameters: InsertQueryParameters) => {
 	TIPOSOLICITUD,
 	INTERLOCK,
 	DESCRIPCIONFORZADO,
-	ESTADOSOLICITUD,
 	FECHAREALIZACION,
 	FECHACIERRE,
 	USUARIO_CREACION,
 	FECHA_CREACION,
 	USUARIO_MODIFICACION,
-	FECHA_MODIFICACION
+	FECHA_MODIFICACION,
+	ESTADOSOLICITUD
 )
 VALUES (
 	${parameters.tagPrefijo}, -- SUBAREA_ID
@@ -82,12 +113,12 @@ VALUES (
 	NULL, -- TIPOSOLICITUD
 	${parameters.interlockSeguridad === "SÍ" ? 1 : 0}, -- INTERLOCK
 	'${parameters.descripcion}', -- DESCRIPCIONFORZADO
-	NULL, -- ESTADOSOLICITUD
 	NULL, -- FECHAREALIZACION
 	NULL, -- FECHACIERRE
 	'${parameters.solicitante}', -- USUARIO_CREACION
 	GETDATE(), -- FECHA_CREACION
 	'${parameters.aprobador}', -- USUARIO_MODIFICACION
-	GETDATE() -- FECHA_MODIFICACION
+	GETDATE(), -- FECHA_MODIFICACION
+	'pendiente' -- ESTADOSOLICITUD
 );`;
 };

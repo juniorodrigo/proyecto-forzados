@@ -24,8 +24,11 @@ export async function GET() {
 export async function POST(request: Request) {
 	try {
 		const pool = await poolPromise;
-		const { nombre } = await request.json();
-		const result = await pool.request().input("NOMBRE", nombre).query("INSERT INTO RESPONSABLE ( NOMBRE) VALUES ( @NOMBRE)");
+		const { descripcion } = await request.json();
+
+		console.log(descripcion, "INSERTANDO EN RESPONSABLEEEEEEEEEEEEEEEEEEEE");
+
+		const result = await pool.request().input("NOMBRE", descripcion).query("INSERT INTO RESPONSABLE ( NOMBRE) VALUES ( @NOMBRE)");
 
 		if (result.rowsAffected[0] > 0) {
 			return NextResponse.json({ success: true, message: "values inserted into database" });

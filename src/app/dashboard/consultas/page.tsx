@@ -1,8 +1,9 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { DateRange } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import Table from "@/components/Table";
+import { useRouter } from "next/navigation";
 
 type Status = "rechazado" | "pendiente" | "aprobado" | "ejecutado" | "finalizado";
 
@@ -13,6 +14,7 @@ interface Row {
 	solicitante: string;
 	estado: string;
 	fecha: string;
+	[key: string]: string | number; // Añadir signatura de índice
 }
 
 const Page = () => {
@@ -22,33 +24,52 @@ const Page = () => {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [selectedRow, setSelectedRow] = useState<Row | null>(null);
 	const [selectedArea, setSelectedArea] = useState<string | "">("");
+	const [rows, setRows] = useState<Row[]>([]); // Asegura que rows sea de tipo Row[]
+	const router = useRouter();
 
 	const columns = [
 		{ key: "id", label: "ID" },
-		{ key: "nombre", label: "Nombre" },
+		{ key: "nombre", label: "Descripcion" },
 		{ key: "area", label: "Área", filterable: true },
 		{ key: "solicitante", label: "Solicitante" },
 		{ key: "estado", label: "Estado", filterable: true },
-		{ key: "fecha", label: "Fecha", filterable: true },
+		{ key: "fecha", label: "Fecha y Hora", filterable: true },
 	];
 
-	const rows = useMemo(
-		() => [
-			{ id: 1, nombre: "Proyecto A", area: "Desarrollo", solicitante: "Juan Carlos Carranza", estado: "aprobado", fecha: "2024-11-14" },
-			{ id: 2, nombre: "Proyecto B", area: "Marketing", solicitante: "Ana Karina Rodriguez", estado: "pendiente", fecha: "2024-11-15" },
-			{ id: 3, nombre: "Proyecto C", area: "Finanzas", solicitante: "Carlos Frank Ventura", estado: "rechazado", fecha: "2024-11-16" },
-			{ id: 4, nombre: "Proyecto D", area: "Recursos Humanos", solicitante: "Laura Stephany Loyola", estado: "ejecutado", fecha: "2024-11-17" },
-			{ id: 5, nombre: "Proyecto E", area: "IT", solicitante: "Pedro Suarez Vertiz", estado: "finalizado", fecha: "2024-11-18" },
-			{ id: 6, nombre: "Proyecto F", area: "Ventas", solicitante: "María Pia Copelo", estado: "pendiente", fecha: "2024-11-19" },
-			{ id: 7, nombre: "Proyecto G", area: "Desarrollo", solicitante: "Juan Francisco Zavaleta", estado: "aprobado", fecha: "2024-11-14" },
-			{ id: 8, nombre: "Proyecto H", area: "Marketing", solicitante: "Manuela Jose Rodriguez", estado: "pendiente", fecha: "2024-11-15" },
-			{ id: 9, nombre: "Proyecto I", area: "Finanzas", solicitante: "Cesar Anthony Valverde", estado: "rechazado", fecha: "2024-11-16" },
-			{ id: 10, nombre: "Proyecto J", area: "Recursos Humanos", solicitante: "Laura Pausini Sanchez", estado: "ejecutado", fecha: "2024-11-17" },
-			{ id: 11, nombre: "Proyecto K", area: "IT", solicitante: "Pedro Roberto Castillo", estado: "finalizado", fecha: "2024-11-18" },
-			{ id: 12, nombre: "Proyecto L", area: "Ventas", solicitante: "Antonella Camila Ferrel", estado: "pendiente", fecha: "2024-11-19" },
-		],
-		[]
-	);
+	const formatDate = (dateString: string) => {
+		const options: Intl.DateTimeFormatOptions = {
+			year: "numeric",
+			month: "2-digit",
+			day: "2-digit",
+			hour: "2-digit",
+			minute: "2-digit",
+			second: "2-digit",
+			timeZone: "UTC",
+		};
+		return new Date(dateString).toLocaleDateString("es-ES", options);
+	};
+
+	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				const response = await fetch("/api/solicitudes/alta");
+				const result = await response.json();
+				if (result.success) {
+					const formattedData = result.data.map((row: Row) => ({
+						...row,
+						fecha: formatDate(row.fecha),
+					}));
+					setRows(formattedData);
+				} else {
+					console.error(result.message);
+				}
+			} catch (error) {
+				console.error("Error fetching data:", error);
+			}
+		};
+
+		fetchData();
+	}, []);
 
 	const filteredRows = useMemo(() => {
 		return rows.filter((row) => {
@@ -86,7 +107,7 @@ const Page = () => {
 	};
 
 	const handleEdit = (id: number) => {
-		alert(`Editar ${id}`);
+		router.push(`/dashboard/generar-alta?id=${id}`);
 	};
 
 	const handleDelete = (id: number) => {

@@ -57,7 +57,7 @@ const Page = () => {
 	}, [selectedCategory]);
 
 	const handleCreateOrUpdate = () => {
-		if (!newRecord.codigo || !newRecord.descripcion || !newRecord.categoria) {
+		if (!newRecord.descripcion || !newRecord.categoria || (selectedCategoryObject?.needsCode && !newRecord.codigo)) {
 			alert("Por favor, complete todos los campos.");
 			return;
 		}

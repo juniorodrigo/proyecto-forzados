@@ -11,7 +11,7 @@ export async function GET() {
 
 		const turnos = recordset.map((singleValue) => {
 			return {
-				id: singleValue.RIESGO_ID,
+				id: singleValue.RIESGOA_ID,
 				descripcion: singleValue.DESCRIPCION,
 			};
 		});

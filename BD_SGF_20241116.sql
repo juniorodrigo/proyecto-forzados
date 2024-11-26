@@ -376,7 +376,7 @@ go
 create table MATRIZ_RIESGO (
    MATRIZ_ID            int                  identity,
    IMPACTO_ID           int                  null,
-   RIESGO_ID            int                  null,
+   RIESGOA_ID            int                  null,
    PROBABILIDAD_ID      int                  null,
    NIVEL                int                  null,
    constraint PK_MATRIZ_RIESGO primary key (MATRIZ_ID)
@@ -405,9 +405,9 @@ create table RESPONSABLE (
 go
 
 create table RIESGO_A (
-   RIESGO_ID            int                  identity,
+   RIESGOA_ID            int                  identity,
    DESCRIPCION          varchar(30)          null,
-   constraint PK_RIESGO_A primary key (RIESGO_ID)
+   constraint PK_RIESGO_A primary key (RIESGOA_ID)
 )
 go
 
@@ -447,7 +447,7 @@ create table TRS_SOLICITUD_FORZADO (
    TIPOSOLICITUD        int                  null,
    INTERLOCK            int                  null,
    DESCRIPCIONFORZADO   varchar(100)         null,
-   ESTADOSOLICITUD      int                  null,
+   ESTADOSOLICITUD      varchar(100)                   null,
    FECHAREALIZACION     datetime             null,
    FECHACIERRE          datetime             null,
    USUARIO_CREACION     varchar(20)          null,
@@ -497,7 +497,7 @@ go
 
 insert into MAE_RIESGO_A (DESCRIPCION) values ('Riesgo A 1')
 go
-
+--
 insert into MAE_ROL (DESCRIPCION, ESTADO, FECHA_CREACION, USUARIO_CREACION, USUARIO_MODIFICACION, FECHA__MODIFICACION)
 values ('Rol 1', 1, getdate(), 'user1', 'user2', getdate())
 go
@@ -510,7 +510,7 @@ insert into MAE_USUARIO_ROL (USUARIO_ID, ROL_ID, SOLICITUD_ID)
 values (1, 1, 1)
 go
 
-insert into MATRIZ_RIESGO (IMPACTO_ID, RIESGO_ID, PROBABILIDAD_ID, NIVEL)
+insert into MATRIZ_RIESGO (IMPACTO_ID, RIESGOA_ID, PROBABILIDAD_ID, NIVEL)
 values (1, 1, 1, 1)
 go
 
@@ -591,8 +591,8 @@ alter table MATRIZ_RIESGO
 go
 
 alter table MATRIZ_RIESGO
-   add constraint FK_MATRIZ_R_REFERENCE_RIESGO foreign key (RIESGO_ID)
-      references RIESGO (RIESGO_ID)
+   add constraint FK_MATRIZ_R_REFERENCE_RIESGO foreign key (RIESGOA_ID)
+      references RIESGO_A (RIESGOA_ID)
 go
 
 alter table TRS_SOLICITUD_FORZADO
@@ -635,3 +635,68 @@ alter table TRS_SOLICITUD_FORZADO
       references MAE_RIESGO_A (RIESGOA_ID)
 go
 
+
+--////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+SELECT
+    SF.SOLICITUD_ID,
+    SF.DESCRIPCIONFORZADO,
+    SF.ESTADOSOLICITUD,
+    SF.FECHAREALIZACION,
+    SF.FECHACIERRE,
+    SF.USUARIO_CREACION,
+    SF.FECHA_CREACION,
+    SF.USUARIO_MODIFICACION,
+    SF.FECHA_MODIFICACION,
+
+    -- Datos de SUB_AREA
+    SA.SUBAREA_ID,
+    SA.CODIGO AS SUBAREA_CODIGO,
+    SA.DESCRIPCION AS SUBAREA_DESCRIPCION,
+
+    -- Datos de DISCIPLINA
+    D.DISCIPLINA_ID,
+    D.DESCRIPCION AS DISCIPLINA_DESCRIPCION,
+
+    -- Datos de TURNO
+    T.TURNO_ID,
+    T.DESCRIPCION AS TURNO_DESCRIPCION,
+
+    -- Datos de MOTIVO_RECHAZO
+    MR.MOTIVORECHAZO_ID,
+    MR.DESCRIPCION AS MOTIVORECHAZO_DESCRIPCION,
+
+    -- Datos de TIPO_FORZADO
+    TF.TIPOFORZADO_ID,
+    TF.DESCRIPCION AS TIPOFORZADO_DESCRIPCION,
+
+    -- Datos de TAG_CENTRO
+    TC.TAGCENTRO_ID,
+    TC.CODIGO AS TAGCENTRO_CODIGO,
+    TC.DESCRIPCION AS TAGCENTRO_DESCRIPCION,
+
+    -- Datos de RESPONSABLE
+    R.RESPONSABLE_ID,
+    R.NOMBRE AS RESPONSABLE_NOMBRE,
+
+    -- Datos de RIESGO_A
+    RA.RIESGOA_ID,
+    RA.DESCRIPCION AS RIESGOA_DESCRIPCION
+
+FROM
+    TRS_SOLICITUD_FORZADO SF
+LEFT JOIN
+    SUB_AREA SA ON SF.SUBAREA_ID = SA.SUBAREA_ID
+LEFT JOIN
+    DISCIPLINA D ON SF.DISCIPLINA_ID = D.DISCIPLINA_ID
+LEFT JOIN
+    TURNO T ON SF.TURNO_ID = T.TURNO_ID
+LEFT JOIN
+    MOTIVO_RECHAZO MR ON SF.MOTIVORECHAZO_ID = MR.MOTIVORECHAZO_ID
+LEFT JOIN
+    TIPO_FORZADO TF ON SF.TIPOFORZADO_ID = TF.TIPOFORZADO_ID
+LEFT JOIN
+    TAG_CENTRO TC ON SF.TAGCENTRO_ID = TC.TAGCENTRO_ID
+LEFT JOIN
+    RESPONSABLE R ON SF.RESPONSABLE_ID = R.RESPONSABLE_ID
+LEFT JOIN
+    MAE_RIESGO_A RA ON SF.RIESGOA_ID = RA.RIESGOA_ID;
