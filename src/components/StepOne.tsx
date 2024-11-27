@@ -66,6 +66,7 @@ const StepOne: React.FC<StepOneProps> = ({
 				try {
 					const response = await fetch(`/api/solicitudes/alta/${id}`);
 					const data = await response.json();
+					console.log(data, "data from fetchSolicitudData");
 					setTagPrefijo(data.tagPrefijo);
 					setTagCentro(data.tagCentro);
 					setTagSubfijo(data.tagSubfijo);
@@ -79,14 +80,6 @@ const StepOne: React.FC<StepOneProps> = ({
 		};
 		fetchSolicitudData();
 	}, [setDescripcion, setDisciplina, setTagCentro, setTagPrefijo, setTagSubfijo, setTurno]);
-
-	useEffect(() => {
-		console.log(tagPrefijos, "tagPrefijos");
-	}, [tagPrefijos]);
-
-	useEffect(() => {
-		console.log(tagCentros, "tagCentros");
-	}, [tagCentros]);
 
 	return (
 		<form className="space-y-6">

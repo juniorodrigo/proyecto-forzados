@@ -230,7 +230,7 @@ const ForcedRegistration: React.FC = () => {
 					)}
 				</button>
 			</div>
-			<Popover message={popoverMessage} type={popoverType} show={showPopover} onClose={() => setShowPopover(false)} />
+			<Popover message={popoverMessage} type={popoverType} show={showPopover} />
 		</div>
 	);
 };

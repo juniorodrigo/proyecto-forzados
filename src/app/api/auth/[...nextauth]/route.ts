@@ -15,15 +15,15 @@ const handler = NextAuth({
 				const { username, password } = credentials ?? {};
 
 				const pool = await poolPromise;
-				const result = await pool.request().query(`SELECT u.*, A.AREA FROM MAE_USUARIO as u
-         INNER JOIN MAE_AREA A on u.ID_AREA = A.ID_AREA
-         WHERE USERNAME = '${username}'`);
+				const result = await pool.request().query(`SELECT u.*, A.DESCRIPCION FROM MAE_USUARIO as u
+         INNER JOIN MAE_AREA A on u.AREA_ID = A.AREA_ID
+         WHERE U.USUARIO = '${username}'`);
 
 				if (result.recordset.length === 0) {
 					throw new Error("Invalid username");
 				}
 
-				const registeredHash = result.recordset[0].CONTRASENAHASH;
+				const registeredHash = result.recordset[0].PASSWORD;
 
 				if (await bcrypt.compare(password ?? "", registeredHash)) {
 					console.log("Password match");

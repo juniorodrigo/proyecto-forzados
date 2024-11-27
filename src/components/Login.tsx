@@ -61,6 +61,10 @@ const Login = () => {
 			callbackUrl: "/dashboard",
 		});
 
+		console.log(result, "____________________________________");
+
+		// _________________________ACA DEBERÍA LLAMARSE A UN ENDPOINT PARA TRAER LOS DATOS DEL USUARIo
+
 		if (result?.error) {
 			// Mostrar error si las credenciales son incorrectas
 			setErrors({ ...newErrors, password: "Credenciales incorrectas" });
