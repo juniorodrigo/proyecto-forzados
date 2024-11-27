@@ -22,8 +22,8 @@ export async function POST(req: NextRequest) {
 
 		// Validar credenciales con la base de datos
 		const pool = await poolPromise;
-		const result = await pool.request().query(`SELECT u.*, A.AREA FROM USUARIO as u
-        INNER JOIN AREA A on u.ID_AREA = A.ID_AREA
+		const result = await pool.request().query(`SELECT u.*, A.AREA FROM MAE_USUARIO as u
+        INNER JOIN MAE_AREA A on u.ID_AREA = A.ID_AREA
         WHERE USERNAME = '${username}'`);
 
 		if (result.recordset.length === 0) {
