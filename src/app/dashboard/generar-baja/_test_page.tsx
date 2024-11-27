@@ -114,7 +114,7 @@ const BajaForzado = () => {
 						onChange={handleInputChange}
 						className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 ${errors.ejecutorRetiro ? "border-red-500" : "border-gray-300"}`}
 					>
-						<option value="">Subfijo del Tag</option>
+						<option value="">Sufijo del Tag</option>
 						<option value="Pedro González">Pedro González</option>
 						<option value="María Fernández">María Fernández</option>
 					</select>
@@ -130,7 +130,7 @@ const BajaForzado = () => {
 						onChange={handleInputChange}
 						className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 ${errors.autorizacionRetiro ? "border-red-500" : "border-gray-300"}`}
 					>
-						<option value="">Subfijo del Tag</option>
+						<option value="">Sufijo del Tag</option>
 						<option value="Luisa Ramírez">Luisa Ramírez</option>
 						<option value="Carlos Herrera">Carlos Herrera</option>
 					</select>
