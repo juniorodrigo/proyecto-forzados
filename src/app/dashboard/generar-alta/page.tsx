@@ -4,7 +4,7 @@ import StepThree from "@/components/StepThree";
 import StepTwo from "@/components/StepTwo";
 import React, { useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const ForcedRegistration: React.FC = () => {
 	const [currentStep, setCurrentStep] = useState(1);
@@ -30,6 +30,8 @@ const ForcedRegistration: React.FC = () => {
 	const [tipoForzado, setTipoForzado] = useState("");
 
 	const router = useRouter();
+	const searchParams = useSearchParams();
+	const id = searchParams.get("id");
 
 	const steps = [
 		{ id: 1, title: "Paso 1" },
@@ -40,29 +42,50 @@ const ForcedRegistration: React.FC = () => {
 	const nextStep = () => {
 		if (currentStep < steps.length) setCurrentStep(currentStep + 1);
 		else {
+			const method = id ? "PUT" : "POST";
+			const body: {
+				tagPrefijo: string;
+				tagCentro: string;
+				tagSubfijo: string;
+				descripcion: string;
+				disciplina: string;
+				turno: string;
+				interlockSeguridad: string;
+				responsable: string;
+				riesgo: string;
+				probabilidad: string;
+				impacto: string;
+				solicitante: string;
+				aprobador: string;
+				ejecutor: string;
+				autorizacion: string;
+				tipoForzado: string;
+				id?: string | null;
+			} = {
+				tagPrefijo,
+				tagCentro,
+				tagSubfijo,
+				descripcion,
+				disciplina,
+				turno,
+				interlockSeguridad,
+				responsable,
+				riesgo,
+				probabilidad,
+				impacto,
+				solicitante,
+				aprobador,
+				ejecutor,
+				autorizacion,
+				tipoForzado,
+			};
+			if (id) body.id = id;
 			fetch("/api/solicitudes/alta", {
-				method: "POST",
+				method,
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify({
-					tagPrefijo,
-					tagCentro,
-					tagSubfijo,
-					descripcion,
-					disciplina,
-					turno,
-					interlockSeguridad,
-					responsable,
-					riesgo,
-					probabilidad,
-					impacto,
-					solicitante,
-					aprobador,
-					ejecutor,
-					autorizacion,
-					tipoForzado,
-				}),
+				body: JSON.stringify(body),
 			})
 				.then((response) => response.json())
 				.then((data) => {

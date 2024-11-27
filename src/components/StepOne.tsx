@@ -58,19 +58,29 @@ const StepOne: React.FC<StepOneProps> = ({
 		fetchData("/api/maestras/activo", setTagCentros);
 		fetchData("/api/maestras/disciplina", setDisciplinas);
 		fetchData("/api/maestras/turno", setTurnos);
-	}, []);
+	}, [setDescripcion, setDisciplina, setTagCentro, setTagPrefijo, setTagSubfijo, setTurno]);
 
 	useEffect(() => {
-		if (tagPrefijo && tagCentro) {
-			fetch(`/api/etiquetas?tagPrefijo=${tagPrefijo}&tagCentro=${tagCentro}`)
-				.then((response) => response.json())
-				.then((labels) => {
-					setTagPrefijo(labels.tagPrefijoLabel);
-					setTagCentro(labels.tagCentroLabel);
-				})
-				.catch((error) => console.error("Error al obtener etiquetas:", error));
-		}
-	}, [tagPrefijo, tagCentro, setTagPrefijo, setTagCentro]);
+		const fetchSolicitudData = async () => {
+			const urlParams = new URLSearchParams(window.location.search);
+			const id = await urlParams.get("id");
+			if (id) {
+				try {
+					const response = await fetch(`/api/solicitudes/alta/${id}`);
+					const data = await response.json();
+					setTagPrefijo(data.tagPrefijo);
+					setTagCentro(data.tagCentro);
+					setTagSubfijo(data.tagSubfijo);
+					setDescripcion(data.descripcion);
+					setDisciplina(data.disciplina);
+					setTurno(data.turno);
+				} catch (error) {
+					console.error("Error fetching solicitud data:", error);
+				}
+			}
+		};
+		fetchSolicitudData();
+	}, [setDescripcion, setDisciplina, setTagCentro, setTagPrefijo, setTagSubfijo, setTurno]);
 
 	useEffect(() => {
 		console.log(tagPrefijos, "tagPrefijos");

@@ -31,19 +31,27 @@ const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor
 		};
 
 		fetchTiposForzado();
-	}, []);
+	}, [setAprobador, setAutorizacion, setEjecutor, setTipoForzado]);
 
 	useEffect(() => {
-		if (aprobador && ejecutor) {
-			fetch(`/api/etiquetas?aprobador=${aprobador}&ejecutor=${ejecutor}`)
-				.then((response) => response.json())
-				.then((labels) => {
-					setAprobador(labels.aprobadorLabel);
-					setEjecutor(labels.ejecutorLabel);
-				})
-				.catch((error) => console.error("Error al obtener etiquetas:", error));
-		}
-	}, [aprobador, ejecutor, setAprobador, setEjecutor]);
+		const fetchSolicitudData = async () => {
+			const urlParams = new URLSearchParams(window.location.search);
+			const id = urlParams.get("id");
+			if (id) {
+				try {
+					const response = await fetch(`/api/solicitudes/alta/${id}`);
+					const data = await response.json();
+					setAprobador(data.aprobador);
+					setEjecutor(data.ejecutor);
+					setAutorizacion(data.autorizacion);
+					setTipoForzado(data.tipoForzado);
+				} catch (error) {
+					console.error("Error fetching solicitud data:", error);
+				}
+			}
+		};
+		fetchSolicitudData();
+	}, [setAprobador, setAutorizacion, setEjecutor, setTipoForzado]);
 
 	return (
 		<form className="space-y-6">

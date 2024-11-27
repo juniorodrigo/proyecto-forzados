@@ -1,200 +1,224 @@
 "use client";
-
+import StepOne from "@/components/StepOne";
+import StepThree from "@/components/StepThree";
+import StepTwo from "@/components/StepTwo";
 import React, { useState } from "react";
+import { FaArrowLeft } from "react-icons/fa";
+import { useRouter, useSearchParams } from "next/navigation";
 
-const BajaForzado = () => {
-	const [formData, setFormData] = useState({
-		solicitanteRetiro: "",
-		aprobadorRetiro: "",
-		ejecutorRetiro: "",
-		autorizacionRetiro: "",
-		fechaCierre: "",
-		observaciones: "",
-		datosAdjuntos: null as File | null,
-	});
+const ForcedRegistration: React.FC = () => {
+	const [currentStep, setCurrentStep] = useState(1);
 
-	const [errors, setErrors] = useState<Record<string, boolean>>({});
-	const [dragActive, setDragActive] = useState(false);
+	// Estados para cada paso
+	const [tagPrefijo, setTagPrefijo] = useState("");
+	const [tagCentro, setTagCentro] = useState("");
+	const [tagSubfijo, setTagSubfijo] = useState("");
+	const [descripcion, setDescripcion] = useState("");
+	const [disciplina, setDisciplina] = useState("");
+	const [turno, setTurno] = useState("");
 
-	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-		const { name, value, files } = e.target as HTMLInputElement;
-		setFormData({
-			...formData,
-			[name]: files ? files[0] : value,
-		});
-		setErrors({
-			...errors,
-			[name]: false,
-		});
-	};
+	const [interlockSeguridad, setInterlockSeguridad] = useState("");
+	const [responsable, setResponsable] = useState("");
+	const [riesgo, setRiesgo] = useState("");
+	const [probabilidad, setProbabilidad] = useState("");
+	const [impacto, setImpacto] = useState("");
+	const [solicitante, setSolicitante] = useState("");
 
-	const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
-		e.preventDefault();
-		e.stopPropagation();
-		setDragActive(e.type === "dragover");
-	};
+	const [aprobador, setAprobador] = useState("");
+	const [ejecutor, setEjecutor] = useState("");
+	const [autorizacion, setAutorizacion] = useState("");
+	const [tipoForzado, setTipoForzado] = useState("");
 
-	const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-		e.preventDefault();
-		e.stopPropagation();
-		setDragActive(false);
-		if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-			setFormData({
-				...formData,
-				datosAdjuntos: e.dataTransfer.files[0],
-			});
-			setErrors({
-				...errors,
-				datosAdjuntos: false,
-			});
+	const router = useRouter();
+	const searchParams = useSearchParams();
+	const id = searchParams.get("id");
+
+	const steps = [
+		{ id: 1, title: "Paso 1" },
+		{ id: 2, title: "Paso 2" },
+		{ id: 3, title: "Paso 3" },
+	];
+
+	const nextStep = () => {
+		if (currentStep < steps.length) setCurrentStep(currentStep + 1);
+		else {
+			const method = id ? "PUT" : "POST";
+			const body: {
+				tagPrefijo: string;
+				tagCentro: string;
+				tagSubfijo: string;
+				descripcion: string;
+				disciplina: string;
+				turno: string;
+				interlockSeguridad: string;
+				responsable: string;
+				riesgo: string;
+				probabilidad: string;
+				impacto: string;
+				solicitante: string;
+				aprobador: string;
+				ejecutor: string;
+				autorizacion: string;
+				tipoForzado: string;
+				id?: string | null;
+			} = {
+				tagPrefijo,
+				tagCentro,
+				tagSubfijo,
+				descripcion,
+				disciplina,
+				turno,
+				interlockSeguridad,
+				responsable,
+				riesgo,
+				probabilidad,
+				impacto,
+				solicitante,
+				aprobador,
+				ejecutor,
+				autorizacion,
+				tipoForzado,
+			};
+			if (id) body.id = id;
+			fetch("/api/solicitudes/alta", {
+				method,
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(body),
+			})
+				.then((response) => response.json())
+				.then((data) => {
+					if (data.success) {
+						alert("Solicitud enviada exitosamente");
+						router.push("/dashboard/consultas");
+					} else {
+						alert("Error al enviar la solicitud");
+					}
+				})
+				.catch((error) => {
+					console.error("Error:", error);
+					alert("Error al enviar la solicitud");
+				});
 		}
 	};
 
-	const validateForm = () => {
-		const newErrors: Record<string, boolean> = {};
-		Object.keys(formData).forEach((key) => {
-			if (!formData[key as keyof typeof formData]) {
-				newErrors[key] = true;
-			}
-		});
-		setErrors(newErrors);
-		return Object.keys(newErrors).length === 0;
+	const prevStep = () => {
+		if (currentStep > 1) setCurrentStep(currentStep - 1);
 	};
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		if (validateForm()) {
-			alert("Formulario enviado exitosamente.");
-			console.log("Datos del formulario:", formData);
+	const renderStep = () => {
+		switch (currentStep) {
+			case 1:
+				return (
+					<StepOne
+						tagPrefijo={tagPrefijo}
+						setTagPrefijo={setTagPrefijo}
+						tagCentro={tagCentro}
+						setTagCentro={setTagCentro}
+						tagSubfijo={tagSubfijo}
+						setTagSubfijo={setTagSubfijo}
+						descripcion={descripcion}
+						setDescripcion={setDescripcion}
+						disciplina={disciplina}
+						setDisciplina={setDisciplina}
+						turno={turno}
+						setTurno={setTurno}
+					/>
+				);
+			case 2:
+				return (
+					<StepTwo
+						interlockSeguridad={interlockSeguridad}
+						setInterlockSeguridad={setInterlockSeguridad}
+						responsable={responsable}
+						setResponsable={setResponsable}
+						riesgo={riesgo}
+						setRiesgo={setRiesgo}
+						probabilidad={probabilidad}
+						setProbabilidad={setProbabilidad}
+						impacto={impacto}
+						setImpacto={setImpacto}
+						solicitante={solicitante}
+						setSolicitante={setSolicitante}
+					/>
+				);
+			case 3:
+				return (
+					<StepThree
+						aprobador={aprobador}
+						setAprobador={setAprobador}
+						ejecutor={ejecutor}
+						setEjecutor={setEjecutor}
+						autorizacion={autorizacion}
+						setAutorizacion={setAutorizacion}
+						tipoForzado={tipoForzado}
+						setTipoForzado={setTipoForzado}
+					/>
+				);
+			default:
+				return null;
+		}
+	};
+
+	const isStepValid = (step: number) => {
+		switch (step) {
+			case 1:
+				return tagPrefijo && tagCentro && tagSubfijo && descripcion && disciplina && turno;
+			case 2:
+				return interlockSeguridad && responsable && riesgo && probabilidad && impacto && solicitante;
+			case 3:
+				return aprobador && ejecutor && autorizacion && tipoForzado;
+			default:
+				return false;
 		}
 	};
 
 	return (
-		<div className=" mx-auto p-6 bg-white shadow-md rounded-md">
-			<h1 className="text-2xl font-bold text-gray-800 mb-6">Baja Forzado</h1>
-			<form onSubmit={handleSubmit}>
-				{/* Solicitante Retiro */}
-				<div className="mb-4">
-					<label className="block text-sm font-medium text-gray-700 mb-1">Solicitante Retiro</label>
-					<select
-						name="solicitanteRetiro"
-						value={formData.solicitanteRetiro}
-						onChange={handleInputChange}
-						className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 ${errors.solicitanteRetiro ? "border-red-500" : "border-gray-300"}`}
-					>
-						<option value="">Prefijo del Tag o Sub área</option>
-						<option value="Juan Pérez">Juan Pérez</option>
-						<option value="Ana Martínez">Ana Martínez</option>
-					</select>
-					{errors.solicitanteRetiro && <span className="text-red-500 text-sm mt-1">Este campo es requerido.</span>}
-				</div>
+		<div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-xl">
+			<h1 className="text-3xl font-bold text-center text-gray-900 mb-4">Baja Forzado</h1>
 
-				{/* Aprobador Retiro */}
-				<div className="mb-4">
-					<label className="block text-sm font-medium text-gray-700 mb-1">Aprobador Retiro (AN)</label>
-					<select
-						name="aprobadorRetiro"
-						value={formData.aprobadorRetiro}
-						onChange={handleInputChange}
-						className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 ${errors.aprobadorRetiro ? "border-red-500" : "border-gray-300"}`}
-					>
-						<option value="">Parte central del Tag Asociado al Instrumento o Equipo</option>
-						<option value="Carlos Gómez">Carlos Gómez</option>
-						<option value="Sofía López">Sofía López</option>
-					</select>
-					{errors.aprobadorRetiro && <span className="text-red-500 text-sm mt-1">Este campo es requerido.</span>}
-				</div>
+			<div className="flex items-center justify-between mb-8">
+				<div className="relative flex-1 flex justify-center items-center">
+					<button onClick={prevStep} disabled={currentStep === 1} className={`absolute left-[-1px] transform ${currentStep === 1 ? "opacity-0" : "opacity-100"} transition-opacity duration-200`}>
+						<FaArrowLeft className="text-blue-500 text-2xl" />
+					</button>
 
-				{/* Ejecutor Retiro */}
-				<div className="mb-4">
-					<label className="block text-sm font-medium text-gray-700 mb-1">Ejecutor Retiro (AN)</label>
-					<select
-						name="ejecutorRetiro"
-						value={formData.ejecutorRetiro}
-						onChange={handleInputChange}
-						className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 ${errors.ejecutorRetiro ? "border-red-500" : "border-gray-300"}`}
-					>
-						<option value="">Subfijo del Tag</option>
-						<option value="Pedro González">Pedro González</option>
-						<option value="María Fernández">María Fernández</option>
-					</select>
-					{errors.ejecutorRetiro && <span className="text-red-500 text-sm mt-1">Este campo es requerido.</span>}
+					{steps.map((step, index) => (
+						<div key={step.id} className="flex items-center justify-center relative">
+							<div
+								className={`flex items-center justify-center w-14 h-14 rounded-full border-4 transition-all duration-300 ${
+									step.id < currentStep ? "bg-blue-600 text-white border-blue-600" : step.id === currentStep ? "bg-blue-500 text-white border-blue-500" : "bg-gray-200 text-gray-400 border-gray-300"
+								}`}
+							>
+								<span>{step.id}</span>
+							</div>
+							{index < steps.length - 1 && <div className={`w-20 h-1 rounded-full ${step.id < currentStep ? "bg-blue-600" : "bg-gray-300"}`}></div>}
+						</div>
+					))}
 				</div>
+			</div>
 
-				{/* Autorización Retiro */}
-				<div className="mb-4">
-					<label className="block text-sm font-medium text-gray-700 mb-1">Autorización Retiro</label>
-					<select
-						name="autorizacionRetiro"
-						value={formData.autorizacionRetiro}
-						onChange={handleInputChange}
-						className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 ${errors.autorizacionRetiro ? "border-red-500" : "border-gray-300"}`}
-					>
-						<option value="">Subfijo del Tag</option>
-						<option value="Luisa Ramírez">Luisa Ramírez</option>
-						<option value="Carlos Herrera">Carlos Herrera</option>
-					</select>
-					{errors.autorizacionRetiro && <span className="text-red-500 text-sm mt-1">Este campo es requerido.</span>}
-				</div>
+			<div>{renderStep()}</div>
 
-				{/* Fecha de Cierre */}
-				<div className="mb-4">
-					<label className="block text-sm font-medium text-gray-700 mb-1">Fecha de Cierre</label>
-					<input
-						type="datetime-local"
-						name="fechaCierre"
-						value={formData.fechaCierre}
-						onChange={handleInputChange}
-						className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 ${errors.fechaCierre ? "border-red-500" : "border-gray-300"}`}
-					/>
-					{errors.fechaCierre && <span className="text-red-500 text-sm mt-1">Este campo es requerido.</span>}
-				</div>
-
-				{/* Observaciones */}
-				<div className="mb-4">
-					<label className="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
-					<textarea
-						name="observaciones"
-						value={formData.observaciones}
-						onChange={handleInputChange}
-						className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 ${errors.observaciones ? "border-red-500" : "border-gray-300"}`}
-						rows={4}
-						placeholder="Escriba sus observaciones aquí..."
-					/>
-					{errors.observaciones && <span className="text-red-500 text-sm mt-1">Este campo es requerido.</span>}
-				</div>
-
-				{/* Datos Adjuntos */}
-				<div className="mb-4">
-					<label htmlFor="datosAdjuntos" className="block text-sm font-medium text-gray-700 mb-1">
-						Datos Adjuntos
-					</label>
-					<div
-						className={`flex items-center justify-center border-2 ${
-							dragActive ? "border-blue-500" : "border-gray-300"
-						} border-dashed rounded-md p-4 cursor-pointer hover:bg-gray-100 focus-within:ring-2 focus-within:ring-blue-500`}
-						onDragOver={handleDrag}
-						onDragEnter={handleDrag}
-						onDragLeave={handleDrag}
-						onDrop={handleDrop}
-						onClick={() => document.getElementById("datosAdjuntos")?.click()}
-					>
-						<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 16v-3a4 4 0 10-8 0v3M8 16v2a4 4 0 004 4h0a4 4 0 004-4v-2m4-4a8 8 0 10-16 0v3m4-8a4 4 0 118 0" />
-						</svg>
-						<span className="text-sm text-gray-500">{formData.datosAdjuntos ? formData.datosAdjuntos.name : "Arrastre y suelte archivos o haga clic aquí"}</span>
-					</div>
-					<input id="datosAdjuntos" name="datosAdjuntos" type="file" className="hidden" onChange={handleInputChange} />
-					{errors.datosAdjuntos && <span className="text-red-500 text-sm mt-1">Este campo es requerido.</span>}
-				</div>
-
-				{/* Botón de Enviar */}
-				<button type="submit" className="w-full px-4 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600">
-					Enviar
+			<div className="flex justify-center mt-10 space-x-6">
+				<button
+					onClick={nextStep}
+					disabled={!isStepValid(currentStep)}
+					className={`px-6 py-3 text-white rounded-md flex items-center gap-2 ${!isStepValid(currentStep) ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"}`}
+				>
+					{currentStep === steps.length ? (
+						<span>Aprobar</span>
+					) : (
+						<>
+							Continuar
+							<span className="ml-2 text-lg">→</span>
+						</>
+					)}
 				</button>
-			</form>
+			</div>
 		</div>
 	);
 };
 
-export default BajaForzado;
+export default ForcedRegistration;

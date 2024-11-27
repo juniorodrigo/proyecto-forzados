@@ -71,6 +71,20 @@ const Page = () => {
 		fetchData();
 	}, []);
 
+	const fetchResumen = async (id: number) => {
+		try {
+			const response = await fetch(`/api/solicitudes/alta/resumen?id=${id}`);
+			const result = await response.json();
+			if (result.success) {
+				setSelectedRow(result.data);
+			} else {
+				console.error(result.message);
+			}
+		} catch (error) {
+			console.error("Error fetching resumen:", error);
+		}
+	};
+
 	const filteredRows = useMemo(() => {
 		return rows.filter((row) => {
 			const rowDate = new Date(row.fecha);
@@ -94,11 +108,8 @@ const Page = () => {
 	};
 
 	const handleView = (id: number) => {
-		const row = rows.find((row) => row.id === id); // Encuentra la fila seleccionada
-		if (row) {
-			setSelectedRow(row); // Almacena los datos en `selectedRow`
-			setIsModalOpen(true); // Abre el modal
-		}
+		fetchResumen(id);
+		setIsModalOpen(true); // Abre el modal
 	};
 
 	const closeModal = () => {
@@ -119,6 +130,25 @@ const Page = () => {
 		setSelectedSolicitante("");
 		setSelectedEstado("");
 		setSelectedArea("");
+	};
+
+	const handleApprove = async () => {
+		if (selectedRow) {
+			try {
+				const response = await fetch(`/api/solicitudes/aprobar?id=${selectedRow.id}`, {
+					method: "POST",
+				});
+				const result = await response.json();
+				if (result.success) {
+					alert("Solicitud aprobada con éxito");
+					closeModal();
+				} else {
+					console.error(result.message);
+				}
+			} catch (error) {
+				console.error("Error approving request:", error);
+			}
+		}
 	};
 
 	return (
@@ -169,132 +199,76 @@ const Page = () => {
 							<form>
 								{/* Tag (Prefijo) */}
 								<label className="block text-sm font-medium text-gray-700 mb-2">Tag (Prefijo)</label>
-								<select required className="w-full px-3 py-2 border rounded mb-4">
-									<option value="">Seleccione una opción</option>
-									<option value="op1">Opción 1</option>
-									<option value="op2">Opción 2</option>
-								</select>
+								<input type="text" value={selectedRow?.tagPrefijo || ""} readOnly className="w-full px-3 py-2 border rounded mb-4" />
 
 								{/* Tag (Centro) */}
 								<label className="block text-sm font-medium text-gray-700 mb-2">Tag (Centro)</label>
-								<select required className="w-full px-3 py-2 border rounded mb-4">
-									<option value="">Seleccione una opción</option>
-									<option value="op1">Opción 1</option>
-									<option value="op2">Opción 2</option>
-								</select>
+								<input type="text" value={selectedRow?.tagCentro || ""} readOnly className="w-full px-3 py-2 border rounded mb-4" />
 
 								{/* Tag (SubFijo) */}
 								<label className="block text-sm font-medium text-gray-700 mb-2">Tag (SubFijo)</label>
-								<select required className="w-full px-3 py-2 border rounded mb-4">
-									<option value="">Seleccione una opción</option>
-									<option value="op1">Opción 1</option>
-									<option value="op2">Opción 2</option>
-								</select>
+								<input type="text" value={selectedRow?.tagSubFijo || ""} readOnly className="w-full px-3 py-2 border rounded mb-4" />
 
 								{/* Descripción */}
 								<label className="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
-								<textarea required className="w-full px-3 py-2 border rounded mb-4" placeholder="Ingrese una descripción"></textarea>
+								<textarea value={selectedRow?.descripcion || ""} readOnly className="w-full px-3 py-2 border rounded mb-4" placeholder="Ingrese una descripción"></textarea>
 
 								{/* Disciplina */}
 								<label className="block text-sm font-medium text-gray-700 mb-2">Disciplina</label>
-								<select required className="w-full px-3 py-2 border rounded mb-4">
-									<option value="">Seleccione una opción</option>
-									<option value="op1">Opción 1</option>
-									<option value="op2">Opción 2</option>
-								</select>
+								<input type="text" value={selectedRow?.disciplinaDescripcion || ""} readOnly className="w-full px-3 py-2 border rounded mb-4" />
 
 								{/* Turno */}
 								<label className="block text-sm font-medium text-gray-700 mb-2">Turno</label>
-								<select required className="w-full px-3 py-2 border rounded mb-4">
-									<option value="">Seleccione una opción</option>
-									<option value="op1">Opción 1</option>
-									<option value="op2">Opción 2</option>
-								</select>
+								<input type="text" value={selectedRow?.turnoDescripcion || ""} readOnly className="w-full px-3 py-2 border rounded mb-4" />
 
 								{/* Interlock Seguridad */}
 								<label className="block text-sm font-medium text-gray-700 mb-2">Interlock Seguridad</label>
-								<select required className="w-full px-3 py-2 border rounded mb-4">
-									<option value="">Seleccione una opción</option>
-									<option value="op1">Opción 1</option>
-									<option value="op2">Opción 2</option>
-								</select>
+								<input type="text" value={selectedRow?.interlockSeguridad || ""} readOnly className="w-full px-3 py-2 border rounded mb-4" />
 
 								{/* Responsable */}
 								<label className="block text-sm font-medium text-gray-700 mb-2">Responsable</label>
-								<select required className="w-full px-3 py-2 border rounded mb-4">
-									<option value="">Seleccione una opción</option>
-									<option value="op1">Opción 1</option>
-									<option value="op2">Opción 2</option>
-								</select>
+								<input type="text" value={selectedRow?.responsableNombre || ""} readOnly className="w-full px-3 py-2 border rounded mb-4" />
 
 								{/* Riesgo */}
 								<label className="block text-sm font-medium text-gray-700 mb-2">Riesgo</label>
-								<select required className="w-full px-3 py-2 border rounded mb-4">
-									<option value="">Seleccione una opción</option>
-									<option value="op1">Opción 1</option>
-									<option value="op2">Opción 2</option>
-								</select>
+								<input type="text" value={selectedRow?.riesgoDescripcion || ""} readOnly className="w-full px-3 py-2 border rounded mb-4" />
 
 								{/* Probabilidad */}
 								<label className="block text-sm font-medium text-gray-700 mb-2">Probabilidad</label>
-								<select required className="w-full px-3 py-2 border rounded mb-4">
-									<option value="">Seleccione una opción</option>
-									<option value="op1">Opción 1</option>
-									<option value="op2">Opción 2</option>
-								</select>
+								<input type="text" value={selectedRow?.probabilidad || ""} readOnly className="w-full px-3 py-2 border rounded mb-4" />
 
 								{/* Impacto */}
 								<label className="block text-sm font-medium text-gray-700 mb-2">Impacto</label>
-								<select required className="w-full px-3 py-2 border rounded mb-4">
-									<option value="">Seleccione una opción</option>
-									<option value="op1">Opción 1</option>
-									<option value="op2">Opción 2</option>
-								</select>
+								<input type="text" value={selectedRow?.impacto || ""} readOnly className="w-full px-3 py-2 border rounded mb-4" />
 
 								{/* Solicitante (AN) */}
 								<label className="block text-sm font-medium text-gray-700 mb-2">Solicitante (AN)</label>
-								<select required className="w-full px-3 py-2 border rounded mb-4">
-									<option value="">Seleccione una opción</option>
-									<option value="op1">Opción 1</option>
-									<option value="op2">Opción 2</option>
-								</select>
+								<input type="text" value={selectedRow?.solicitanteAN || ""} readOnly className="w-full px-3 py-2 border rounded mb-4" />
 
 								{/* Aprobador */}
 								<label className="block text-sm font-medium text-gray-700 mb-2">Aprobador</label>
-								<select required className="w-full px-3 py-2 border rounded mb-4">
-									<option value="">Seleccione una opción</option>
-									<option value="op1">Opción 1</option>
-									<option value="op2">Opción 2</option>
-								</select>
+								<input type="text" value={selectedRow?.aprobador || ""} readOnly className="w-full px-3 py-2 border rounded mb-4" />
 
 								{/* Ejecutor */}
 								<label className="block text-sm font-medium text-gray-700 mb-2">Ejecutor</label>
-								<select required className="w-full px-3 py-2 border rounded mb-4">
-									<option value="">Seleccione una opción</option>
-									<option value="op1">Opción 1</option>
-									<option value="op2">Opción 2</option>
-								</select>
+								<input type="text" value={selectedRow?.ejecutor || ""} readOnly className="w-full px-3 py-2 border rounded mb-4" />
 
 								{/* Autorización */}
 								<label className="block text-sm font-medium text-gray-700 mb-2">Autorización</label>
-								<select required className="w-full px-3 py-2 border rounded mb-4">
-									<option value="">Seleccione una opción</option>
-									<option value="op1">Opción 1</option>
-									<option value="op2">Opción 2</option>
-								</select>
+								<input type="text" value={selectedRow?.autorizacion || ""} readOnly className="w-full px-3 py-2 border rounded mb-4" />
 
 								{/* Tipo de Forzado */}
 								<label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Forzado</label>
-								<select required className="w-full px-3 py-2 border rounded mb-4">
-									<option value="">Seleccione una opción</option>
-									<option value="op1">Opción 1</option>
-									<option value="op2">Opción 2</option>
-								</select>
+								<input type="text" value={selectedRow?.tipoForzadoDescripcion || ""} readOnly className="w-full px-3 py-2 border rounded mb-4" />
+
 								<div className="flex justify-end p-4 border-t">
 									<button className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600" onClick={closeModal}>
 										Cancelar
 									</button>
 									<button className="ml-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Guardar</button>
+									<button className="ml-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700" onClick={handleApprove}>
+										Aprobar
+									</button>
 								</div>
 							</form>
 						</div>

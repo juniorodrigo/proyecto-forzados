@@ -36,6 +36,30 @@ export async function POST(request: Request) {
 	}
 }
 
+// Manejo del método PUT
+export async function PUT(request: Request) {
+	try {
+		const data = await request.json();
+		console.log(data);
+
+		// generar el query
+		const query = generateUpdateQuery(data);
+		console.log(query);
+
+		const pool = await poolPromise;
+		const result = await pool.query(query);
+
+		if (result.rowsAffected && result.rowsAffected[0] > 0) {
+			return NextResponse.json({ success: true, message: "Record updated successfully", data });
+		} else {
+			return NextResponse.json({ success: false, message: "Failed to update record" }, { status: 500 });
+		}
+	} catch (error) {
+		console.error("Error processing PUT:", error);
+		return NextResponse.json({ success: false, message: "Invalid request data" }, { status: 400 });
+	}
+}
+
 const getAllSolicitudes = async () => {
 	const pool = await poolPromise;
 	const result = await pool.query(`
@@ -121,4 +145,27 @@ VALUES (
 	GETDATE(), -- FECHA_MODIFICACION
 	'pendiente' -- ESTADOSOLICITUD
 );`;
+};
+
+type UpdateQueryParameters = {
+	[key: string]: string | number | boolean;
+};
+
+const generateUpdateQuery = (parameters: UpdateQueryParameters) => {
+	console.log(parameters);
+
+	return `UPDATE TRS_SOLICITUD_FORZADO SET
+		SUBAREA_ID = ${parameters.tagPrefijo},
+		DISCIPLINA_ID = ${parameters.disciplina},
+		TURNO_ID = ${parameters.turno},
+		TIPOFORZADO_ID = ${parameters.tipoForzado},
+		TAGCENTRO_ID = ${parameters.tagCentro},
+		RESPONSABLE_ID = ${parameters.responsable},
+		RIESGOA_ID = ${parameters.riesgo},
+		INTERLOCK = ${parameters.interlockSeguridad === "SÍ" ? 1 : 0},
+		DESCRIPCIONFORZADO = '${parameters.descripcion}',
+		USUARIO_MODIFICACION = '${parameters.aprobador}',
+		FECHA_MODIFICACION = GETDATE(),
+		ESTADOSOLICITUD = 'pendiente'
+	WHERE SOLICITUD_ID = ${parameters.id};`;
 };
