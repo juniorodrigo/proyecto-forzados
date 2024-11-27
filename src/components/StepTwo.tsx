@@ -69,7 +69,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
 		fetchData("/api/maestras/riesgo-a", setRiesgos);
 		fetchData("/api/maestras/probabilidad", setProbabilidades);
 		fetchData("/api/maestras/impacto", setImpactos);
-	}, []);
+	}, [setInterlockSeguridad, setResponsable, setRiesgo, setProbabilidad, setImpacto, setSolicitante]);
 
 	useEffect(() => {
 		if (responsable && riesgo) {
@@ -82,6 +82,28 @@ const StepTwo: React.FC<StepTwoProps> = ({
 				.catch((error) => console.error("Error al obtener etiquetas:", error));
 		}
 	}, [responsable, riesgo, setResponsable, setRiesgo]);
+
+	useEffect(() => {
+		const fetchSolicitudData = async () => {
+			const urlParams = new URLSearchParams(window.location.search);
+			const id = urlParams.get("id");
+			if (id) {
+				try {
+					const response = await fetch(`/api/solicitudes/alta/${id}`);
+					const data = await response.json();
+					setInterlockSeguridad(data.interlockSeguridad);
+					setResponsable(data.responsable);
+					setRiesgo(data.riesgo);
+					setProbabilidad(data.probabilidad);
+					setImpacto(data.impacto);
+					setSolicitante(data.solicitante);
+				} catch (error) {
+					console.error("Error fetching solicitud data:", error);
+				}
+			}
+		};
+		fetchSolicitudData();
+	}, [setInterlockSeguridad, setResponsable, setRiesgo, setProbabilidad, setImpacto, setSolicitante]);
 
 	return (
 		<form className="space-y-6">
