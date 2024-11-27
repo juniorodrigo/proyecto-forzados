@@ -24,7 +24,8 @@ const BajaForzado = () => {
 			try {
 				const response = await fetch("/api/usuarios");
 				const data = await response.json();
-				setUsuarios(data);
+
+				setUsuarios(data.values);
 			} catch (error) {
 				console.error("Error al obtener usuarios:", error);
 			}
@@ -94,7 +95,7 @@ const BajaForzado = () => {
 					if (response.ok) {
 						setPopover({ show: true, message: "Baja generada exitosamente.", type: "success" });
 						setTimeout(() => {
-							window.location.href = "/dashboard/consulta";
+							window.location.href = "/dashboard/consultas";
 						}, 3000);
 					} else {
 						throw new Error("Error al generar la baja.");
@@ -122,7 +123,9 @@ const BajaForzado = () => {
 					>
 						<option value="">Seleccione un usuario</option>
 						{usuarios.map((usuario) => (
-							<option key={usuario.id} value={usuario.id}>{usuario.nombre}</option>
+							<option key={usuario.id} value={usuario.id}>
+								{usuario.nombre}
+							</option>
 						))}
 					</select>
 					{errors.solicitanteRetiro && <span className="text-red-500 text-sm mt-1">Este campo es requerido.</span>}
@@ -139,7 +142,9 @@ const BajaForzado = () => {
 					>
 						<option value="">Seleccione un usuario</option>
 						{usuarios.map((usuario) => (
-							<option key={usuario.id} value={usuario.id}>{usuario.nombre}</option>
+							<option key={usuario.id} value={usuario.id}>
+								{usuario.nombre}
+							</option>
 						))}
 					</select>
 					{errors.aprobadorRetiro && <span className="text-red-500 text-sm mt-1">Este campo es requerido.</span>}
@@ -156,7 +161,9 @@ const BajaForzado = () => {
 					>
 						<option value="">Seleccione un usuario</option>
 						{usuarios.map((usuario) => (
-							<option key={usuario.id} value={usuario.id}>{usuario.nombre}</option>
+							<option key={usuario.id} value={usuario.id}>
+								{usuario.nombre}
+							</option>
 						))}
 					</select>
 					{errors.ejecutorRetiro && <span className="text-red-500 text-sm mt-1">Este campo es requerido.</span>}
@@ -173,7 +180,9 @@ const BajaForzado = () => {
 					>
 						<option value="">Seleccione un usuario</option>
 						{usuarios.map((usuario) => (
-							<option key={usuario.id} value={usuario.id}>{usuario.nombre}</option>
+							<option key={usuario.id} value={usuario.id}>
+								{usuario.nombre}
+							</option>
 						))}
 					</select>
 					{errors.autorizacionRetiro && <span className="text-red-500 text-sm mt-1">Este campo es requerido.</span>}

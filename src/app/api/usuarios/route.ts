@@ -7,12 +7,12 @@ import { poolPromise } from "@sql/lib/db";
 export async function GET() {
 	try {
 		const pool = await poolPromise;
-		const { recordset } = await pool.request().query("SELECT USUARIO_ID, NOMBRE,APEPATERNPO, APEMATERNO FROM MAE_USUARIO");
+		const { recordset } = await pool.request().query("SELECT USUARIO_ID, NOMBRE,APEPATERNO, APEMATERNO FROM MAE_USUARIO");
 
 		const turnos = recordset.map((singleValue) => {
 			return {
 				id: singleValue.USUARIO_ID,
-				nombre: singleValue.NOMBRE + " " + singleValue.APEPATERNPO + " " + singleValue.APEMATERNO,
+				nombre: singleValue.NOMBRE + " " + singleValue.APEPATERNO + " " + singleValue.APEMATERNO,
 			};
 		});
 		return NextResponse.json({ success: true, values: turnos });

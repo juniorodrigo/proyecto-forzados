@@ -43,6 +43,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
 	const [riesgos, setRiesgos] = useState<Option[]>([]);
 	const [probabilidades, setProbabilidades] = useState<Option[]>([]);
 	const [impactos, setImpactos] = useState<Option[]>([]);
+	const [usuarios, setUsuarios] = useState<{ id: string; nombre: string }[]>([]);
 
 	useEffect(() => {
 		const fetchData = async (url: string, setState: React.Dispatch<React.SetStateAction<Option[]>>) => {
@@ -73,6 +74,19 @@ const StepTwo: React.FC<StepTwoProps> = ({
 		fetchData("/api/maestras/probabilidad", setProbabilidades);
 		fetchData("/api/maestras/impacto", setImpactos);
 	}, [setInterlockSeguridad, setResponsable, setRiesgo, setProbabilidad, setImpacto, setSolicitante]);
+
+	useEffect(() => {
+		const fetchUsuarios = async () => {
+			try {
+				const response = await fetch("/api/usuarios");
+				const data = await response.json();
+				setUsuarios(data.values);
+			} catch (error) {
+				console.error("Error al obtener usuarios:", error);
+			}
+		};
+		fetchUsuarios();
+	}, []);
 
 	useEffect(() => {
 		const fetchSolicitudData = async () => {
@@ -186,9 +200,11 @@ const StepTwo: React.FC<StepTwoProps> = ({
 					required
 				>
 					<option value="">Seleccione Solicitante del Forzado</option>
-					<option value="Carlos Fernandez">Aparicio Jorge</option>
-					<option value="Ricardo Araya">Araya Ricardo</option>
-					<option value="Cristian Carrillo">Carrillo Cristian</option>
+					{usuarios.map((usuario) => (
+						<option key={usuario.id} value={usuario.id}>
+							{usuario.nombre}
+						</option>
+					))}
 				</select>
 			</div>
 		</form>

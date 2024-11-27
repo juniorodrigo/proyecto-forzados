@@ -18,6 +18,7 @@ interface TipoForzado {
 
 const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor, setEjecutor, autorizacion, setAutorizacion, tipoForzado, setTipoForzado }) => {
 	const [tiposForzado, setTiposForzado] = useState<TipoForzado[]>([]);
+	const [usuarios, setUsuarios] = useState<{ id: string; nombre: string }[]>([]);
 
 	useEffect(() => {
 		const fetchTiposForzado = async () => {
@@ -32,6 +33,19 @@ const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor
 
 		fetchTiposForzado();
 	}, [setAprobador, setAutorizacion, setEjecutor, setTipoForzado]);
+
+	useEffect(() => {
+		const fetchUsuarios = async () => {
+			try {
+				const response = await fetch("/api/usuarios");
+				const data = await response.json();
+				setUsuarios(data.values);
+			} catch (error) {
+				console.error("Error al obtener usuarios:", error);
+			}
+		};
+		fetchUsuarios();
+	}, []);
 
 	useEffect(() => {
 		const fetchSolicitudData = async () => {
@@ -66,9 +80,11 @@ const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor
 					required
 				>
 					<option value="">Seleccione Aprobador del Forzado</option>
-					<option value="Aparicio Jorge">Aparicio Jorge</option>
-					<option value="Araya Ricardo">Araya Ricardo</option>
-					<option value="Carrillo Cristian">Carrillo Cristian</option>
+					{usuarios.map((usuario) => (
+						<option key={usuario.id} value={usuario.id}>
+							{usuario.nombre}
+						</option>
+					))}
 				</select>
 			</div>
 
@@ -77,9 +93,11 @@ const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor
 				<label className="block text-sm font-medium text-gray-600 mb-2">Ejecutor</label>
 				<select value={ejecutor} onChange={(e) => setEjecutor(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
 					<option value="">Seleccione Ejecutor</option>
-					<option value="Chamorro Felipe">Chamorro Felipe</option>
-					<option value="Cornejo Joaquín">Cornejo Joaquín</option>
-					<option value="Fernández Rodrigo">Fernández Rodrigo</option>
+					{usuarios.map((usuario) => (
+						<option key={usuario.id} value={usuario.id}>
+							{usuario.nombre}
+						</option>
+					))}
 				</select>
 			</div>
 

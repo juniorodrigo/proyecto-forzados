@@ -1,6 +1,6 @@
 "use client";
 import React, { useContext, useEffect, useState, useMemo } from "react";
-import { RiDashboardLine, RiProductHuntLine, RiSettings2Line, RiBriefcaseLine, RiBuildingLine } from "react-icons/ri";
+import { RiProductHuntLine, RiSettings2Line, RiBriefcaseLine, RiBuildingLine } from "react-icons/ri";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UiContext } from "@/context/SidebarContext";
@@ -38,12 +38,12 @@ const Sidebar: React.FC = () => {
 				icon: <RiBriefcaseLine className="text-xl mr-3" />,
 				href: "/dashboard/generar-alta",
 			},
-			{
-				id: "administrar-usuario",
-				label: "Administrar Usuarios",
-				icon: <RiDashboardLine className="text-xl mr-3" />,
-				href: "/dashboard/administrar-usuario",
-			},
+			// {
+			// 	id: "administrar-usuario",
+			// 	label: "Administrar Usuarios",
+			// 	icon: <RiDashboardLine className="text-xl mr-3" />,
+			// 	href: "/dashboard/administrar-usuario",
+			// },
 			{
 				id: "administrar-parametros",
 				label: "Administrar Parametros",

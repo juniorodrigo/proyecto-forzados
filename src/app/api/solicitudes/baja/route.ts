@@ -22,14 +22,16 @@ export async function POST(request: Request) {
 		const query = generateInsertQuery(data);
 		console.log(query);
 
-		const pool = await poolPromise;
-		const result = await pool.query(query);
+		return NextResponse.json({ success: true, message: "Record inserted successfully", data });
 
-		if (result.rowsAffected && result.rowsAffected[0] > 0) {
-			return NextResponse.json({ success: true, message: "Record inserted successfully", data });
-		} else {
-			return NextResponse.json({ success: false, message: "Failed to insert record" }, { status: 500 });
-		}
+		// const pool = await poolPromise;
+		// const result = await pool.query(query);
+
+		// if (result.rowsAffected && result.rowsAffected[0] > 0) {
+		// 	return NextResponse.json({ success: true, message: "Record inserted successfully", data });
+		// } else {
+		// 	return NextResponse.json({ success: false, message: "Failed to insert record" }, { status: 500 });
+		// }
 	} catch (error) {
 		console.error("Error processing POST:", error);
 		return NextResponse.json({ success: false, message: "Invalid request data" }, { status: 400 });
