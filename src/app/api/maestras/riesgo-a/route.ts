@@ -7,7 +7,7 @@ import { poolPromise } from "@sql/lib/db";
 export async function GET() {
 	try {
 		const pool = await poolPromise;
-		const { recordset } = await pool.request().query("SELECT * FROM RIESGO_A");
+		const { recordset } = await pool.request().query("SELECT * FROM MAE_RIESGO_A");
 
 		const turnos = recordset.map((singleValue) => {
 			return {
