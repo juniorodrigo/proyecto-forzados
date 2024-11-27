@@ -64,6 +64,7 @@ const getAllSolicitudes = async () => {
 	const pool = await poolPromise;
 	const result = await pool.query(`
 SELECT
+		SF.SOLICITUD_ID,
     SF.DESCRIPCIONFORZADO,
     SF.ESTADOSOLICITUD,
     SF.FECHAREALIZACION,
@@ -122,7 +123,7 @@ LEFT JOIN
 		id: record.SOLICITUD_ID,
 		nombre: record.DESCRIPCIONFORZADO,
 		area: record.SUBAREA_DESCRIPCION,
-		solicitante: record.SOLICITANTE,
+		solicitante: record.USUARIO_CREACION,
 		estado: record.ESTADOSOLICITUD,
 		fecha: record.FECHA_CREACION,
 		descripcion: record.DESCRIPCIONFORZADO,
@@ -195,7 +196,7 @@ VALUES (
 	${parameters.tagCentro}, -- TAGCENTRO_ID
 	${parameters.responsable}, -- RESPONSABLE_ID
 	${parameters.riesgo}, -- RIESGOA_ID
-	NULL, -- TIPOSOLICITUD
+	2, -- TIPOSOLICITUD
 	${parameters.interlockSeguridad === "SÍ" ? 1 : 0}, -- INTERLOCK
 	'${parameters.descripcion}', -- DESCRIPCIONFORZADO
 	NULL, -- FECHAREALIZACION

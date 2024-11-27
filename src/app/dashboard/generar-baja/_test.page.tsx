@@ -5,7 +5,6 @@ import StepTwo from "@/components/StepTwo";
 import React, { useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import { useRouter, useSearchParams } from "next/navigation";
-import Popover from "@/components/Popover";
 
 const ForcedRegistration: React.FC = () => {
 	const [currentStep, setCurrentStep] = useState(1);
@@ -29,10 +28,6 @@ const ForcedRegistration: React.FC = () => {
 	const [ejecutor, setEjecutor] = useState("");
 	const [autorizacion, setAutorizacion] = useState("");
 	const [tipoForzado, setTipoForzado] = useState("");
-
-	const [popoverMessage, setPopoverMessage] = useState("");
-	const [popoverType, setPopoverType] = useState<"success" | "error">("success");
-	const [showPopover, setShowPopover] = useState(false);
 
 	const router = useRouter();
 	const searchParams = useSearchParams();
@@ -95,23 +90,15 @@ const ForcedRegistration: React.FC = () => {
 				.then((response) => response.json())
 				.then((data) => {
 					if (data.success) {
-						setPopoverMessage("Solicitud de forzado enviada exitosamente");
-						setPopoverType("success");
-						setShowPopover(true);
-						setTimeout(() => {
-							router.push("/dashboard/consultas");
-						}, 2000); // Espera de 2 segundos antes de redirigir
+						alert("Solicitud enviada exitosamente");
+						router.push("/dashboard/consultas");
 					} else {
-						setPopoverMessage("Error al enviar la solicitud");
-						setPopoverType("error");
-						setShowPopover(true);
+						alert("Error al enviar la solicitud");
 					}
 				})
 				.catch((error) => {
 					console.error("Error:", error);
-					setPopoverMessage("Error al enviar la solicitud");
-					setPopoverType("error");
-					setShowPopover(true);
+					alert("Error al enviar la solicitud");
 				});
 		}
 	};
@@ -189,7 +176,7 @@ const ForcedRegistration: React.FC = () => {
 
 	return (
 		<div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-xl">
-			<h1 className="text-3xl font-bold text-center text-gray-900 mb-4">{!id ? "Alta de Forzado" : "Modificación de Alta"}</h1>
+			<h1 className="text-3xl font-bold text-center text-gray-900 mb-4">Baja Forzado</h1>
 
 			<div className="flex items-center justify-between mb-8">
 				<div className="relative flex-1 flex justify-center items-center">
@@ -221,7 +208,7 @@ const ForcedRegistration: React.FC = () => {
 					className={`px-6 py-3 text-white rounded-md flex items-center gap-2 ${!isStepValid(currentStep) ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"}`}
 				>
 					{currentStep === steps.length ? (
-						<span>Realizar Solicitud</span>
+						<span>Aprobar</span>
 					) : (
 						<>
 							Continuar
@@ -230,7 +217,6 @@ const ForcedRegistration: React.FC = () => {
 					)}
 				</button>
 			</div>
-			<Popover message={popoverMessage} type={popoverType} show={showPopover} onClose={() => setShowPopover(false)} />
 		</div>
 	);
 };

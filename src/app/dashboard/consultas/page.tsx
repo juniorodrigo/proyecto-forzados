@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Search, Calendar, X } from "lucide-react";
+import Popover from "@/components/Popover";
 
 type Status = "rechazado" | "pendiente" | "aprobado" | "ejecutado" | "finalizado";
 
@@ -30,6 +31,9 @@ const Page: React.FC = () => {
 	const [rows, setRows] = useState<Row[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const [popoverMessage, setPopoverMessage] = useState("");
+	const [popoverType, setPopoverType] = useState<"success" | "error">("success");
+	const [showPopover, setShowPopover] = useState(false);
 	const router = useRouter();
 
 	const columns = [
@@ -57,6 +61,7 @@ const Page: React.FC = () => {
 						...row,
 						fecha: formatDate(row.fecha),
 					}));
+					console.log(formattedData);
 					setRows(formattedData);
 				} else {
 					setError(result.message);
@@ -109,6 +114,66 @@ const Page: React.FC = () => {
 		setSelectedSolicitante("");
 		setSelectedEstado("");
 		setSelectedArea("");
+	};
+
+	const getStatusClass = (estado: Status) => {
+		switch (estado) {
+			case "pendiente":
+				return "bg-yellow-200";
+			case "aprobado":
+				return "bg-green-200";
+			case "ejecutado":
+				return "bg-green-600 text-white";
+			case "finalizado":
+				return "bg-blue-200";
+			default:
+				return "";
+		}
+	};
+
+	const handleApprove = async (id: number) => {
+		if (confirm("¿Está seguro de aprobar?")) {
+			try {
+				const response = await fetch("/api/solicitudes/alta/aprobar", { method: "POST", body: JSON.stringify({ id }) });
+				if (response.ok) {
+					setPopoverMessage("Aprobación exitosa");
+					setPopoverType("success");
+					// Recargar datos
+					const fetchData = async () => {
+						setIsLoading(true);
+						setError(null);
+						try {
+							const response = await fetch("/api/solicitudes/alta");
+							const result = await response.json();
+							if (result.success) {
+								const formattedData = result.data.map((row: Row) => ({
+									...row,
+									fecha: formatDate(row.fecha),
+								}));
+								setRows(formattedData);
+							} else {
+								setError(result.message);
+							}
+						} catch {
+							setError("Error al cargar los datos. Por favor, intente nuevamente.");
+						} finally {
+							setIsLoading(false);
+						}
+					};
+					fetchData();
+					closeModal(); // Cerrar modal
+				} else {
+					setPopoverMessage("Error al aprobar");
+					setPopoverType("error");
+				}
+			} catch {
+				setPopoverMessage("Error al aprobar");
+				setPopoverType("error");
+			} finally {
+				setShowPopover(true);
+				setTimeout(() => setShowPopover(false), 3000);
+			}
+		}
 	};
 
 	return (
@@ -230,18 +295,20 @@ const Page: React.FC = () => {
 								<tr key={row.id}>
 									{columns.map((column) => (
 										<td key={column.key} className="px-6 py-4 whitespace-nowrap">
-											<div className="text-sm text-gray-900">{row[column.key]}</div>
+											<div className={`text-sm text-gray-900 ${column.key === "estado" ? `${getStatusClass(row.estado)} text-center rounded-full py-1 px-3` : ""}`}>{row[column.key]}</div>
 										</td>
 									))}
 									<td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
 										<button onClick={() => handleView(row.id)} className="text-indigo-600 hover:text-indigo-900 mr-2">
 											Ver
 										</button>
-										<button onClick={() => handleEdit(row.id)} className="text-green-600 hover:text-green-900 mr-2">
-											Editar
-										</button>
+										{row.estado !== "aprobado" && (
+											<button onClick={() => handleEdit(row.id)} className="text-green-600 hover:text-green-900 mr-2">
+												Editar
+											</button>
+										)}
 										<button onClick={() => handleDelete(row.id)} className="text-red-600 hover:text-red-900">
-											Eliminar
+											Dar de Baja
 										</button>
 									</td>
 								</tr>
@@ -268,30 +335,69 @@ const Page: React.FC = () => {
 									<strong>Área:</strong> {selectedRow.area}
 								</p>
 								<p>
-									<strong>Solicitante:</strong> {selectedRow.solicitante}
+									<strong>Solicitante:</strong> {selectedRow.usuarioCreacion}
 								</p>
 								<p>
-									<strong>Estado:</strong> {selectedRow.estado}
+									<strong>Estado:</strong> <span className={`p-2 rounded ${getStatusClass(selectedRow.estado)}`}>{selectedRow.estado}</span>
 								</p>
 								<p>
 									<strong>Fecha:</strong> {selectedRow.fecha}
+								</p>
+								<p>
+									<strong>Descripción:</strong> {selectedRow.descripcion}
+								</p>
+								<p>
+									<strong>Disciplina:</strong> {selectedRow.disciplinaDescripcion}
+								</p>
+								<p>
+									<strong>Estado Solicitud:</strong> {selectedRow.estadoSolicitud}
+								</p>
+								<p>
+									<strong>Fecha Cierre:</strong> {selectedRow.fechaCierre ? formatDate(selectedRow.fechaCierre.toString()) : "N/A"}
+								</p>
+								<p>
+									<strong>Fecha Realización:</strong> {selectedRow.fechaRealizacion ? formatDate(selectedRow.fechaRealizacion.toString()) : "N/A"}
+								</p>
+								<p>
+									<strong>Motivo de Rechazo:</strong> {selectedRow.motivoRechazoDescripcion}
+								</p>
+								<p>
+									<strong>Responsable Nombre:</strong> {selectedRow.responsableNombre}
+								</p>
+								<p>
+									<strong>Riesgo A:</strong> {selectedRow.riesgoDescripcion}
+								</p>
+								<p>
+									<strong>Subárea:</strong> {selectedRow.subareaDescripcion}
+								</p>
+								<p>
+									<strong>Tag Centro:</strong> {selectedRow.tagCentroDescripcion}
+								</p>
+								<p>
+									<strong>Tipo Forzado:</strong> {selectedRow.tipoForzadoDescripcion}
+								</p>
+								<p>
+									<strong>Turno:</strong> Turno {selectedRow.turnoDescripcion}
 								</p>
 							</div>
 							<div className="flex justify-end gap-4">
 								<button onClick={closeModal} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
 									Cerrar
 								</button>
-								<button
-									onClick={() => handleEdit(selectedRow.id)}
-									className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-								>
-									Editar
-								</button>
+								{selectedRow.estado !== "aprobado" && (
+									<button
+										onClick={() => handleApprove(selectedRow.id)}
+										className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+									>
+										Aprobar
+									</button>
+								)}
 							</div>
 						</div>
 					</div>
 				</div>
 			)}
+			<Popover message={popoverMessage} type={popoverType} show={showPopover} />
 		</div>
 	);
 };

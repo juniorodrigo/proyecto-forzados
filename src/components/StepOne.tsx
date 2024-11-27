@@ -25,9 +25,9 @@ const StepOne: React.FC<StepOneProps> = ({
 	setTagPrefijo,
 	tagCentro,
 	setTagCentro,
-	tagSubfijo,
+	tagSubfijo = "",
 	setTagSubfijo,
-	descripcion,
+	descripcion = "",
 	setDescripcion,
 	disciplina,
 	setDisciplina,
@@ -44,8 +44,6 @@ const StepOne: React.FC<StepOneProps> = ({
 			try {
 				const response = await fetch(url);
 				const data = await response.json();
-
-				console.log(data, "data_____");
 
 				setState(data.values);
 				console.log(data.values, `data values from ${url}`);
@@ -94,7 +92,7 @@ const StepOne: React.FC<StepOneProps> = ({
 		<form className="space-y-6">
 			{/* Tag (Prefijo) */}
 			<div>
-				<h2 className="text-center font-semibold text-2xl mb-2">Tag y Sufijo</h2>
+				<h2 className="text-center font-semibold text-2xl mb-2">Datos generales</h2>
 				<label className="block text-sm font-medium text-gray-600 mb-2">Tag (Prefijo)</label>
 				<select
 					value={tagPrefijo}
@@ -129,9 +127,9 @@ const StepOne: React.FC<StepOneProps> = ({
 				</select>
 			</div>
 
-			{/* Tag (Subfijo) */}
+			{/* Tag (Sufijo) */}
 			<div>
-				<label className="block text-sm font-medium text-gray-600 mb-2">Tag (Subfijo)</label>
+				<label className="block text-sm font-medium text-gray-600 mb-2">Tag (Sufijo)</label>
 				<input
 					type="text"
 					value={tagSubfijo}

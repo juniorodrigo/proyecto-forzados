@@ -27,7 +27,7 @@ export async function POST(request: Request) {
 	try {
 		const pool = await poolPromise;
 		const { descripcion } = await request.json();
-		const result = await pool.request().input("descripcion", descripcion).query("INSERT INTO RIESGO_A ( DESCRIPCION) VALUES ( @descripcion)");
+		const result = await pool.request().input("descripcion", descripcion).query("INSERT INTO MAE_RIESGO_A ( DESCRIPCION) VALUES ( @descripcion)");
 
 		if (result.rowsAffected[0] > 0) {
 			return NextResponse.json({ success: true, message: "values inserted into database" });
@@ -45,7 +45,7 @@ export async function DELETE(request: Request) {
 	try {
 		const pool = await poolPromise;
 		const { id } = await request.json();
-		const result = await pool.request().input("id", id).query("DELETE FROM RIESGO_A WHERE RIESGO_ID = @id");
+		const result = await pool.request().input("id", id).query("DELETE FROM MAE_RIESGO_A WHERE RIESGO_ID = @id");
 
 		if (result.rowsAffected[0] > 0) {
 			return NextResponse.json({ success: true, message: "Record deleted successfully" });
@@ -55,5 +55,23 @@ export async function DELETE(request: Request) {
 	} catch (error) {
 		console.error("Error processing DELETE:", error);
 		return NextResponse.json({ success: false, message: "Error deleting data" }, { status: 500 });
+	}
+}
+
+// Manejo del método PUT
+export async function PUT(request: Request) {
+	try {
+		const pool = await poolPromise;
+		const { id, descripcion } = await request.json();
+		const result = await pool.request().input("id", id).input("descripcion", descripcion).query("UPDATE MAE_RIESGO_A SET DESCRIPCION = @descripcion WHERE RIESGOA_ID = @id");
+
+		if (result.rowsAffected[0] > 0) {
+			return NextResponse.json({ success: true, message: "Record updated successfully" });
+		} else {
+			return NextResponse.json({ success: false, message: "No record found to update" }, { status: 404 });
+		}
+	} catch (error) {
+		console.error("Error processing PUT:", error);
+		return NextResponse.json({ success: false, message: "Error updating data" }, { status: 500 });
 	}
 }

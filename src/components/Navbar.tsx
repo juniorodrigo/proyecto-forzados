@@ -58,7 +58,7 @@ const Navbar: React.FC = () => {
 					{/* Botón de usuario que muestra el dropdown */}
 					<button type="button" className="flex items-center focus:outline-none space-x-2" onClick={toggleDropdown} aria-haspopup="true" aria-expanded={dropdownOpen}>
 						<div className="text-left">
-							<p className="text-base font-medium">Juan Pérez</p>
+							<p className="text-base font-medium">Carlos Fernandez</p>
 							<p className="text-sm text-gray-400 text-right">Área de Procesos</p>
 						</div>
 						<Image src="/images/login.png" alt="Profile" className="w-10 h-10 rounded-full" height={40} width={40} />

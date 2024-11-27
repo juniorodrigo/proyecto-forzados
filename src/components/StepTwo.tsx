@@ -49,6 +49,9 @@ const StepTwo: React.FC<StepTwoProps> = ({
 			try {
 				const response = await fetch(url);
 				const data = await response.json();
+
+				console.log(data.values, `data values from ${url}`);
+
 				setState(data.values);
 			} catch (error) {
 				console.error(`Error fetching data from ${url}:`, error);
@@ -70,18 +73,6 @@ const StepTwo: React.FC<StepTwoProps> = ({
 		fetchData("/api/maestras/probabilidad", setProbabilidades);
 		fetchData("/api/maestras/impacto", setImpactos);
 	}, [setInterlockSeguridad, setResponsable, setRiesgo, setProbabilidad, setImpacto, setSolicitante]);
-
-	useEffect(() => {
-		if (responsable && riesgo) {
-			fetch(`/api/etiquetas?responsable=${responsable}&riesgo=${riesgo}`)
-				.then((response) => response.json())
-				.then((labels) => {
-					setResponsable(labels.responsableLabel);
-					setRiesgo(labels.riesgoLabel);
-				})
-				.catch((error) => console.error("Error al obtener etiquetas:", error));
-		}
-	}, [responsable, riesgo, setResponsable, setRiesgo]);
 
 	useEffect(() => {
 		const fetchSolicitudData = async () => {
@@ -196,8 +187,8 @@ const StepTwo: React.FC<StepTwoProps> = ({
 				>
 					<option value="">Seleccione Solicitante del Forzado</option>
 					<option value="Carlos Fernandez">Aparicio Jorge</option>
-					<option value="Miguel Barrantes">Araya Ricardo</option>
-					<option value="Hernando Zurita">Carrillo Cristian</option>
+					<option value="Ricardo Araya">Araya Ricardo</option>
+					<option value="Cristian Carrillo">Carrillo Cristian</option>
 				</select>
 			</div>
 		</form>
