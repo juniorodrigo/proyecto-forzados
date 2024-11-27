@@ -1,8 +1,8 @@
 "use client";
+
 import React, { useState, useMemo, useEffect } from "react";
 import { DateRange } from "react-day-picker";
 import "react-day-picker/dist/style.css";
-import Table from "@/components/Table";
 import { useRouter } from "next/navigation";
 
 type Status = "rechazado" | "pendiente" | "aprobado" | "ejecutado" | "finalizado";
@@ -107,10 +107,13 @@ const Page = () => {
 		}
 	};
 
-	const handleView = (id: number) => {
-		fetchResumen(id);
-		setIsModalOpen(true); // Abre el modal
-	};
+  const handleView = (id: number) => {
+    const row = rows.find((row) => row.id === id);
+    if (row) {
+      setSelectedRow(row);
+      setIsModalOpen(true);
+    }
+  };
 
 	const closeModal = () => {
 		setIsModalOpen(false);
@@ -277,6 +280,89 @@ const Page = () => {
 			)}
 		</div>
 	);
+      {/* Tabla */}
+      {isLoading ? (
+        <div className="text-center py-4">Cargando datos...</div>
+      ) : (
+        <div className="bg-white rounded-lg shadow overflow-hidden">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                {columns.map((column) => (
+                  <th
+                    key={column.key}
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    {column.label}
+                  </th>
+                ))}
+                <th scope="col" className="relative px-6 py-3">
+                  <span className="sr-only">Acciones</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredRows.map((row) => (
+                <tr key={row.id}>
+                  {columns.map((column) => (
+                    <td key={column.key} className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{row[column.key]}</div>
+                    </td>
+                  ))}
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <button onClick={() => handleView(row.id)} className="text-indigo-600 hover:text-indigo-900 mr-2">
+                      Ver
+                    </button>
+                    <button onClick={() => handleEdit(row.id)} className="text-green-600 hover:text-green-900 mr-2">
+                      Editar
+                    </button>
+                    <button onClick={() => handleDelete(row.id)} className="text-red-600 hover:text-red-900">
+                      Eliminar
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Modal */}
+      {isModalOpen && selectedRow && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <h2 className="text-2xl font-bold mb-4">Detalles del Registro</h2>
+              <div className="bg-gray-100 p-4 rounded-lg mb-4 grid grid-cols-2 gap-4">
+                <p><strong>ID:</strong> {selectedRow.id}</p>
+                <p><strong>Nombre:</strong> {selectedRow.nombre}</p>
+                <p><strong>Área:</strong> {selectedRow.area}</p>
+                <p><strong>Solicitante:</strong> {selectedRow.solicitante}</p>
+                <p><strong>Estado:</strong> {selectedRow.estado}</p>
+                <p><strong>Fecha:</strong> {selectedRow.fecha}</p>
+              </div>
+              <div className="flex justify-end gap-4">
+                <button
+                  onClick={closeModal}
+                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                >
+                  Cerrar
+                </button>
+                <button
+                  onClick={() => handleEdit(selectedRow.id)}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                >
+                  Editar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default Page;
+
