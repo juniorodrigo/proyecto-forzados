@@ -94,7 +94,7 @@ const StepOne: React.FC<StepOneProps> = ({
 		<form className="space-y-6">
 			{/* Tag (Prefijo) */}
 			<div>
-				<h2 className="text-center font-semibold text-2xl mb-2">Tag y SubFijo</h2>
+				<h2 className="text-center font-semibold text-2xl mb-2">Tag y Sufijo</h2>
 				<label className="block text-sm font-medium text-gray-600 mb-2">Tag (Prefijo)</label>
 				<select
 					value={tagPrefijo}
