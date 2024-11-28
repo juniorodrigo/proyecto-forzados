@@ -27,6 +27,13 @@ go
 
 if exists (select 1
    from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
+   where r.fkeyid = object_id('MAE_USUARIO') and o.name = 'FK_MAE_USUA_REFERENCE_MAE_ROL')
+alter table MAE_USUARIO
+   drop constraint FK_MAE_USUA_REFERENCE_MAE_ROL
+go
+
+if exists (select 1
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
    where r.fkeyid = object_id('MAE_USUARIO') and o.name = 'FK_MAE_USUA_REFERENCE_MAE_AREA')
 alter table MAE_USUARIO
    drop constraint FK_MAE_USUA_REFERENCE_MAE_AREA
@@ -186,12 +193,6 @@ if exists (select 1
    drop table MAE_ROL
 go
 
-if exists (select 1
-            from  sysobjects
-           where  id = object_id('MAE_USUARIO')
-            and   type = 'U')
-   drop table MAE_USUARIO
-go
 
 if exists (select 1
             from  sysobjects
@@ -256,12 +257,6 @@ if exists (select 1
    drop table TIPO_FORZADO
 go
 
-if exists (select 1
-            from  sysobjects
-           where  id = object_id('TRS_SOLICITUD_FORZADO')
-            and   type = 'U')
-   drop table TRS_SOLICITUD_FORZADO
-go
 
 if exists (select 1
             from  sysobjects
@@ -270,8 +265,78 @@ if exists (select 1
    drop table TURNO
 go
 
-/*==============================================================*/
+if exists (select 1
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
+   where r.fkeyid = object_id('MAE_DATO_ADJUNTO') and o.name = 'FK_MAE_DATO_REFERENCE_TRS_SOLI')
+alter table MAE_DATO_ADJUNTO
+   drop constraint FK_MAE_DATO_REFERENCE_TRS_SOLI
+go
 
+if exists (select 1
+            from  sysobjects
+           where  id = object_id('MAE_DATO_ADJUNTO')
+            and   type = 'U')
+   drop table MAE_DATO_ADJUNTO
+go
+
+if exists (select 1
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
+   where r.fkeyid = object_id('TRS_SOLICITUD_FORZADO') and o.name = 'FK_TRS_SOLI_REFERENCE_MAE_USUA')
+alter table TRS_SOLICITUD_FORZADO
+   drop constraint FK_TRS_SOLI_REFERENCE_MAE_USUA
+go
+
+if exists (select 1
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
+   where r.fkeyid = object_id('TRS_SOLICITUD_FORZADO') and o.name = 'FK_TRS_SOLI_REFERENCE_MAE_USUA1')
+alter table TRS_SOLICITUD_FORZADO
+   drop constraint FK_TRS_SOLI_REFERENCE_MAE_USUA1
+go
+
+if exists (select 1
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
+   where r.fkeyid = object_id('TRS_SOLICITUD_FORZADO') and o.name = 'FK_TRS_SOLI_REFERENCE_MAE_USUA2')
+alter table TRS_SOLICITUD_FORZADO
+   drop constraint FK_TRS_SOLI_REFERENCE_MAE_USUA2
+go
+
+if exists (select 1
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
+   where r.fkeyid = object_id('TRS_SOLICITUD_FORZADO') and o.name = 'FK_TRS_SOLI_REFERENCE_MAE_USUA3')
+alter table TRS_SOLICITUD_FORZADO
+   drop constraint FK_TRS_SOLI_REFERENCE_MAE_USUA3
+go
+
+if exists (select 1
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
+   where r.fkeyid = object_id('TRS_SOLICITUD_FORZADO') and o.name = 'FK_TRS_SOLI_REFERENCE_MAE_USUA4')
+alter table TRS_SOLICITUD_FORZADO
+   drop constraint FK_TRS_SOLI_REFERENCE_MAE_USUA4
+go
+
+if exists (select 1
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
+   where r.fkeyid = object_id('TRS_SOLICITUD_FORZADO') and o.name = 'FK_TRS_SOLI_REFERENCE_MAE_USUA5')
+alter table TRS_SOLICITUD_FORZADO
+   drop constraint FK_TRS_SOLI_REFERENCE_MAE_USUA5
+go
+
+
+if exists (select 1
+            from  sysobjects
+           where  id = object_id('MAE_USUARIO')
+            and   type = 'U')
+   drop table MAE_USUARIO
+go
+
+if exists (select 1
+            from  sysobjects
+           where  id = object_id('TRS_SOLICITUD_FORZADO')
+            and   type = 'U')
+   drop table TRS_SOLICITUD_FORZADO
+go
+
+/*==============================================================*/
 
 create table DISCIPLINA (
    DISCIPLINA_ID        int                  identity,
@@ -375,6 +440,7 @@ create table MAE_USUARIO (
    APEPATERNO           varchar(50)          null,
    APEMATERNO           varchar(50)          null,
    CORREO               varchar(60)          null,
+   ROL_ID               int                  null,
    ESTADO               int                  null,
    USUARIO_CREACION     varchar(20)          null,
    FECHA_CREACION       datetime             null,
@@ -383,7 +449,7 @@ create table MAE_USUARIO (
    constraint PK_MAE_USUARIO primary key (USUARIO_ID)
 )
 go
-
+/*
 create table MAE_USUARIO_ROL (
    USUARIOROL_ID        int                  identity,
    USUARIO_ID           int                  null,
@@ -397,7 +463,7 @@ create table MAE_USUARIO_ROL (
    constraint PK_MAE_USUARIO_ROL primary key (USUARIOROL_ID)
 )
 go
-
+*/
 create table MATRIZ_RIESGO (
    MATRIZ_ID            int                  identity,
    IMPACTO_ID           int                  null,
@@ -502,9 +568,15 @@ create table TRS_SOLICITUD_FORZADO (
    TIPOSOLICITUD        int                  null,
    INTERLOCK            int                  null,
    DESCRIPCIONFORZADO   varchar(100)         null,
-   ESTADOSOLICITUD      varchar(100)                   null,
+   ESTADOSOLICITUD      varchar(100)         null,
    FECHAREALIZACION     datetime             null,
    FECHACIERRE          datetime             null,
+   SOLICITANTE_A_ID     int                  null,
+   APROBADOR_A_ID       int                  null,
+   EJECUTOR_A_ID        int                  null,
+   SOLICITANTE_B_ID     int                  null,
+   APROBADOR_B_ID       int                  null,
+   EJECUTOR_B_ID        int                  null,
    USUARIO_CREACION     varchar(20)          null,
    FECHA_CREACION       datetime             null,
    USUARIO_MODIFICACION varchar(20)          null,
@@ -525,6 +597,20 @@ create table TURNO (
 )
 go
 
+create table MAE_DATO_ADJUNTO (
+   DATOADJUNTO_ID       int                  identity,
+   SOLICITUD_ID         int                  null,
+   NOMBRE_ARCHIVO       varchar(100)         null,
+   ARCHIVO              varchar(max)         null,
+   ESTADO               int                  null,
+   USUARIO_CREACION     varchar(20)          null,
+   FECHA_CREACION       datetime             null,
+   USUARIO_MODIFICACION varchar(20)          null,
+   FECHA_MODIFICACION   datetime             null,
+   constraint PK_MAE_DATO_ADJUNTO primary key (DATOADJUNTO_ID)
+)
+go
+
 
 
 alter table MAE_PERMISO
@@ -541,12 +627,18 @@ alter table MAE_USUARIO
    add constraint FK_MAE_USUA_REFERENCE_MAE_PUES foreign key (PUESTO_ID)
       references MAE_PUESTO (PUESTO_ID)
 go
+alter table MAE_USUARIO
+   add constraint FK_MAE_USUA_REFERENCE_MAE_ROL foreign key (ROL_ID)
+      references MAE_ROL (ROL_ID)
+go
+
 
 alter table MAE_USUARIO
    add constraint FK_MAE_USUA_REFERENCE_MAE_AREA foreign key (AREA_ID)
       references MAE_AREA (AREA_ID)
 go
 
+/*
 alter table MAE_USUARIO_ROL
    add constraint FK_MAE_USUA_REFERENCE_TRS_SOLI foreign key (SOLICITUD_ID)
       references TRS_SOLICITUD_FORZADO (SOLICITUD_ID)
@@ -561,7 +653,7 @@ alter table MAE_USUARIO_ROL
    add constraint FK_MAE_USUA_REFERENCE_MAE_ROL foreign key (ROL_ID)
       references MAE_ROL (ROL_ID)
 go
-
+*/
 alter table MATRIZ_RIESGO
    add constraint FK_MATRIZ_R_REFERENCE_IMPACTO foreign key (IMPACTO_ID)
       references IMPACTO (IMPACTO_ID)
@@ -617,7 +709,40 @@ alter table TRS_SOLICITUD_FORZADO
       references MAE_RIESGO_A (RIESGOA_ID)
 go
 
+alter table MAE_DATO_ADJUNTO
+   add constraint FK_MAE_DATO_REFERENCE_TRS_SOLI foreign key (SOLICITUD_ID)
+      references TRS_SOLICITUD_FORZADO (SOLICITUD_ID)
+go
 
+alter table TRS_SOLICITUD_FORZADO
+   add constraint FK_TRS_SOLI_REFERENCE_MAE_USUA foreign key (SOLICITANTE_A_ID)
+      references MAE_USUARIO (USUARIO_ID)
+go
+
+alter table TRS_SOLICITUD_FORZADO
+   add constraint FK_TRS_SOLI_REFERENCE_MAE_USUA1 foreign key (APROBADOR_A_ID)
+      references MAE_USUARIO (USUARIO_ID)
+go
+
+alter table TRS_SOLICITUD_FORZADO
+   add constraint FK_TRS_SOLI_REFERENCE_MAE_USUA2 foreign key (EJECUTOR_A_ID)
+      references MAE_USUARIO (USUARIO_ID)
+go
+
+alter table TRS_SOLICITUD_FORZADO
+   add constraint FK_TRS_SOLI_REFERENCE_MAE_USUA3 foreign key (SOLICITANTE_B_ID)
+      references MAE_USUARIO (USUARIO_ID)
+go
+
+alter table TRS_SOLICITUD_FORZADO
+   add constraint FK_TRS_SOLI_REFERENCE_MAE_USUA4 foreign key (APROBADOR_B_ID)
+      references MAE_USUARIO (USUARIO_ID)
+go
+
+alter table TRS_SOLICITUD_FORZADO
+   add constraint FK_TRS_SOLI_REFERENCE_MAE_USUA5 foreign key (EJECUTOR_B_ID)
+      references MAE_USUARIO (USUARIO_ID)
+go
 
 /*==============================================================*/
 -- INSERCIÓN DE DATOS
@@ -715,7 +840,7 @@ INSERT INTO MAE_AREA (DESCRIPCION,ESTADO,USUARIO__CREACION,FECHA_CREACION) VALUE
 
 
 insert into MAE_USUARIO (AREA_ID, PUESTO_ID, USUARIO, PASSWORD, NOMBRE, APEPATERNO, APEMATERNO, CORREO, ESTADO, USUARIO_CREACION, FECHA_CREACION, USUARIO_MODIFICACION, FECHA_MODIFICACION)
-values (1, 1, 'usuario1', 'pass1234', 'Nombre 1', 'Apellido Paterno', 'Apellido Materno', 'correo@example.com', 1, 'user1', getdate(), 'user2', getdate())
+values (1, 1, 'USERUSER', '$2b$10$leMLTPRtiKiqtZRCjBnAy.BiFmuB362GGfk8zKwM4ccuNP83akFIm', 'Nombre 1', 'Apellido Paterno', 'Apellido Materno', 'correo@example.com', 1, 'user1', getdate(), 'user2', getdate())
 go
 
 INSERT INTO MAE_USUARIO (AREA_ID,PUESTO_ID,USUARIO,PASSWORD,NOMBRE,APEPATERNO,APEMATERNO,CORREO,ESTADO,USUARIO_CREACION,FECHA_CREACION) VALUES(3,8,'JORGEAPARICIO','ADMIN123','Jorge','Aparicio','','Jorge.Aparicio@goldfields.com',1,'ADMIN',GETDATE())
@@ -749,10 +874,10 @@ insert into TRS_SOLICITUD_FORZADO (SUBAREA_ID, DISCIPLINA_ID, TURNO_ID, MOTIVORE
 values (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 'Descripcion Forzado 1', 1, getdate(), getdate(), 'user1', getdate(), 'user2', getdate())
 go
 
-insert into MAE_USUARIO_ROL (USUARIO_ID, ROL_ID, SOLICITUD_ID)
+/*insert into MAE_USUARIO_ROL (USUARIO_ID, ROL_ID, SOLICITUD_ID)
 values (1, 1, 1)
 go
-
+*/
 
 /*==============================================================*/
 
@@ -822,72 +947,3 @@ LEFT JOIN
     RESPONSABLE R ON SF.RESPONSABLE_ID = R.RESPONSABLE_ID
 LEFT JOIN
     MAE_RIESGO_A RA ON SF.RIESGOA_ID = RA.RIESGOA_ID;
-
-
-
-SELECT u.*, A.DESCRIPCION FROM MAE_USUARIO as u
-         INNER JOIN MAE_AREA A on u.AREA_ID = A.AREA_ID
-         WHERE U.USUARIO = 'USUARIOUSUARIO'
-
-
-SELECT
-		SF.SOLICITUD_ID,
-    SF.DESCRIPCIONFORZADO,
-    SF.ESTADOSOLICITUD,
-    SF.FECHAREALIZACION,
-    SF.FECHACIERRE,
-    SF.USUARIO_CREACION,
-    SF.FECHA_CREACION,
-    SF.USUARIO_MODIFICACION,
-    SF.FECHA_MODIFICACION,
-
-    -- Datos de SUB_AREA
-    SA.CODIGO AS SUBAREA_CODIGO,
-    SA.DESCRIPCION AS SUBAREA_DESCRIPCION,
-
-    -- Datos de DISCIPLINA
-    D.DESCRIPCION AS DISCIPLINA_DESCRIPCION,
-
-    -- Datos de TURNO
-    T.DESCRIPCION AS TURNO_DESCRIPCION,
-
-    -- Datos de MOTIVO_RECHAZO
-    MR.DESCRIPCION AS MOTIVORECHAZO_DESCRIPCION,
-
-    -- Datos de TIPO_FORZADO
-    TF.DESCRIPCION AS TIPOFORZADO_DESCRIPCION,
-
-    -- Datos de TAG_CENTRO
-    TC.CODIGO AS TAGCENTRO_CODIGO,
-    TC.DESCRIPCION AS TAGCENTRO_DESCRIPCION,
-
-    -- Datos de RESPONSABLE
-    R.NOMBRE AS RESPONSABLE_NOMBRE,
-
-    -- Datos de RIESGO_A
-    RA.DESCRIPCION AS RIESGOA_DESCRIPCION,
-
-    -- USUARIO:
-    UX.NOMBRE AS NOMBRE_SOLICITANTE,
-    UX.APEPATERNO AS AP_SOLICITANTE,
-    UX.APEMATERNO AS AM_SOLICITANTE
-
-FROM
-    TRS_SOLICITUD_FORZADO SF
-LEFT JOIN
-    SUB_AREA SA ON SF.SUBAREA_ID = SA.SUBAREA_ID
-LEFT JOIN
-    DISCIPLINA D ON SF.DISCIPLINA_ID = D.DISCIPLINA_ID
-LEFT JOIN
-    TURNO T ON SF.TURNO_ID = T.TURNO_ID
-LEFT JOIN
-    MOTIVO_RECHAZO MR ON SF.MOTIVORECHAZO_ID = MR.MOTIVORECHAZO_ID
-LEFT JOIN
-    TIPO_FORZADO TF ON SF.TIPOFORZADO_ID = TF.TIPOFORZADO_ID
-LEFT JOIN
-    TAG_CENTRO TC ON SF.TAGCENTRO_ID = TC.TAGCENTRO_ID
-LEFT JOIN
-    RESPONSABLE R ON SF.RESPONSABLE_ID = R.RESPONSABLE_ID
-LEFT JOIN
-    MAE_RIESGO_A RA ON SF.RIESGOA_ID = RA.RIESGOA_ID
-    LEFT JOIN MAE_USUARIO UX ON SF.USUARIO_CREACION = CAST(UX.USUARIO_ID AS CHAR)
