@@ -61,25 +61,31 @@ const StepOne: React.FC<StepOneProps> = ({
 	useEffect(() => {
 		const fetchSolicitudData = async () => {
 			const urlParams = new URLSearchParams(window.location.search);
-			const id = await urlParams.get("id");
+			const id = urlParams.get("id");
 			if (id) {
 				try {
 					const response = await fetch(`/api/solicitudes/alta/${id}`);
-					const data = await response.json();
-					console.log(data, "data from fetchSolicitudData");
-					setTagPrefijo(data.tagPrefijo);
-					setTagCentro(data.tagCentro);
-					setTagSubfijo(data.tagSubfijo);
-					setDescripcion(data.descripcion);
-					setDisciplina(data.disciplina);
-					setTurno(data.turno);
+					const result = await response.json();
+
+					if (result.success && result.data.length > 0) {
+						const solicitud = result.data[0];
+
+						setTagPrefijo(String(solicitud.tagPrefijo));
+						setTagCentro(String(solicitud.tagCentro));
+						setTagSubfijo(solicitud.tagSubfijo || ""); // Asegurarse de que no sea null/undefined
+						setDescripcion(solicitud.descripcion || "");
+						setDisciplina(String(solicitud.disciplina));
+						setTurno(String(solicitud.turno));
+					} else {
+						console.error("No se encontraron datos para la solicitud.");
+					}
 				} catch (error) {
 					console.error("Error fetching solicitud data:", error);
 				}
 			}
 		};
 		fetchSolicitudData();
-	}, [setDescripcion, setDisciplina, setTagCentro, setTagPrefijo, setTagSubfijo, setTurno]);
+	}, [setTagPrefijo, setTagCentro, setTagSubfijo, setDescripcion, setDisciplina, setTurno]);
 
 	return (
 		<form className="space-y-6">

@@ -66,10 +66,17 @@ const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor
 			if (id) {
 				try {
 					const response = await fetch(`/api/solicitudes/alta/${id}`);
-					const data = await response.json();
-					setAprobador(data.aprobador);
-					setEjecutor(data.ejecutor);
-					setTipoForzado(data.tipoForzado);
+					const result = await response.json();
+
+					if (result.success && result.data.length > 0) {
+						const solicitud = result.data[0];
+
+						setAprobador(String(solicitud.aprobador));
+						setEjecutor(String(solicitud.ejecutor));
+						setTipoForzado(String(solicitud.tipoForzado));
+					} else {
+						console.error("No se encontraron datos para la solicitud.");
+					}
 				} catch (error) {
 					console.error("Error fetching solicitud data:", error);
 				}

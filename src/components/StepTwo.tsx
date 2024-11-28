@@ -95,13 +95,20 @@ const StepTwo: React.FC<StepTwoProps> = ({
 			if (id) {
 				try {
 					const response = await fetch(`/api/solicitudes/alta/${id}`);
-					const data = await response.json();
-					setInterlockSeguridad(data.interlockSeguridad);
-					setResponsable(data.responsable);
-					setRiesgo(data.riesgo);
-					setProbabilidad(data.probabilidad);
-					setImpacto(data.impacto);
-					setSolicitante(data.solicitante);
+					const result = await response.json();
+
+					if (result.success && result.data.length > 0) {
+						const solicitud = result.data[0];
+
+						setInterlockSeguridad(String(solicitud.interlockSeguridad)); // Convertimos a string porque el value del select es string
+						setResponsable(String(solicitud.responsable));
+						setRiesgo(String(solicitud.riesgo));
+						setProbabilidad(String(solicitud.probabilidad));
+						setImpacto(String(solicitud.impacto));
+						setSolicitante(String(solicitud.solicitante));
+					} else {
+						console.error("No se encontraron datos para la solicitud.");
+					}
 				} catch (error) {
 					console.error("Error fetching solicitud data:", error);
 				}
