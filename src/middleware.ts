@@ -31,8 +31,8 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
 	matcher: [
-		"/", // Aplica a todas las rutas, puedes agregar más según lo necesites
-		// "/dashboard/:path*",
+		// "/", // Aplica a todas las rutas, puedes agregar más según lo necesites
+		"/dashboard/:path*",
 		// "/financial",
 		// "/analytics",
 		// "/logistics/:path*",

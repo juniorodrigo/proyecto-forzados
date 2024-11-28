@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { poolPromise } from "@sql/lib/db";
+// import { mailer } from "@/lib/mailer";
 
 // Manejo del método GET
 export async function GET() {
@@ -26,6 +27,7 @@ export async function POST(request: Request) {
 		const result = await pool.query(query);
 
 		if (result.rowsAffected && result.rowsAffected[0] > 0) {
+			// await mailer.sendTestMail();
 			return NextResponse.json({ success: true, message: "Record inserted successfully", data });
 		} else {
 			return NextResponse.json({ success: false, message: "Failed to insert record" }, { status: 500 });
@@ -98,7 +100,12 @@ SELECT
     R.NOMBRE AS RESPONSABLE_NOMBRE,
 
     -- Datos de RIESGO_A
-    RA.DESCRIPCION AS RIESGOA_DESCRIPCION
+    RA.DESCRIPCION AS RIESGOA_DESCRIPCION,
+
+    -- USUARIO:
+    UX.NOMBRE AS NOMBRE_SOLICITANTE,
+    UX.APEPATERNO AS AP_SOLICITANTE,
+    UX.APEMATERNO AS AM_SOLICITANTE
 
 FROM
     TRS_SOLICITUD_FORZADO SF
@@ -118,12 +125,13 @@ LEFT JOIN
     RESPONSABLE R ON SF.RESPONSABLE_ID = R.RESPONSABLE_ID
 LEFT JOIN
     MAE_RIESGO_A RA ON SF.RIESGOA_ID = RA.RIESGOA_ID
+    LEFT JOIN MAE_USUARIO UX ON SF.USUARIO_CREACION = CAST(UX.USUARIO_ID AS CHAR)
 	`);
 	return result.recordset.map((record) => ({
 		id: record.SOLICITUD_ID,
 		nombre: record.DESCRIPCIONFORZADO,
 		area: record.SUBAREA_DESCRIPCION,
-		solicitante: record.USUARIO_CREACION,
+		solicitante: record.NOMBRE_SOLICITANTE + " " + record.AP_SOLICITANTE + " " + record.AM_SOLICITANTE,
 		estado: record.ESTADOSOLICITUD,
 		fecha: record.FECHA_CREACION,
 		descripcion: record.DESCRIPCIONFORZADO,

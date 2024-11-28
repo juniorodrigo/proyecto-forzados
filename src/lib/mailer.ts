@@ -32,6 +32,19 @@ class Mailer {
 			throw new Error("No se pudo enviar el correo");
 		}
 	}
+
+	async sendTestMail(): Promise<void> {
+		const testMailOptions: MailOptions = {
+			from: process.env.SMTP_USER || "default@example.com",
+			to: "jvniorrodrigo@gmail.com",
+			subject: "hola mundo",
+			text: "hola mundo",
+		};
+
+		console.log("Enviando correo de prueba...");
+
+		await this.sendMail(testMailOptions);
+	}
 }
 
 export const mailer = new Mailer();
