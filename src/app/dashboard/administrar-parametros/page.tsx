@@ -63,6 +63,18 @@ const Page = () => {
 		}
 
 		if (modalType === "create") {
+			if (selectedCategoryObject?.needsCode) {
+				const existingRecord = data[selectedCategory]?.find((record) => record.codigo === newRecord.codigo);
+				if (existingRecord) {
+					setPopoverMessage("No puede haber un código duplicado.");
+					setPopoverType("error");
+					setShowPopover(true);
+					setTimeout(() => {
+						setShowPopover(false);
+					}, 2000);
+					return;
+				}
+			}
 			fetch(`/api/maestras/${newRecord.categoria.toLowerCase()}`, {
 				method: "POST",
 				headers: {

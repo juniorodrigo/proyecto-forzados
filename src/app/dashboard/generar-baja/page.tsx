@@ -2,13 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import Popover from "../../../components/Popover";
+import { useSearchParams } from "next/navigation";
 
 const BajaForzado = () => {
 	const [formData, setFormData] = useState({
 		solicitanteRetiro: "",
 		aprobadorRetiro: "",
 		ejecutorRetiro: "",
-		autorizacionRetiro: "",
 		fechaCierre: "",
 		observaciones: "",
 		datosAdjuntos: null as File | null,
@@ -18,6 +18,10 @@ const BajaForzado = () => {
 	const [dragActive, setDragActive] = useState(false);
 	const [popover, setPopover] = useState({ show: false, message: "", type: "success" as "success" | "error" });
 	const [usuarios, setUsuarios] = useState<{ id: string; nombre: string }[]>([]);
+	const [aprobadores, setAprobadores] = useState<{ id: string; nombre: string }[]>([]);
+
+	const searchParams = useSearchParams();
+	const id = searchParams.get("id");
 
 	useEffect(() => {
 		const fetchUsuarios = async () => {
@@ -26,6 +30,19 @@ const BajaForzado = () => {
 				const data = await response.json();
 
 				setUsuarios(data.values);
+			} catch (error) {
+				console.error("Error al obtener usuarios:", error);
+			}
+		};
+		fetchUsuarios();
+	}, []);
+
+	useEffect(() => {
+		const fetchUsuarios = async () => {
+			try {
+				const response = await fetch("/api/usuarios/aprobadores");
+				const data = await response.json();
+				setAprobadores(data.values);
 			} catch (error) {
 				console.error("Error al obtener usuarios:", error);
 			}
@@ -84,13 +101,12 @@ const BajaForzado = () => {
 			const confirmed = window.confirm("¿Está seguro de que desea generar la baja?");
 			if (confirmed) {
 				try {
-					// Llamar a la API
 					const response = await fetch("/api/solicitudes/baja", {
 						method: "POST",
 						headers: {
 							"Content-Type": "application/json",
 						},
-						body: JSON.stringify(formData),
+						body: JSON.stringify({ ...formData, id }),
 					});
 					if (response.ok) {
 						setPopover({ show: true, message: "Baja generada exitosamente.", type: "success" });
@@ -141,9 +157,9 @@ const BajaForzado = () => {
 						className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 ${errors.aprobadorRetiro ? "border-red-500" : "border-gray-300"}`}
 					>
 						<option value="">Seleccione un usuario</option>
-						{usuarios.map((usuario) => (
-							<option key={usuario.id} value={usuario.id}>
-								{usuario.nombre}
+						{aprobadores.map((aprobador) => (
+							<option key={aprobador.id} value={aprobador.id}>
+								{aprobador.nombre}
 							</option>
 						))}
 					</select>
@@ -167,25 +183,6 @@ const BajaForzado = () => {
 						))}
 					</select>
 					{errors.ejecutorRetiro && <span className="text-red-500 text-sm mt-1">Este campo es requerido.</span>}
-				</div>
-
-				{/* Autorización Retiro */}
-				<div className="mb-4">
-					<label className="block text-sm font-medium text-gray-700 mb-1">Autorización Retiro</label>
-					<select
-						name="autorizacionRetiro"
-						value={formData.autorizacionRetiro}
-						onChange={handleInputChange}
-						className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 ${errors.autorizacionRetiro ? "border-red-500" : "border-gray-300"}`}
-					>
-						<option value="">Seleccione un usuario</option>
-						{usuarios.map((usuario) => (
-							<option key={usuario.id} value={usuario.id}>
-								{usuario.nombre}
-							</option>
-						))}
-					</select>
-					{errors.autorizacionRetiro && <span className="text-red-500 text-sm mt-1">Este campo es requerido.</span>}
 				</div>
 
 				{/* Fecha de Cierre */}

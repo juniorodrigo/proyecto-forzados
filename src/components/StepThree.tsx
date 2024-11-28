@@ -5,8 +5,6 @@ interface StepThreeProps {
 	setAprobador: React.Dispatch<React.SetStateAction<string>>;
 	ejecutor: string;
 	setEjecutor: React.Dispatch<React.SetStateAction<string>>;
-	autorizacion: string;
-	setAutorizacion: React.Dispatch<React.SetStateAction<string>>;
 	tipoForzado: string;
 	setTipoForzado: React.Dispatch<React.SetStateAction<string>>;
 }
@@ -16,9 +14,10 @@ interface TipoForzado {
 	descripcion: string;
 }
 
-const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor, setEjecutor, autorizacion, setAutorizacion, tipoForzado, setTipoForzado }) => {
+const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor, setEjecutor, tipoForzado, setTipoForzado }) => {
 	const [tiposForzado, setTiposForzado] = useState<TipoForzado[]>([]);
 	const [usuarios, setUsuarios] = useState<{ id: string; nombre: string }[]>([]);
+	const [aprobadores, setAprobadores] = useState<{ id: string; nombre: string }[]>([]);
 
 	useEffect(() => {
 		const fetchTiposForzado = async () => {
@@ -32,7 +31,7 @@ const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor
 		};
 
 		fetchTiposForzado();
-	}, [setAprobador, setAutorizacion, setEjecutor, setTipoForzado]);
+	}, [setAprobador, setEjecutor, setTipoForzado]);
 
 	useEffect(() => {
 		const fetchUsuarios = async () => {
@@ -40,6 +39,19 @@ const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor
 				const response = await fetch("/api/usuarios");
 				const data = await response.json();
 				setUsuarios(data.values);
+			} catch (error) {
+				console.error("Error al obtener usuarios:", error);
+			}
+		};
+		fetchUsuarios();
+	}, []);
+
+	useEffect(() => {
+		const fetchUsuarios = async () => {
+			try {
+				const response = await fetch("/api/usuarios/aprobadores");
+				const data = await response.json();
+				setAprobadores(data.values);
 			} catch (error) {
 				console.error("Error al obtener usuarios:", error);
 			}
@@ -57,7 +69,6 @@ const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor
 					const data = await response.json();
 					setAprobador(data.aprobador);
 					setEjecutor(data.ejecutor);
-					setAutorizacion(data.autorizacion);
 					setTipoForzado(data.tipoForzado);
 				} catch (error) {
 					console.error("Error fetching solicitud data:", error);
@@ -65,7 +76,7 @@ const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor
 			}
 		};
 		fetchSolicitudData();
-	}, [setAprobador, setAutorizacion, setEjecutor, setTipoForzado]);
+	}, [setAprobador, setEjecutor, setTipoForzado]);
 
 	return (
 		<form className="space-y-6">
@@ -80,9 +91,9 @@ const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor
 					required
 				>
 					<option value="">Seleccione Aprobador del Forzado</option>
-					{usuarios.map((usuario) => (
-						<option key={usuario.id} value={usuario.id}>
-							{usuario.nombre}
+					{aprobadores.map((aprobador) => (
+						<option key={aprobador.id} value={aprobador.id}>
+							{aprobador.nombre}
 						</option>
 					))}
 				</select>
@@ -98,21 +109,6 @@ const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor
 							{usuario.nombre}
 						</option>
 					))}
-				</select>
-			</div>
-
-			{/* Autorización */}
-			<div>
-				<label className="block text-sm font-medium text-gray-600 mb-2">Autorización</label>
-				<select
-					value={autorizacion}
-					onChange={(e) => setAutorizacion(e.target.value)}
-					className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-					required
-				>
-					<option value="">Seleccione Autorización</option>
-					<option value="autorizado">Autorizado</option>
-					<option value="rechazado">Rechazado</option>
 				</select>
 			</div>
 

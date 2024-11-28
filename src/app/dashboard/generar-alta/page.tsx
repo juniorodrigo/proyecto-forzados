@@ -27,7 +27,6 @@ const ForcedRegistration: React.FC = () => {
 
 	const [aprobador, setAprobador] = useState("");
 	const [ejecutor, setEjecutor] = useState("");
-	const [autorizacion, setAutorizacion] = useState("");
 	const [tipoForzado, setTipoForzado] = useState("");
 
 	const [popoverMessage, setPopoverMessage] = useState("");
@@ -63,7 +62,6 @@ const ForcedRegistration: React.FC = () => {
 				solicitante: string;
 				aprobador: string;
 				ejecutor: string;
-				autorizacion: string;
 				tipoForzado: string;
 				id?: string | null;
 			} = {
@@ -81,10 +79,9 @@ const ForcedRegistration: React.FC = () => {
 				solicitante,
 				aprobador,
 				ejecutor,
-				autorizacion,
 				tipoForzado,
+				id,
 			};
-			if (id) body.id = id;
 			fetch("/api/solicitudes/alta", {
 				method,
 				headers: {
@@ -157,18 +154,7 @@ const ForcedRegistration: React.FC = () => {
 					/>
 				);
 			case 3:
-				return (
-					<StepThree
-						aprobador={aprobador}
-						setAprobador={setAprobador}
-						ejecutor={ejecutor}
-						setEjecutor={setEjecutor}
-						autorizacion={autorizacion}
-						setAutorizacion={setAutorizacion}
-						tipoForzado={tipoForzado}
-						setTipoForzado={setTipoForzado}
-					/>
-				);
+				return <StepThree aprobador={aprobador} setAprobador={setAprobador} ejecutor={ejecutor} setEjecutor={setEjecutor} tipoForzado={tipoForzado} setTipoForzado={setTipoForzado} />;
 			default:
 				return null;
 		}
@@ -181,7 +167,7 @@ const ForcedRegistration: React.FC = () => {
 			case 2:
 				return interlockSeguridad && responsable && riesgo && probabilidad && impacto && solicitante;
 			case 3:
-				return aprobador && ejecutor && autorizacion && tipoForzado;
+				return aprobador && ejecutor && tipoForzado;
 			default:
 				return false;
 		}

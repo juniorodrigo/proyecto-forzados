@@ -45,7 +45,7 @@ export async function DELETE(request: Request) {
 	try {
 		const pool = await poolPromise;
 		const { id } = await request.json();
-		const result = await pool.request().input("id", id).query("DELETE FROM MAE_RIESGO_A WHERE RIESGO_ID = @id");
+		const result = await pool.request().input("id", id).query("DELETE FROM MAE_RIESGO_A WHERE RIESGOA_ID = @id");
 
 		if (result.rowsAffected[0] > 0) {
 			return NextResponse.json({ success: true, message: "Record deleted successfully" });
