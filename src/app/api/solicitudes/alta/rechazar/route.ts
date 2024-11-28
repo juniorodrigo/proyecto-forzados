@@ -4,8 +4,12 @@ import { poolPromise } from "@sql/lib/db";
 export async function POST(request: Request) {
 	try {
 		const pool = await poolPromise;
-		const { id } = await request.json();
-		const result = await pool.request().input("id", id).query("UPDATE TRS_Solicitud_forzado SET ESTADOSOLICITUD = 'rechazado-alta' WHERE SOLICITUD_ID = @id");
+		const { id, motivoRechazo } = await request.json();
+		const result = await pool
+			.request()
+			.input("id", id)
+			.input("motivoRechazo", motivoRechazo)
+			.query("UPDATE TRS_Solicitud_forzado SET ESTADOSOLICITUD = 'rechazado-alta', MOTIVORECHAZO_ID = @motivoRechazo WHERE SOLICITUD_ID = @id");
 
 		if (result.rowsAffected[0] > 0) {
 			return NextResponse.json({ success: true, message: "Record updated successfully" });

@@ -40,6 +40,8 @@ const Page: React.FC = () => {
 	const [selectedExecuteRow, setSelectedExecuteRow] = useState<Row | null>(null);
 	const [executeFile, setExecuteFile] = useState<File | null>(null);
 	const [dragActive, setDragActive] = useState(false);
+	const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
+	const [rejectReason, setRejectReason] = useState("");
 	const router = useRouter();
 
 	const columns = [
@@ -80,6 +82,27 @@ const Page: React.FC = () => {
 		};
 
 		fetchData();
+	}, []);
+
+	const [rejectReasons, setRejectReasons] = useState<{ id: number; descripcion: string }[]>([]);
+
+	useEffect(() => {
+		const fetchRejectReasons = async () => {
+			try {
+				const response = await fetch("/api/maestras/motivo-rechazo");
+				const result = await response.json();
+				if (result.success) {
+					setRejectReasons(result.values);
+					// console.log(rejectReasons, "LUJANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+				} else {
+					setError(result.message);
+				}
+			} catch {
+				setError("Error al cargar los motivos de rechazo. Por favor, intente nuevamente.");
+			}
+		};
+
+		fetchRejectReasons();
 	}, []);
 
 	const filteredRows = useMemo(() => {
@@ -256,6 +279,74 @@ const Page: React.FC = () => {
 				}
 			} catch {
 				setPopoverMessage("Error al ejecutar");
+				setPopoverType("error");
+			} finally {
+				setShowPopover(true);
+				setTimeout(() => setShowPopover(false), 3000);
+			}
+		}
+	};
+
+	const openRejectModal = () => {
+		setIsRejectModalOpen(true);
+	};
+
+	const closeRejectModal = () => {
+		setIsRejectModalOpen(false);
+		setRejectReason("");
+	};
+
+	const handleRejectConfirm = async (id: number, tipo: string) => {
+		if (!rejectReason) {
+			setPopoverMessage("Por favor, ingrese el motivo del rechazo");
+			setPopoverType("error");
+			setShowPopover(true);
+			setTimeout(() => setShowPopover(false), 3000);
+			return;
+		}
+		if (confirm("¿Está seguro de rechazar?")) {
+			try {
+				const response = await fetch(`/api/solicitudes/${tipo}/rechazar`, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ id, motivoRechazo: rejectReason }),
+				});
+				if (response.ok) {
+					setPopoverMessage("Rechazo exitoso");
+					setPopoverType("success");
+					// Recargar datos
+					const fetchData = async () => {
+						setIsLoading(true);
+						setError(null);
+						try {
+							const response = await fetch("/api/solicitudes/alta");
+							const result = await response.json();
+							if (result.success) {
+								const formattedData = result.data.map((row: Row) => ({
+									...row,
+									fecha: formatDate(row.fecha),
+								}));
+								setRows(formattedData);
+							} else {
+								setError(result.message);
+							}
+						} catch {
+							setError("Error al cargar los datos. Por favor, intente nuevamente.");
+						} finally {
+							setIsLoading(false);
+						}
+					};
+					fetchData();
+					closeRejectModal(); // Cerrar modal de rechazo
+					closeModal(); // Cerrar modal de detalles
+				} else {
+					setPopoverMessage("Error al rechazar");
+					setPopoverType("error");
+				}
+			} catch {
+				setPopoverMessage("Error al rechazar");
 				setPopoverType("error");
 			} finally {
 				setShowPopover(true);
@@ -554,10 +645,7 @@ const Page: React.FC = () => {
 								</button>
 								{selectedRow.estado === "pendiente-alta" && (
 									<>
-										<button
-											onClick={() => handleReject(selectedRow.id, "alta")}
-											className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-										>
+										<button onClick={openRejectModal} className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
 											Rechazar
 										</button>
 									</>
@@ -677,6 +765,38 @@ const Page: React.FC = () => {
 					</div>
 				</div>
 			)}
+			{isRejectModalOpen && (
+				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+					<div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+						<div className="p-6">
+							<h2 className="text-2xl font-bold mb-4">Motivo del Rechazo</h2>
+							<select value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 border-gray-300 mb-4">
+								<option value="">Seleccione un motivo</option>
+								{rejectReasons.map((reason) => (
+									<option key={reason.id} value={reason.id}>
+										{reason.descripcion}
+									</option>
+								))}
+							</select>
+							<div className="flex justify-end gap-4">
+								<button onClick={closeRejectModal} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+									Cancelar
+								</button>
+								<button
+									onClick={() => selectedRow && handleRejectConfirm(selectedRow.id, "alta")}
+									disabled={!rejectReason} // Deshabilitar si no hay un motivo seleccionado
+									className={`px-4 py-2 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+										!rejectReason ? "bg-gray-400 cursor-not-allowed" : "bg-red-500 hover:bg-red-600 focus:ring-red-500"
+									}`}
+								>
+									Confirmar Rechazo
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			)}
+
 			<Popover message={popoverMessage} type={popoverType} show={showPopover} />
 		</div>
 	);
