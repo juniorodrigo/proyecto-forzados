@@ -232,6 +232,7 @@ const generateUpdateQuery = (parameters: UpdateQueryParameters) => {
 		TURNO_ID = ${parameters.turno},
 		TIPOFORZADO_ID = ${parameters.tipoForzado},
 		TAGCENTRO_ID = ${parameters.tagCentro},
+		TAGSUFIJO = '${parameters.tagSubfijo}',
 		RESPONSABLE_ID = ${parameters.responsable},
 		RIESGOA_ID = ${parameters.riesgo},
 		INTERLOCK = ${parameters.interlockSeguridad === "SÍ" ? 1 : 0},
