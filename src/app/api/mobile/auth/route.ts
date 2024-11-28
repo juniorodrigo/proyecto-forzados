@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
 				name: user.NOMBRE,
 				email: user.CORREO,
 				areaId: user.AREA_ID,
-				areaName: user.AREA,
+				areaName: user.DESCRIPCION,
 				userId: user.ID,
 			},
 			NEXTAUTH_SECRET,
