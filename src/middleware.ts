@@ -12,7 +12,6 @@ export default withAuth({
 // Middleware para habilitar CORS a todos los orígenes
 export async function middleware(req: NextRequest) {
 	const response = NextResponse.next();
-
 	response.headers.set("Access-Control-Allow-Origin", "*"); // Permitir todos los orígenes
 	response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS"); // Métodos permitidos
 	response.headers.set(
@@ -20,19 +19,16 @@ export async function middleware(req: NextRequest) {
 		"Content-Type, Authorization, X-Requested-With" // Cabeceras personalizadas permitidas
 	);
 	response.headers.set("Access-Control-Allow-Credentials", "true"); // Si necesitas credenciales compartidas
-
 	// Si es una solicitud OPTIONS (preflight), responde directamente
 	if (req.method === "OPTIONS") {
 		return new NextResponse(null, { headers: response.headers });
 	}
-
 	return response;
 }
-
 export const config = {
 	matcher: [
-		// "/", // Aplica a todas las rutas, puedes agregar más según lo necesites
-		"/dashboard/:path*",
+		"/", // Aplica a todas las rutas, puedes agregar más según lo necesites
+		// "/dashboard/:path*",
 		// "/financial",
 		// "/analytics",
 		// "/logistics/:path*",

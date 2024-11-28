@@ -182,6 +182,7 @@ const generateInsertQuery = (parameters: InsertQueryParameters) => {
 	MOTIVORECHAZO_ID,
 	TIPOFORZADO_ID,
 	TAGCENTRO_ID,
+	TAGSUFIJO,
 	RESPONSABLE_ID,
 	RIESGOA_ID,
 	TIPOSOLICITUD,
@@ -202,6 +203,7 @@ VALUES (
 	NULL, -- MOTIVORECHAZO_ID
 	${parameters.tipoForzado}, -- TIPOFORZADO_ID
 	${parameters.tagCentro}, -- TAGCENTRO_ID
+	'${parameters.tagSubfijo}', -- TAGSUFIJO
 	${parameters.responsable}, -- RESPONSABLE_ID
 	${parameters.riesgo}, -- RIESGOA_ID
 	2, -- TIPOSOLICITUD

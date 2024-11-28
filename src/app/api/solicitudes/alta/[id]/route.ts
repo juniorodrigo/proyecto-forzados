@@ -43,9 +43,9 @@ const getSingleSolicitud = async (id: string) => {
     `);
 	return result.recordset.map((record) => ({
 		id: record.SOLICITUD_ID,
-		tagPrefijo: record.TAGCENTRO_ID,
+		tagPrefijo: record.SUBAREA_ID,
 		tagCentro: record.TAGCENTRO_ID,
-		tagSubfijo: record.TAGCENTRO_ID,
+		tagSubfijo: record.TAGSUFIJO,
 		descripcion: record.DESCRIPCIONFORZADO,
 		disciplina: record.DISCIPLINA_ID,
 		turno: record.TURNO_ID,
