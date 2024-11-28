@@ -8,8 +8,9 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Search, Calendar, X } from "lucide-react";
 import Popover from "@/components/Popover";
+import { FaEye, FaEdit, FaPlay, FaMinus } from "react-icons/fa";
 
-type Status = "rechazado" | "pendiente" | "aprobado" | "ejecutado" | "finalizado";
+type Status = "rechazado-alta" | "pendiente-alta" | "aprobado-alta" | "ejecutado-alta" | "rechazado" | "pendiente-baja" | "aprobado-baja" | "ejecutado-baja" | "finalizado";
 
 interface Row {
 	id: number;
@@ -37,6 +38,8 @@ const Page: React.FC = () => {
 	const [isExecuteModalOpen, setIsExecuteModalOpen] = useState(false);
 	const [executeDate, setExecuteDate] = useState("");
 	const [selectedExecuteRow, setSelectedExecuteRow] = useState<Row | null>(null);
+	const [executeFile, setExecuteFile] = useState<File | null>(null);
+	const [dragActive, setDragActive] = useState(false);
 	const router = useRouter();
 
 	const columns = [
@@ -49,7 +52,7 @@ const Page: React.FC = () => {
 	];
 
 	const formatDate = (dateString: string) => {
-		return format(new Date(dateString), "dd/MM/yyyy HH:mm", { locale: es });
+		return format(new Date(dateString), "dd/MM/yy HH:mm", { locale: es });
 	};
 
 	useEffect(() => {
@@ -104,6 +107,11 @@ const Page: React.FC = () => {
 		setSelectedRow(null);
 	};
 
+	const closeModalBaja = () => {
+		setIsModalOpen(false);
+		setSelectedRow(null);
+	};
+
 	const handleEdit = (id: number) => {
 		router.push(`/dashboard/generar-alta?id=${id}`);
 	};
@@ -120,24 +128,25 @@ const Page: React.FC = () => {
 	};
 
 	const getStatusClass = (estado: Status) => {
-		switch (estado) {
-			case "pendiente":
-				return "bg-yellow-200";
-			case "aprobado":
-				return "bg-green-200";
-			case "ejecutado":
-				return "bg-green-600 text-white";
-			case "finalizado":
-				return "bg-blue-200";
-			default:
-				return "";
+		if (estado.includes("pendiente")) {
+			return "bg-yellow-200";
+		} else if (estado.includes("aprobado")) {
+			return "bg-green-200";
+		} else if (estado.includes("ejecutado")) {
+			return "bg-green-600 text-white";
+		} else if (estado.includes("finalizado")) {
+			return "bg-blue-200";
+		} else if (estado.includes("rechazado")) {
+			return "bg-red-500 text-white";
+		} else {
+			return "";
 		}
 	};
 
-	const handleApprove = async (id: number) => {
+	const handleApprove = async (id: number, tipo: string) => {
 		if (confirm("¿Está seguro de aprobar?")) {
 			try {
-				const response = await fetch("/api/solicitudes/alta/aprobar", { method: "POST", body: JSON.stringify({ id }) });
+				const response = await fetch(`/api/solicitudes/${tipo}/aprobar`, { method: "POST", body: JSON.stringify({ id }) });
 				if (response.ok) {
 					setPopoverMessage("Aprobación exitosa");
 					setPopoverType("success");
@@ -197,7 +206,7 @@ const Page: React.FC = () => {
 		setExecuteDate("");
 	};
 
-	const handleExecuteConfirm = async () => {
+	const handleExecuteConfirm = async (tipo: string) => {
 		if (!executeDate) {
 			setPopoverMessage("Por favor, ingrese la fecha y hora de ejecución");
 			setPopoverType("error");
@@ -207,7 +216,7 @@ const Page: React.FC = () => {
 		}
 		if (confirm("¿Está seguro de ejecutar?")) {
 			try {
-				const response = await fetch("/api/solicitudes/alta/ejecutar", {
+				const response = await fetch(`/api/solicitudes/${tipo}/ejecutar`, {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
@@ -255,6 +264,72 @@ const Page: React.FC = () => {
 		}
 	};
 
+	const handleReject = async (id: number, tipo: string) => {
+		if (confirm("¿Está seguro de rechazar?")) {
+			try {
+				const response = await fetch(`/api/solicitudes/${tipo}/rechazar`, { method: "POST", body: JSON.stringify({ id }) });
+				if (response.ok) {
+					setPopoverMessage("Rechazo exitoso");
+					setPopoverType("success");
+					// Recargar datos
+					const fetchData = async () => {
+						setIsLoading(true);
+						setError(null);
+						try {
+							const response = await fetch("/api/solicitudes/alta");
+							const result = await response.json();
+							if (result.success) {
+								const formattedData = result.data.map((row: Row) => ({
+									...row,
+									fecha: formatDate(row.fecha),
+								}));
+								setRows(formattedData);
+							} else {
+								setError(result.message);
+							}
+						} catch {
+							setError("Error al cargar los datos. Por favor, intente nuevamente.");
+						} finally {
+							setIsLoading(false);
+						}
+					};
+					fetchData();
+					closeModal(); // Cerrar modal
+				} else {
+					setPopoverMessage("Error al rechazar");
+					setPopoverType("error");
+				}
+			} catch {
+				setPopoverMessage("Error al rechazar");
+				setPopoverType("error");
+			} finally {
+				setShowPopover(true);
+				setTimeout(() => setShowPopover(false), 3000);
+			}
+		}
+	};
+
+	const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
+		e.preventDefault();
+		e.stopPropagation();
+		setDragActive(e.type === "dragover");
+	};
+
+	const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+		e.preventDefault();
+		e.stopPropagation();
+		setDragActive(false);
+		if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+			setExecuteFile(e.dataTransfer.files[0]);
+		}
+	};
+
+	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		if (e.target.files && e.target.files[0]) {
+			setExecuteFile(e.target.files[0]);
+		}
+	};
+
 	return (
 		<div className="p-6 bg-gray-50 min-h-screen">
 			<h1 className="text-2xl font-bold mb-6">Consultas</h1>
@@ -280,7 +355,12 @@ const Page: React.FC = () => {
 					{/* Área */}
 					<div>
 						<label className="block text-sm font-medium text-gray-700 mb-1">Área</label>
-						<select value={selectedArea} onChange={(e) => setSelectedArea(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+						<select
+							value={selectedArea}
+							onChange={(e) => setSelectedArea(e.target.value)}
+							className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+							disabled
+						>
 							<option value="">Todas las áreas</option>
 							<option value="Producción">Producción</option>
 							<option value="Mantenimiento">Mantenimiento</option>
@@ -295,6 +375,7 @@ const Page: React.FC = () => {
 							value={selectedEstado}
 							onChange={(e) => setSelectedEstado(e.target.value as Status)}
 							className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+							disabled
 						>
 							<option value="">Todos los estados</option>
 							<option value="pendiente">Pendiente</option>
@@ -315,10 +396,11 @@ const Page: React.FC = () => {
 									value={selectedRange?.from?.toISOString().split("T")[0] || ""}
 									onChange={(e) => setSelectedRange({ from: new Date(e.target.value), to: selectedRange?.to })}
 									className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+									disabled
 								/>
 								<Calendar className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
 							</div>
-							<div className="relative flex-1">
+							{/* <div className="relative flex-1">
 								<input
 									type="date"
 									value={selectedRange?.to?.toISOString().split("T")[0] || ""}
@@ -326,7 +408,7 @@ const Page: React.FC = () => {
 									className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
 								/>
 								<Calendar className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-							</div>
+							</div> */}
 						</div>
 					</div>
 				</div>
@@ -379,19 +461,21 @@ const Page: React.FC = () => {
 									))}
 									<td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
 										<button onClick={() => handleView(row.id)} className="text-indigo-600 hover:text-indigo-900 mr-2">
-											Ver
+											<FaEye />
 										</button>
-										{row.estado !== "aprobado" && (
+										{row.estado !== "finalizado" && row.estado !== "aprobado-alta" && !row.estado.includes("aprobado") && !row.estado.includes("rechazado") && !row.estado.includes("ejecutado") && (
 											<button onClick={() => handleEdit(row.id)} className="text-green-600 hover:text-green-900 mr-2">
-												Editar
+												<FaEdit />
 											</button>
 										)}
-										<button onClick={() => handleDelete(row.id)} className="text-red-600 hover:text-red-900 mr-2">
-											Dar de Baja
-										</button>
-										{row.estado !== "ejecutado" && (
+										{row.estado !== "finalizado" && row.estado === "ejecutado-alta" && (
+											<button onClick={() => handleDelete(row.id)} className="text-red-600 hover:text-red-900 mr-2">
+												<FaMinus />
+											</button>
+										)}
+										{row.estado !== "finalizado" && !row.estado.includes("ejecutado") && !row.estado.includes("rechazado") && row.estado.includes("aprobado") && (
 											<button onClick={() => handleExecute(row.id)} className="text-blue-600 hover:text-blue-900">
-												Ejecutar
+												<FaPlay />
 											</button>
 										)}
 									</td>
@@ -403,7 +487,7 @@ const Page: React.FC = () => {
 			)}
 
 			{/* Modal */}
-			{isModalOpen && selectedRow && (
+			{isModalOpen && selectedRow && (selectedRow.estado.includes("alta") || selectedRow.estado.includes("rechazado") || selectedRow.estado.includes("finalizado")) && (
 				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
 					<div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
 						<div className="p-6">
@@ -419,7 +503,7 @@ const Page: React.FC = () => {
 									<strong>Área:</strong> {selectedRow.area}
 								</p>
 								<p>
-									<strong>Solicitante:</strong> {selectedRow.usuarioCreacion}
+									<strong>Solicitante:</strong> {selectedRow.solicitante}
 								</p>
 								<p>
 									<strong>Estado:</strong> <span className={`p-2 rounded ${getStatusClass(selectedRow.estado)}`}>{selectedRow.estado}</span>
@@ -468,9 +552,74 @@ const Page: React.FC = () => {
 								<button onClick={closeModal} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
 									Cerrar
 								</button>
-								{selectedRow.estado !== "aprobado" && (
+								{selectedRow.estado === "pendiente-alta" && (
+									<>
+										<button
+											onClick={() => handleReject(selectedRow.id, "alta")}
+											className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+										>
+											Rechazar
+										</button>
+									</>
+								)}
+								{selectedRow.estado !== "aprobado-alta" && !selectedRow.estado.includes("ejecutado") && (
 									<button
-										onClick={() => handleApprove(selectedRow.id)}
+										onClick={() => handleApprove(selectedRow.id, "alta")}
+										className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+									>
+										Aprobar
+									</button>
+								)}
+							</div>
+						</div>
+					</div>
+				</div>
+			)}
+			{isModalOpen && selectedRow && selectedRow.estado.includes("baja") && (
+				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+					<div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+						<div className="p-6">
+							<h2 className="text-2xl font-bold mb-4">Detalles del Registro de Baja</h2>
+							<div className="bg-gray-100 p-4 rounded-lg mb-4 grid grid-cols-2 gap-4">
+								<p>
+									<strong>ID:</strong> {selectedRow.id}
+								</p>
+								<p>
+									<strong>Nombre:</strong> {selectedRow.nombre}
+								</p>
+								<p>
+									<strong>Área:</strong> {selectedRow.area}
+								</p>
+								<p>
+									<strong>Solicitante:</strong> {selectedRow.usuarioCreacion}
+								</p>
+								<p>
+									<strong>Estado:</strong> <span className={`p-2 rounded ${getStatusClass(selectedRow.estado)}`}>{selectedRow.estado}</span>
+								</p>
+								<p>
+									<strong>Fecha:</strong> {selectedRow.fecha}
+								</p>
+								<p>
+									<strong>Descripción:</strong> {selectedRow.descripcion}
+								</p>
+							</div>
+							<div className="flex justify-end gap-4">
+								<button onClick={closeModalBaja} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+									Cerrar
+								</button>
+								{selectedRow.estado === "pendiente-baja" && (
+									<>
+										<button
+											onClick={() => handleReject(selectedRow.id, "alta")}
+											className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+										>
+											Rechazar
+										</button>
+									</>
+								)}
+								{selectedRow.estado !== "aprobado-baja" && !selectedRow.estado.includes("ejecutado") && (
+									<button
+										onClick={() => handleApprove(selectedRow.id, "baja")}
 										className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
 									>
 										Aprobar
@@ -485,16 +634,42 @@ const Page: React.FC = () => {
 				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
 					<div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
 						<div className="p-6">
-							<h2 className="text-2xl font-bold mb-4">Ejecutar Registro</h2>
+							<h2 className="text-2xl font-bold mb-4">{`Ejecutar ${selectedRow?.estado.includes("alta") ? "Alta" : "Baja"} de Forzado`}</h2>
 							<div className="mb-4">
 								<label className="block text-sm font-medium text-gray-700 mb-1">Fecha de Ejecución</label>
 								<input type="datetime-local" value={executeDate} onChange={(e) => setExecuteDate(e.target.value)} className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 border-gray-300" />
 							</div>
+							<div className="mb-4">
+								<label htmlFor="executeFile" className="block text-sm font-medium text-gray-700 mb-1">
+									Datos Adjuntos
+								</label>
+								<div
+									className={`flex items-center justify-center border-2 ${
+										dragActive ? "border-blue-500" : "border-gray-300"
+									} border-dashed rounded-md p-4 cursor-pointer hover:bg-gray-100 focus-within:ring-2 focus-within:ring-blue-500`}
+									onDragOver={handleDrag}
+									onDragEnter={handleDrag}
+									onDragLeave={handleDrag}
+									onDrop={handleDrop}
+									onClick={() => document.getElementById("executeFile")?.click()}
+								>
+									<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 16v-3a4 4 0 10-8 0v3M8 16v2a4 4 0 004 4h0a4 4 0 004-4v-2m4-4a8 8 0 10-16 0v3m4-8a4 4 0 118 0" />
+									</svg>
+									<span className="text-sm text-gray-500">{executeFile ? executeFile.name : "Arrastre y suelte archivos o haga clic aquí"}</span>
+								</div>
+								<input id="executeFile" name="executeFile" type="file" className="hidden" onChange={handleFileChange} />
+							</div>
+
 							<div className="flex justify-end gap-4">
 								<button onClick={closeExecuteModal} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
 									Cancelar
 								</button>
-								<button onClick={handleExecuteConfirm} className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" disabled={!executeDate}>
+								<button
+									onClick={() => handleExecuteConfirm(selectedExecuteRow?.estado.includes("alta") ? "alta" : "baja")}
+									className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+									disabled={!executeDate}
+								>
 									Ejecutar
 								</button>
 							</div>

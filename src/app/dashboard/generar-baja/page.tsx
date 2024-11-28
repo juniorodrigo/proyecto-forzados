@@ -14,7 +14,7 @@ const BajaForzado = () => {
 	});
 
 	const [errors, setErrors] = useState<Record<string, boolean>>({});
-	const [dragActive, setDragActive] = useState(false);
+	// const [dragActive, setDragActive] = useState(false);
 	const [popover, setPopover] = useState({ show: false, message: "", type: "success" as "success" | "error" });
 	const [usuarios, setUsuarios] = useState<{ id: string; nombre: string }[]>([]);
 	const [aprobadores, setAprobadores] = useState<{ id: string; nombre: string }[]>([]);
@@ -61,27 +61,27 @@ const BajaForzado = () => {
 		});
 	};
 
-	const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
-		e.preventDefault();
-		e.stopPropagation();
-		setDragActive(e.type === "dragover");
-	};
+	// const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
+	// 	e.preventDefault();
+	// 	e.stopPropagation();
+	// 	setDragActive(e.type === "dragover");
+	// };
 
-	const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-		e.preventDefault();
-		e.stopPropagation();
-		setDragActive(false);
-		if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-			setFormData({
-				...formData,
-				datosAdjuntos: e.dataTransfer.files[0],
-			});
-			setErrors({
-				...errors,
-				datosAdjuntos: false,
-			});
-		}
-	};
+	// const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+	// 	e.preventDefault();
+	// 	e.stopPropagation();
+	// 	setDragActive(false);
+	// 	if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+	// 		setFormData({
+	// 			...formData,
+	// 			datosAdjuntos: e.dataTransfer.files[0],
+	// 		});
+	// 		setErrors({
+	// 			...errors,
+	// 			datosAdjuntos: false,
+	// 		});
+	// 	}
+	// };
 
 	const validateForm = () => {
 		const newErrors: Record<string, boolean> = {};
@@ -199,7 +199,7 @@ const BajaForzado = () => {
 				</div>
 
 				{/* Datos Adjuntos */}
-				<div className="mb-4">
+				{/* <div className="mb-4">
 					<label htmlFor="datosAdjuntos" className="block text-sm font-medium text-gray-700 mb-1">
 						Datos Adjuntos
 					</label>
@@ -220,7 +220,7 @@ const BajaForzado = () => {
 					</div>
 					<input id="datosAdjuntos" name="datosAdjuntos" type="file" className="hidden" onChange={handleInputChange} />
 					{errors.datosAdjuntos && <span className="text-red-500 text-sm mt-1">Este campo es requerido.</span>}
-				</div>
+				</div> */}
 
 				{/* Botón de Enviar */}
 				<button type="submit" className="w-full px-4 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600">

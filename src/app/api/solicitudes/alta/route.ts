@@ -213,7 +213,7 @@ VALUES (
 	GETDATE(), -- FECHA_CREACION
 	'${parameters.aprobador}', -- USUARIO_MODIFICACION
 	GETDATE(), -- FECHA_MODIFICACION
-	'pendiente' -- ESTADOSOLICITUD
+	'pendiente-alta' -- ESTADOSOLICITUD
 );`;
 };
 
