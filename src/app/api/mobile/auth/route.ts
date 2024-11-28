@@ -22,16 +22,16 @@ export async function POST(req: NextRequest) {
 
 		// Validar credenciales con la base de datos
 		const pool = await poolPromise;
-		const result = await pool.request().query(`SELECT u.*, A.AREA FROM MAE_USUARIO as u
-        INNER JOIN MAE_AREA A on u.ID_AREA = A.ID_AREA
-        WHERE USERNAME = '${username}'`);
+		const result = await pool.request().query(`SELECT u.*, A.DESCRIPCION FROM MAE_USUARIO as u
+         INNER JOIN MAE_AREA A on u.AREA_ID = A.AREA_ID
+         WHERE U.USUARIO = '${username}'`);
 
 		if (result.recordset.length === 0) {
 			return NextResponse.json({ message: "Invalid username" }, { status: 401 });
 		}
 
 		const user = result.recordset[0];
-		const registeredHash = user.CONTRASENAHASH;
+		const registeredHash = user.PASSWORD;
 
 		// Verificar contraseña
 		const isPasswordValid = await bcrypt.compare(password, registeredHash);

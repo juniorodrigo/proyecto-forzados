@@ -9,7 +9,6 @@ const BajaForzado = () => {
 		solicitanteRetiro: "",
 		aprobadorRetiro: "",
 		ejecutorRetiro: "",
-		fechaCierre: "",
 		observaciones: "",
 		datosAdjuntos: null as File | null,
 	});
@@ -183,19 +182,6 @@ const BajaForzado = () => {
 						))}
 					</select>
 					{errors.ejecutorRetiro && <span className="text-red-500 text-sm mt-1">Este campo es requerido.</span>}
-				</div>
-
-				{/* Fecha de Cierre */}
-				<div className="mb-4">
-					<label className="block text-sm font-medium text-gray-700 mb-1">Fecha de Cierre</label>
-					<input
-						type="datetime-local"
-						name="fechaCierre"
-						value={formData.fechaCierre}
-						onChange={handleInputChange}
-						className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 ${errors.fechaCierre ? "border-red-500" : "border-gray-300"}`}
-					/>
-					{errors.fechaCierre && <span className="text-red-500 text-sm mt-1">Este campo es requerido.</span>}
 				</div>
 
 				{/* Observaciones */}
