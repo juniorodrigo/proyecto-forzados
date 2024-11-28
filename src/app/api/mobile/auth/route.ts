@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
 			{
 				name: user.NOMBRE,
 				email: user.CORREO,
-				areaId: user.ID_AREA,
+				areaId: user.AREA_ID,
 				areaName: user.AREA,
 				userId: user.ID,
 			},

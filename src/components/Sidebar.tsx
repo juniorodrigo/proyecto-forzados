@@ -1,6 +1,6 @@
 "use client";
 import React, { useContext, useEffect, useState, useMemo } from "react";
-import { RiProductHuntLine, RiSettings2Line, RiBriefcaseLine, RiBuildingLine } from "react-icons/ri";
+import { RiDashboardLine, RiProductHuntLine, RiSettings2Line, RiBriefcaseLine, RiBuildingLine } from "react-icons/ri";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UiContext } from "@/context/SidebarContext";

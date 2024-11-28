@@ -840,7 +840,7 @@ INSERT INTO MAE_AREA (DESCRIPCION,ESTADO,USUARIO__CREACION,FECHA_CREACION) VALUE
 
 
 insert into MAE_USUARIO (AREA_ID, PUESTO_ID, USUARIO, PASSWORD, NOMBRE, APEPATERNO, APEMATERNO, CORREO, ESTADO, USUARIO_CREACION, FECHA_CREACION, USUARIO_MODIFICACION, FECHA_MODIFICACION)
-values (1, 1, 'USERUSER', '$2b$10$leMLTPRtiKiqtZRCjBnAy.BiFmuB362GGfk8zKwM4ccuNP83akFIm', 'Nombre 1', 'Apellido Paterno', 'Apellido Materno', 'correo@example.com', 1, 'user1', getdate(), 'user2', getdate())
+values (1, 1, 'USERUSER22', '$2b$10$leMLTPRtiKiqtZRCjBnAy.BiFmuB362GGfk8zKwM4ccuNP83akFIm', 'Nombre 1', 'Apellido Paterno', 'Apellido Materno', 'correo@example.com', 1, 'user1', getdate(), 'user2', getdate())
 go
 
 INSERT INTO MAE_USUARIO (AREA_ID,PUESTO_ID,USUARIO,PASSWORD,NOMBRE,APEPATERNO,APEMATERNO,CORREO,ESTADO,USUARIO_CREACION,FECHA_CREACION) VALUES(3,8,'JORGEAPARICIO','ADMIN123','Jorge','Aparicio','','Jorge.Aparicio@goldfields.com',1,'ADMIN',GETDATE())
