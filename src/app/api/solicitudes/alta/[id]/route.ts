@@ -24,6 +24,7 @@ const getSingleSolicitud = async (id: string) => {
             MOTIVORECHAZO_ID,
             TIPOFORZADO_ID,
             TAGCENTRO_ID,
+			TAGSUFIJO,
             RESPONSABLE_ID,
             RIESGOA_ID,
             TIPOSOLICITUD,
