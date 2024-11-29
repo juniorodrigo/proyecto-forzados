@@ -10,7 +10,6 @@ const BajaForzado = () => {
 		aprobadorRetiro: "",
 		ejecutorRetiro: "",
 		observaciones: "",
-		datosAdjuntos: null as File | null,
 	});
 
 	const [errors, setErrors] = useState<Record<string, boolean>>({});
@@ -50,38 +49,16 @@ const BajaForzado = () => {
 	}, []);
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-		const { name, value, files } = e.target as HTMLInputElement;
+		const { name, value } = e.target as HTMLInputElement;
 		setFormData({
 			...formData,
-			[name]: files ? files[0] : value,
+			[name]: value,
 		});
 		setErrors({
 			...errors,
 			[name]: false,
 		});
 	};
-
-	// const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
-	// 	e.preventDefault();
-	// 	e.stopPropagation();
-	// 	setDragActive(e.type === "dragover");
-	// };
-
-	// const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-	// 	e.preventDefault();
-	// 	e.stopPropagation();
-	// 	setDragActive(false);
-	// 	if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-	// 		setFormData({
-	// 			...formData,
-	// 			datosAdjuntos: e.dataTransfer.files[0],
-	// 		});
-	// 		setErrors({
-	// 			...errors,
-	// 			datosAdjuntos: false,
-	// 		});
-	// 	}
-	// };
 
 	const validateForm = () => {
 		const newErrors: Record<string, boolean> = {};
@@ -197,30 +174,6 @@ const BajaForzado = () => {
 					/>
 					{errors.observaciones && <span className="text-red-500 text-sm mt-1">Este campo es requerido.</span>}
 				</div>
-
-				{/* Datos Adjuntos */}
-				{/* <div className="mb-4">
-					<label htmlFor="datosAdjuntos" className="block text-sm font-medium text-gray-700 mb-1">
-						Datos Adjuntos
-					</label>
-					<div
-						className={`flex items-center justify-center border-2 ${
-							dragActive ? "border-blue-500" : "border-gray-300"
-						} border-dashed rounded-md p-4 cursor-pointer hover:bg-gray-100 focus-within:ring-2 focus-within:ring-blue-500`}
-						onDragOver={handleDrag}
-						onDragEnter={handleDrag}
-						onDragLeave={handleDrag}
-						onDrop={handleDrop}
-						onClick={() => document.getElementById("datosAdjuntos")?.click()}
-					>
-						<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 16v-3a4 4 0 10-8 0v3M8 16v2a4 4 0 004 4h0a4 4 0 004-4v-2m4-4a8 8 0 10-16 0v3m4-8a4 4 0 118 0" />
-						</svg>
-						<span className="text-sm text-gray-500">{formData.datosAdjuntos ? formData.datosAdjuntos.name : "Arrastre y suelte archivos o haga clic aquí"}</span>
-					</div>
-					<input id="datosAdjuntos" name="datosAdjuntos" type="file" className="hidden" onChange={handleInputChange} />
-					{errors.datosAdjuntos && <span className="text-red-500 text-sm mt-1">Este campo es requerido.</span>}
-				</div> */}
 
 				{/* Botón de Enviar */}
 				<button type="submit" className="w-full px-4 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600">
