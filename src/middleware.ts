@@ -12,6 +12,10 @@ export default withAuth({
 // Middleware para habilitar CORS a todos los orígenes
 export async function middleware(req: NextRequest) {
 	const response = NextResponse.next();
+	response.headers.append("Access-Control-Allow-Credentials", "true");
+	response.headers.append("Access-Control-Allow-Origin", ""); // Cambia "" por "http://localhost:<puerto>" en producción
+	response.headers.append("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+	response.headers.append("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, Accept, Origin");
 	response.headers.set("Access-Control-Allow-Origin", "*"); // Permitir todos los orígenes
 	response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS"); // Métodos permitidos
 	response.headers.set(
@@ -26,12 +30,5 @@ export async function middleware(req: NextRequest) {
 	return response;
 }
 export const config = {
-	matcher: [
-		"/", // Aplica a todas las rutas, puedes agregar más según lo necesites
-		// "/dashboard/:path*",
-		// "/financial",
-		// "/analytics",
-		// "/logistics/:path*",
-		// ...
-	],
+	matcher: ["/", "/api/:path*"],
 };
