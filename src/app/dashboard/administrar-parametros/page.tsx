@@ -84,6 +84,7 @@ const Page = () => {
 				body: JSON.stringify({
 					descripcion: newRecord.descripcion,
 					...(selectedCategoryObject?.needsCode && { codigo: newRecord.codigo }),
+					usuario: 1,
 				}),
 			})
 				.then((response) => response.json())

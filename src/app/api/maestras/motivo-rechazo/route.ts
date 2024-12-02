@@ -24,15 +24,16 @@ export async function GET() {
 export async function POST(request: Request) {
 	try {
 		const pool = await poolPromise;
-		const { descripcion, usuarioCreacion } = await request.json();
-		const fechaCreacion = new Date();
+		const { descripcion, usuario } = await request.json();
 		const result = await pool
 			.request()
 			.input("descripcion", descripcion)
 			.input("estado", 1)
-			.input("usuarioCreacion", usuarioCreacion)
-			.input("fechaCreacion", fechaCreacion)
-			.query("INSERT INTO MOTIVO_RECHAZO (DESCRIPCION, ESTADO, USUARIO_CREACION, FECHA_CREACION) VALUES (@descripcion, @estado, @usuarioCreacion, @fechaCreacion)");
+			.input("usuarioCreacion", usuario)
+			.input("usuarioModificacion", usuario)
+			.query(
+				"INSERT INTO MOTIVO_RECHAZO (DESCRIPCION, ESTADO, USUARIO_CREACION, USUARIO_MODIFICACION, FECHA_CREACION, FECHA_MODIFICACION) VALUES (@descripcion, @estado, @usuarioCreacion, @usuarioModificacion, GETDATE(), GETDATE())"
+			);
 
 		if (result.rowsAffected[0] > 0) {
 			return NextResponse.json({ success: true, message: "values inserted into database" });
@@ -49,8 +50,15 @@ export async function POST(request: Request) {
 export async function DELETE(request: Request) {
 	try {
 		const pool = await poolPromise;
-		const { id } = await request.json();
-		const result = await pool.request().input("id", id).query("UPDATE MOTIVO_RECHAZO SET ESTADO = 0 WHERE MOTIVORECHAZO_ID = @id");
+		const { id, usuario } = await request.json();
+		const fechaModificacion = new Date();
+		const result = await pool
+			.request()
+			.input("id", id)
+			.input("estado", 0)
+			.input("usuarioModificacion", usuario)
+			.input("fechaModificacion", fechaModificacion)
+			.query("UPDATE MOTIVO_RECHAZO SET ESTADO = @estado, USUARIO_MODIFICACION = @usuarioModificacion, FECHA_MODIFICACION = @fechaModificacion WHERE MOTIVORECHAZO_ID = @id");
 
 		if (result.rowsAffected[0] > 0) {
 			return NextResponse.json({ success: true, message: "Record deleted successfully" });
@@ -67,13 +75,13 @@ export async function DELETE(request: Request) {
 export async function PUT(request: Request) {
 	try {
 		const pool = await poolPromise;
-		const { id, descripcion, usuarioModificacion } = await request.json();
+		const { id, descripcion, usuario } = await request.json();
 		const fechaModificacion = new Date();
 		const result = await pool
 			.request()
 			.input("id", id)
 			.input("descripcion", descripcion)
-			.input("usuarioModificacion", usuarioModificacion)
+			.input("usuarioModificacion", usuario)
 			.input("fechaModificacion", fechaModificacion)
 			.query("UPDATE MOTIVO_RECHAZO SET DESCRIPCION = @descripcion, USUARIO_MODIFICACION = @usuarioModificacion, FECHA_MODIFICACION = @fechaModificacion WHERE MOTIVORECHAZO_ID = @id");
 

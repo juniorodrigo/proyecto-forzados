@@ -5,7 +5,7 @@ import { poolPromise } from "@sql/lib/db";
 export async function GET() {
 	try {
 		const pool = await poolPromise;
-		const { recordset } = await pool.request().query("SELECT * FROM RESPONSABLE");
+		const { recordset } = await pool.request().query("SELECT * FROM RESPONSABLE WHERE ESTADO = 1");
 
 		const turnos = recordset.map((singleValue) => {
 			return {
@@ -24,11 +24,16 @@ export async function GET() {
 export async function POST(request: Request) {
 	try {
 		const pool = await poolPromise;
-		const { descripcion } = await request.json();
+		const { descripcion, usuario } = await request.json();
 
-		console.log(descripcion, "INSERTANDO EN RESPONSABLEEEEEEEEEEEEEEEEEEEE");
-
-		const result = await pool.request().input("NOMBRE", descripcion).query("INSERT INTO RESPONSABLE ( NOMBRE) VALUES ( @NOMBRE)");
+		const result = await pool
+			.request()
+			.input("NOMBRE", descripcion)
+			.input("USUARIO_CREACION", usuario)
+			.input("USUARIO_MODIFICACION", usuario)
+			.query(
+				"INSERT INTO RESPONSABLE (NOMBRE, USUARIO_CREACION, USUARIO_MODIFICACION, FECHA_CREACION, FECHA_MODIFICACION, ESTADO) VALUES (@NOMBRE, @USUARIO_CREACION, @USUARIO_MODIFICACION, GETDATE(), GETDATE(), 1)"
+			);
 
 		if (result.rowsAffected[0] > 0) {
 			return NextResponse.json({ success: true, message: "values inserted into database" });
@@ -45,17 +50,21 @@ export async function POST(request: Request) {
 export async function DELETE(request: Request) {
 	try {
 		const pool = await poolPromise;
-		const { id } = await request.json();
-		const result = await pool.request().input("RESPONSABLE_ID", id).query("DELETE FROM RESPONSABLE WHERE RESPONSABLE_ID = @RESPONSABLE_ID");
+		const { id, usuario } = await request.json();
+		const result = await pool
+			.request()
+			.input("RESPONSABLE_ID", id)
+			.input("USUARIO_MODIFICACION", usuario)
+			.query("UPDATE RESPONSABLE SET ESTADO = 0, USUARIO_MODIFICACION = @USUARIO_MODIFICACION, FECHA_MODIFICACION = GETDATE() WHERE RESPONSABLE_ID = @RESPONSABLE_ID");
 
 		if (result.rowsAffected[0] > 0) {
-			return NextResponse.json({ success: true, message: "Record deleted successfully" });
+			return NextResponse.json({ success: true, message: "Record updated successfully" });
 		} else {
 			return NextResponse.json({ success: false, message: "No record found with the provided ID" }, { status: 404 });
 		}
 	} catch (error) {
 		console.error("Error processing DELETE:", error);
-		return NextResponse.json({ success: false, message: "Error deleting data" }, { status: 500 });
+		return NextResponse.json({ success: false, message: "Error updating data" }, { status: 500 });
 	}
 }
 
@@ -63,8 +72,13 @@ export async function DELETE(request: Request) {
 export async function PUT(request: Request) {
 	try {
 		const pool = await poolPromise;
-		const { id, descripcion } = await request.json();
-		const result = await pool.request().input("id", id).input("nombre", descripcion).query("UPDATE RESPONSABLE SET NOMBRE = @nombre WHERE RESPONSABLE_ID = @id");
+		const { id, descripcion, usuario } = await request.json();
+		const result = await pool
+			.request()
+			.input("id", id)
+			.input("nombre", descripcion)
+			.input("USUARIO_MODIFICACION", usuario)
+			.query("UPDATE RESPONSABLE SET NOMBRE = @nombre, USUARIO_MODIFICACION = @USUARIO_MODIFICACION, FECHA_MODIFICACION = GETDATE() WHERE RESPONSABLE_ID = @id");
 
 		if (result.rowsAffected[0] > 0) {
 			return NextResponse.json({ success: true, message: "Record updated successfully" });

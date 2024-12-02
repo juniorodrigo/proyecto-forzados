@@ -5,7 +5,7 @@ import { poolPromise } from "@sql/lib/db";
 export async function GET() {
 	try {
 		const pool = await poolPromise;
-		const { recordset } = await pool.request().query("SELECT * FROM PROBABILIDAD");
+		const { recordset } = await pool.request().query("SELECT * FROM PROBABILIDAD WHERE ESTADO = 1");
 
 		const turnos = recordset.map((singleValue) => {
 			return {
@@ -24,8 +24,14 @@ export async function GET() {
 export async function POST(request: Request) {
 	try {
 		const pool = await poolPromise;
-		const { descripcion } = await request.json();
-		const result = await pool.request().input("descripcion", descripcion).query("INSERT INTO PROBABILIDAD ( DESCRIPCION) VALUES ( @descripcion)");
+		const { descripcion, usuario } = await request.json();
+		const result = await pool
+			.request()
+			.input("descripcion", descripcion)
+			.input("usuario", usuario)
+			.query(
+				"INSERT INTO PROBABILIDAD (DESCRIPCION, USUARIO_CREACION, USUARIO_MODIFICACION, FECHA_CREACION, FECHA_MODIFICACION, ESTADO) VALUES (@descripcion, @usuario, @usuario, GETDATE(), GETDATE(), 1)"
+			);
 
 		if (result.rowsAffected[0] > 0) {
 			return NextResponse.json({ success: true, message: "values inserted into database" });
@@ -42,8 +48,12 @@ export async function POST(request: Request) {
 export async function DELETE(request: Request) {
 	try {
 		const pool = await poolPromise;
-		const { id } = await request.json();
-		const result = await pool.request().input("id", id).query("DELETE FROM PROBABILIDAD WHERE PROBABILIDAD_ID = @id");
+		const { id, usuario } = await request.json();
+		const result = await pool
+			.request()
+			.input("id", id)
+			.input("usuario", usuario)
+			.query("UPDATE PROBABILIDAD SET ESTADO = 0, USUARIO_MODIFICACION = @usuario, FECHA_MODIFICACION = GETDATE() WHERE PROBABILIDAD_ID = @id");
 
 		if (result.rowsAffected[0] > 0) {
 			return NextResponse.json({ success: true, message: "Record deleted successfully" });
@@ -60,8 +70,13 @@ export async function DELETE(request: Request) {
 export async function PUT(request: Request) {
 	try {
 		const pool = await poolPromise;
-		const { id, descripcion } = await request.json();
-		const result = await pool.request().input("id", id).input("descripcion", descripcion).query("UPDATE PROBABILIDAD SET DESCRIPCION = @descripcion WHERE PROBABILIDAD_ID = @id");
+		const { id, descripcion, usuario } = await request.json();
+		const result = await pool
+			.request()
+			.input("id", id)
+			.input("descripcion", descripcion)
+			.input("usuario", usuario)
+			.query("UPDATE PROBABILIDAD SET DESCRIPCION = @descripcion, USUARIO_MODIFICACION = @usuario, FECHA_MODIFICACION = GETDATE() WHERE PROBABILIDAD_ID = @id");
 
 		if (result.rowsAffected[0] > 0) {
 			return NextResponse.json({ success: true, message: "Record updated successfully" });

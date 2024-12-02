@@ -12,7 +12,7 @@ export async function GET(request: Request) {
 		}
 
 		const pool = await poolPromise;
-		const { recordset } = await pool.request().input("id", id).query("SELECT * FROM PROBABILIDAD WHERE PROBABILIDAD_ID = @id");
+		const { recordset } = await pool.request().input("id", id).query("SELECT * FROM PROBABILIDAD WHERE PROBABILIDAD_ID = @id AND ESTADO = 1");
 
 		if (recordset.length === 0) {
 			return NextResponse.json({ success: false, message: "Record not found" }, { status: 404 });
