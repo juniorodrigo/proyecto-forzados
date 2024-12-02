@@ -33,6 +33,7 @@ type UpdateQueryParameters = {
 	fechaCierre: string;
 	observaciones: string;
 	datosAdjuntos: object;
+	usuario: string;
 };
 
 const generateUpdateQuery = (parameters: UpdateQueryParameters) => {
@@ -42,7 +43,8 @@ const generateUpdateQuery = (parameters: UpdateQueryParameters) => {
 		APROBADOR_B_ID = ${parameters.aprobadorRetiro},
 		EJECUTOR_B_ID = ${parameters.ejecutorRetiro},
 		-- FECHACIERRE = '${1}',
-		USUARIO_MODIFICACION = '${parameters.aprobadorRetiro}',
+
+		USUARIO_MODIFICACION = '${parameters.usuario}',
 		FECHA_MODIFICACION = GETDATE(),
 		ESTADOSOLICITUD = 'PENDIENTE-BAJA'
 		
