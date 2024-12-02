@@ -5,7 +5,7 @@ import { poolPromise } from "@sql/lib/db";
 export async function GET() {
 	try {
 		const pool = await poolPromise;
-		const { recordset } = await pool.request().query("SELECT * FROM MOTIVO_RECHAZO");
+		const { recordset } = await pool.request().query("SELECT * FROM MOTIVO_RECHAZO WHERE ESTADO = 1");
 
 		const turnos = recordset.map((singleValue) => {
 			return {
@@ -24,8 +24,15 @@ export async function GET() {
 export async function POST(request: Request) {
 	try {
 		const pool = await poolPromise;
-		const { descripcion } = await request.json();
-		const result = await pool.request().input("descripcion", descripcion).query("INSERT INTO IMPACTO ( DESCRIPCION) VALUES ( @descripcion)");
+		const { descripcion, usuarioCreacion } = await request.json();
+		const fechaCreacion = new Date();
+		const result = await pool
+			.request()
+			.input("descripcion", descripcion)
+			.input("estado", 1)
+			.input("usuarioCreacion", usuarioCreacion)
+			.input("fechaCreacion", fechaCreacion)
+			.query("INSERT INTO MOTIVO_RECHAZO (DESCRIPCION, ESTADO, USUARIO_CREACION, FECHA_CREACION) VALUES (@descripcion, @estado, @usuarioCreacion, @fechaCreacion)");
 
 		if (result.rowsAffected[0] > 0) {
 			return NextResponse.json({ success: true, message: "values inserted into database" });
@@ -43,7 +50,7 @@ export async function DELETE(request: Request) {
 	try {
 		const pool = await poolPromise;
 		const { id } = await request.json();
-		const result = await pool.request().input("id", id).query("DELETE FROM IMPACTO WHERE IMPACTO_ID = @id");
+		const result = await pool.request().input("id", id).query("UPDATE MOTIVO_RECHAZO SET ESTADO = 0 WHERE MOTIVORECHAZO_ID = @id");
 
 		if (result.rowsAffected[0] > 0) {
 			return NextResponse.json({ success: true, message: "Record deleted successfully" });
@@ -60,8 +67,15 @@ export async function DELETE(request: Request) {
 export async function PUT(request: Request) {
 	try {
 		const pool = await poolPromise;
-		const { id, descripcion } = await request.json();
-		const result = await pool.request().input("id", id).input("descripcion", descripcion).query("UPDATE IMPACTO SET DESCRIPCION = @descripcion WHERE IMPACTO_ID = @id");
+		const { id, descripcion, usuarioModificacion } = await request.json();
+		const fechaModificacion = new Date();
+		const result = await pool
+			.request()
+			.input("id", id)
+			.input("descripcion", descripcion)
+			.input("usuarioModificacion", usuarioModificacion)
+			.input("fechaModificacion", fechaModificacion)
+			.query("UPDATE MOTIVO_RECHAZO SET DESCRIPCION = @descripcion, USUARIO_MODIFICACION = @usuarioModificacion, FECHA_MODIFICACION = @fechaModificacion WHERE MOTIVORECHAZO_ID = @id");
 
 		if (result.rowsAffected[0] > 0) {
 			return NextResponse.json({ success: true, message: "Record updated successfully" });

@@ -13,6 +13,7 @@ const Page = () => {
 		{ label: "Elemento de Riesgo", value: "riesgo-a", needsCode: false },
 		{ label: "Impacto", value: "impacto", needsCode: false },
 		{ label: "Tipo de forzado", value: "tipo-forzado", needsCode: false },
+		{ label: "Motivo de Rechazo", value: "motivo-rechazo", needsCode: false },
 	];
 	const [selectedCategory, setSelectedCategory] = useState("");
 	const [data, setData] = useState<Record<string, { id: number; codigo: string; descripcion: string }[]>>({

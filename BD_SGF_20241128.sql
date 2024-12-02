@@ -342,7 +342,7 @@ create table DISCIPLINA (
    DISCIPLINA_ID        int                  identity,
    DESCRIPCION          varchar(30)          null,
    ESTADO               int                  null,
-   USUARIO__CREACION    varchar(20)          null,
+   USUARIO_CREACION    varchar(20)          null,
    FECHA_CREACION       datetime             null,
    USUARIO_MODIFICACION varchar(20)          null,
    FECHA_MODIFICACION   datetime             null,
@@ -354,7 +354,7 @@ create table IMPACTO (
    IMPACTO_ID           int                  identity,
    DESCRIPCION          varchar(30)          null,
    ESTADO               int                  null,
-   USUARIO__CREACION    varchar(20)          null,
+   USUARIO_CREACION    varchar(20)          null,
    FECHA_CREACION       datetime             null,
    USUARIO_MODIFICACION varchar(20)          null,
    FECHA_MODIFICACION   datetime             null,
@@ -366,7 +366,7 @@ create table MAE_AREA (
    AREA_ID              int                  identity,
    DESCRIPCION          varchar(30)          null,
    ESTADO               int                  null,
-   USUARIO__CREACION    varchar(20)          null,
+   USUARIO_CREACION    varchar(20)          null,
    FECHA_CREACION       datetime             null,
    USUARIO_MODIFICACION varchar(20)          null,
    FECHA_MODIFICACION   datetime             null,
@@ -398,7 +398,7 @@ create table MAE_PUESTO (
    PUESTO_ID            int                  identity,
    DESCRIPCION          varchar(50)          null,
    ESTADO               int                  null,
-   USUARIO__CREACION    varchar(20)          null,
+   USUARIO_CREACION    varchar(20)          null,
    FECHA_CREACION       datetime             null,
    USUARIO_MODIFICACION varchar(20)          null,
    FECHA_MODIFICACION   datetime             null,
@@ -410,7 +410,7 @@ create table MAE_RIESGO_A (
    RIESGOA_ID           int                  identity,
    DESCRIPCION          varchar(80)          null,
    ESTADO               int                  null,
-   USUARIO__CREACION    varchar(20)          null,
+   USUARIO_CREACION    varchar(20)          null,
    FECHA_CREACION       datetime             null,
    USUARIO_MODIFICACION varchar(20)          null,
    FECHA_MODIFICACION   datetime             null,
@@ -456,7 +456,7 @@ create table MAE_USUARIO_ROL (
    ROL_ID               int                  null,
    SOLICITUD_ID         int                  null,
    ESTADO               int                  null,
-   USUARIO__CREACION    varchar(20)          null,
+   USUARIO_CREACION    varchar(20)          null,
    FECHA_CREACION       datetime             null,
    USUARIO_MODIFICACION varchar(20)          null,
    FECHA_MODIFICACION   datetime             null,
@@ -471,7 +471,7 @@ create table MATRIZ_RIESGO (
    PROBABILIDAD_ID      int                  null,
    NIVEL                int                  null,
    ESTADO               int                  null,
-   USUARIO__CREACION    varchar(20)          null,
+   USUARIO_CREACION    varchar(20)          null,
    FECHA_CREACION       datetime             null,
    USUARIO_MODIFICACION varchar(20)          null,
    FECHA_MODIFICACION   datetime             null,
@@ -483,7 +483,7 @@ create table MOTIVO_RECHAZO (
    MOTIVORECHAZO_ID     int                  identity,
    DESCRIPCION          varchar(30)          null,
    ESTADO               int                  null,
-   USUARIO__CREACION    varchar(20)          null,
+   USUARIO_CREACION    varchar(20)          null,
    FECHA_CREACION       datetime             null,
    USUARIO_MODIFICACION varchar(20)          null,
    FECHA_MODIFICACION   datetime             null,
@@ -495,7 +495,7 @@ create table PROBABILIDAD (
    PROBABILIDAD_ID      int                  identity,
    DESCRIPCION          varchar(30)          null,
    ESTADO               int                  null,
-   USUARIO__CREACION    varchar(20)          null,
+   USUARIO_CREACION    varchar(20)          null,
    FECHA_CREACION       datetime             null,
    USUARIO_MODIFICACION varchar(20)          null,
    FECHA_MODIFICACION   datetime             null,
@@ -507,7 +507,7 @@ create table RESPONSABLE (
    RESPONSABLE_ID       int                  identity,
    NOMBRE               varchar(30)          null,
    ESTADO               int                  null,
-   USUARIO__CREACION    varchar(20)          null,
+   USUARIO_CREACION    varchar(20)          null,
    FECHA_CREACION       datetime             null,
    USUARIO_MODIFICACION varchar(20)          null,
    FECHA_MODIFICACION   datetime             null,
@@ -553,8 +553,6 @@ create table TIPO_FORZADO (
    DESCRIPCION          varchar(30)          null,
    constraint PK_TIPO_FORZADO primary key (TIPOFORZADO_ID)
 )
-go
-
 create table TRS_SOLICITUD_FORZADO (
    SOLICITUD_ID         int                  identity,
    SUBAREA_ID           int                  null,
@@ -566,6 +564,7 @@ create table TRS_SOLICITUD_FORZADO (
    TAGSUFIJO            varchar(100)         null,
    RESPONSABLE_ID       int                  null,
    RIESGOA_ID           int                  null,
+   PROBABILIDAD_RIESGO  int                  null,
    TIPOSOLICITUD        int                  null,
    INTERLOCK            int                  null,
    DESCRIPCIONFORZADO   varchar(100)         null,
@@ -590,7 +589,7 @@ create table TURNO (
    TURNO_ID             int                  identity,
    DESCRIPCION          varchar(30)          null,
    ESTADO               int                  null,
-   USUARIO__CREACION    varchar(20)          null,
+   USUARIO_CREACION    varchar(20)          null,
    FECHA_CREACION       datetime             null,
    USUARIO_MODIFICACION varchar(20)          null,
    FECHA_MODIFICACION   datetime             null,
@@ -745,6 +744,12 @@ alter table TRS_SOLICITUD_FORZADO
       references MAE_USUARIO (USUARIO_ID)
 go
 
+alter table TRS_SOLICITUD_FORZADO
+   add constraint FK_TRS_SOLI_REFERENCE_PROBABILIDAD foreign key (PROBABILIDAD_RIESGO)
+      references PROBABILIDAD (PROBABILIDAD_ID)
+go
+
+
 /*==============================================================*/
 -- INSERCIÓN DE DATOS
 
@@ -761,7 +766,7 @@ go
 insert into IMPACTO (DESCRIPCION) values ('insignificante'),('menor'),('moderado'),('mayor'), ('extremo')
 go
 
-insert into MAE_AREA (DESCRIPCION, ESTADO, USUARIO__CREACION, FECHA_CREACION, USUARIO_MODIFICACION, FECHA_MODIFICACION)
+insert into MAE_AREA (DESCRIPCION, ESTADO, USUARIO_CREACION, FECHA_CREACION, USUARIO_MODIFICACION, FECHA_MODIFICACION)
 values ('Area 1', 1, 'user1', getdate(), 'user2', getdate())
 go
 
@@ -947,27 +952,27 @@ INSERT INTO MAE_ROL (DESCRIPCION,ESTADO,FECHA__MODIFICACION,USUARIO_CREACION) VA
 INSERT INTO MAE_ROL (DESCRIPCION,ESTADO,FECHA__MODIFICACION,USUARIO_CREACION) VALUES('EJECUTOR BAJA',1,GETDATE(),'ADMIN')
 
 
-INSERT INTO MAE_PUESTO (DESCRIPCION,ESTADO,USUARIO__CREACION,FECHA_CREACION) VALUES ('GERENTE PLANTA PROCESO',1,'ADMIN',GETDATE())
-INSERT INTO MAE_PUESTO (DESCRIPCION,ESTADO,USUARIO__CREACION,FECHA_CREACION) VALUES ('GERENTE SEGURIDAD, SALUD Y MEDIO AMBIENTE',1,'ADMIN',GETDATE())
-INSERT INTO MAE_PUESTO (DESCRIPCION,ESTADO,USUARIO__CREACION,FECHA_CREACION) VALUES ('SUPERINTENDENTE MANTENIMIENTO, METALURGIA Y PRODUC',1,'ADMIN',GETDATE())
-INSERT INTO MAE_PUESTO (DESCRIPCION,ESTADO,USUARIO__CREACION,FECHA_CREACION) VALUES ('JEFE MANTENIMIENTO ELECTRICO E INSTRUMENTACION',1,'ADMIN',GETDATE())
-INSERT INTO MAE_PUESTO (DESCRIPCION,ESTADO,USUARIO__CREACION,FECHA_CREACION) VALUES ('JEFE PROCESO',1,'ADMIN',GETDATE())
-INSERT INTO MAE_PUESTO (DESCRIPCION,ESTADO,USUARIO__CREACION,FECHA_CREACION) VALUES ('JEFE SALA ORO',1,'ADMIN',GETDATE())
-INSERT INTO MAE_PUESTO (DESCRIPCION,ESTADO,USUARIO__CREACION,FECHA_CREACION) VALUES ('JEFE TURNO MANTENIMIENTO',1,'ADMIN',GETDATE())
-INSERT INTO MAE_PUESTO (DESCRIPCION,ESTADO,USUARIO__CREACION,FECHA_CREACION) VALUES ('INGENIERO SISTEMA CONTROL',1,'ADMIN',GETDATE())
-INSERT INTO MAE_PUESTO (DESCRIPCION,ESTADO,USUARIO__CREACION,FECHA_CREACION) VALUES ('OPERADOR SALA DE CONTROL',1,'ADMIN',GETDATE())
-INSERT INTO MAE_PUESTO (DESCRIPCION,ESTADO,USUARIO__CREACION,FECHA_CREACION) VALUES ('MANTENEDOR',1,'ADMIN',GETDATE())
-INSERT INTO MAE_PUESTO (DESCRIPCION,ESTADO,USUARIO__CREACION,FECHA_CREACION) VALUES ('CONTROL DOCUMENTOS',1,'ADMIN',GETDATE())
+INSERT INTO MAE_PUESTO (DESCRIPCION,ESTADO,USUARIO_CREACION,FECHA_CREACION) VALUES ('GERENTE PLANTA PROCESO',1,'ADMIN',GETDATE())
+INSERT INTO MAE_PUESTO (DESCRIPCION,ESTADO,USUARIO_CREACION,FECHA_CREACION) VALUES ('GERENTE SEGURIDAD, SALUD Y MEDIO AMBIENTE',1,'ADMIN',GETDATE())
+INSERT INTO MAE_PUESTO (DESCRIPCION,ESTADO,USUARIO_CREACION,FECHA_CREACION) VALUES ('SUPERINTENDENTE MANTENIMIENTO, METALURGIA Y PRODUC',1,'ADMIN',GETDATE())
+INSERT INTO MAE_PUESTO (DESCRIPCION,ESTADO,USUARIO_CREACION,FECHA_CREACION) VALUES ('JEFE MANTENIMIENTO ELECTRICO E INSTRUMENTACION',1,'ADMIN',GETDATE())
+INSERT INTO MAE_PUESTO (DESCRIPCION,ESTADO,USUARIO_CREACION,FECHA_CREACION) VALUES ('JEFE PROCESO',1,'ADMIN',GETDATE())
+INSERT INTO MAE_PUESTO (DESCRIPCION,ESTADO,USUARIO_CREACION,FECHA_CREACION) VALUES ('JEFE SALA ORO',1,'ADMIN',GETDATE())
+INSERT INTO MAE_PUESTO (DESCRIPCION,ESTADO,USUARIO_CREACION,FECHA_CREACION) VALUES ('JEFE TURNO MANTENIMIENTO',1,'ADMIN',GETDATE())
+INSERT INTO MAE_PUESTO (DESCRIPCION,ESTADO,USUARIO_CREACION,FECHA_CREACION) VALUES ('INGENIERO SISTEMA CONTROL',1,'ADMIN',GETDATE())
+INSERT INTO MAE_PUESTO (DESCRIPCION,ESTADO,USUARIO_CREACION,FECHA_CREACION) VALUES ('OPERADOR SALA DE CONTROL',1,'ADMIN',GETDATE())
+INSERT INTO MAE_PUESTO (DESCRIPCION,ESTADO,USUARIO_CREACION,FECHA_CREACION) VALUES ('MANTENEDOR',1,'ADMIN',GETDATE())
+INSERT INTO MAE_PUESTO (DESCRIPCION,ESTADO,USUARIO_CREACION,FECHA_CREACION) VALUES ('CONTROL DOCUMENTOS',1,'ADMIN',GETDATE())
 
 
-INSERT INTO MAE_AREA (DESCRIPCION,ESTADO,USUARIO__CREACION,FECHA_CREACION) VALUES ('COMISIONAMIENTO',1,'ADMIN',GETDATE())
-INSERT INTO MAE_AREA (DESCRIPCION,ESTADO,USUARIO__CREACION,FECHA_CREACION) VALUES ('MANTENIMIENTO',1,'ADMIN',GETDATE())
-INSERT INTO MAE_AREA (DESCRIPCION,ESTADO,USUARIO__CREACION,FECHA_CREACION) VALUES ('METALURGIA',1,'ADMIN',GETDATE())
-INSERT INTO MAE_AREA (DESCRIPCION,ESTADO,USUARIO__CREACION,FECHA_CREACION) VALUES ('OPERACIONES',1,'ADMIN',GETDATE())
+INSERT INTO MAE_AREA (DESCRIPCION,ESTADO,USUARIO_CREACION,FECHA_CREACION) VALUES ('COMISIONAMIENTO',1,'ADMIN',GETDATE())
+INSERT INTO MAE_AREA (DESCRIPCION,ESTADO,USUARIO_CREACION,FECHA_CREACION) VALUES ('MANTENIMIENTO',1,'ADMIN',GETDATE())
+INSERT INTO MAE_AREA (DESCRIPCION,ESTADO,USUARIO_CREACION,FECHA_CREACION) VALUES ('METALURGIA',1,'ADMIN',GETDATE())
+INSERT INTO MAE_AREA (DESCRIPCION,ESTADO,USUARIO_CREACION,FECHA_CREACION) VALUES ('OPERACIONES',1,'ADMIN',GETDATE())
 
 
 insert into MAE_USUARIO (AREA_ID, PUESTO_ID, USUARIO, PASSWORD, NOMBRE, APEPATERNO, APEMATERNO, CORREO, ESTADO, USUARIO_CREACION, FECHA_CREACION, USUARIO_MODIFICACION, FECHA_MODIFICACION)
-values (1, 1, 'USERUSERUSER', '$2b$10$leMLTPRtiKiqtZRCjBnAy.BiFmuB362GGfk8zKwM4ccuNP83akFIm', 'Nombre 1', 'Apellido Paterno', 'Apellido Materno', 'correo@example.com', 1, 'user1', getdate(), 'user2', getdate())
+values (1, 1, 'usuario1', 'pass1234', 'Nombre 1', 'Apellido Paterno', 'Apellido Materno', 'correo@example.com', 1, 'user1', getdate(), 'user2', getdate())
 go
 
 INSERT INTO MAE_USUARIO (AREA_ID,PUESTO_ID,USUARIO,PASSWORD,NOMBRE,APEPATERNO,APEMATERNO,CORREO,ESTADO,USUARIO_CREACION,FECHA_CREACION) VALUES(3,8,'JORGEAPARICIO','ADMIN123','Jorge','Aparicio','','Jorge.Aparicio@goldfields.com',1,'ADMIN',GETDATE())

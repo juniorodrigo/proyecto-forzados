@@ -12,7 +12,7 @@ export async function POST(request: Request) {
 			.request()
 			.input("id", id)
 			.input("motivoRechazo", motivoRechazo)
-			.query("UPDATE TRS_Solicitud_forzado SET ESTADOSOLICITUD = 'rechazado-baja', MOTIVORECHAZO_ID = @motivoRechazo WHERE SOLICITUD_ID = @id");
+			.query("UPDATE TRS_Solicitud_forzado SET ESTADOSOLICITUD = 'RECHAZADO-BAJA', MOTIVORECHAZO_ID = @motivoRechazo WHERE SOLICITUD_ID = @id");
 
 		if (result.rowsAffected[0] > 0) {
 			return NextResponse.json({ success: true, message: "Record updated successfully" });

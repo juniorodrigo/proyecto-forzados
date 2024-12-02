@@ -5,7 +5,7 @@ export async function POST(request: Request) {
 	try {
 		const pool = await poolPromise;
 		const { id } = await request.json();
-		const result = await pool.request().input("id", id).query("UPDATE TRS_Solicitud_forzado SET ESTADOSOLICITUD = 'aprobado-baja' WHERE SOLICITUD_ID = @id");
+		const result = await pool.request().input("id", id).query("UPDATE TRS_Solicitud_forzado SET ESTADOSOLICITUD = 'APROBADO-BAJA' WHERE SOLICITUD_ID = @id");
 
 		if (result.rowsAffected[0] > 0) {
 			return NextResponse.json({ success: true, message: "Record updated successfully" });

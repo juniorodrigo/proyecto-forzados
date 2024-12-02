@@ -44,7 +44,7 @@ const generateUpdateQuery = (parameters: UpdateQueryParameters) => {
 		-- FECHACIERRE = '${1}',
 		USUARIO_MODIFICACION = '${parameters.aprobadorRetiro}',
 		FECHA_MODIFICACION = GETDATE(),
-		ESTADOSOLICITUD = 'pendiente-baja'
+		ESTADOSOLICITUD = 'PENDIENTE-BAJA'
 		
 	WHERE SOLICITUD_ID = ${parameters.id};`;
 };

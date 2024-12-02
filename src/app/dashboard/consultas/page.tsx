@@ -10,7 +10,7 @@ import { Search, Calendar, X } from "lucide-react";
 import Popover from "@/components/Popover";
 import { FaEye, FaEdit, FaPlay, FaMinus } from "react-icons/fa";
 
-type Status = "rechazado-alta" | "pendiente-alta" | "aprobado-alta" | "ejecutado-alta" | "rechazado" | "pendiente-baja" | "aprobado-baja" | "ejecutado-baja" | "finalizado";
+type Status = "RECHAZADO-ALTA" | "PENDIENTE-ALTA" | "APROBADO-ALTA" | "EJECUTADO-ALTA" | "RECHAZADO" | "PENDIENTE-BAJA" | "APROBADO-BAJA" | "EJECUTADO-BAJA" | "FINALIZADO";
 
 interface Row {
 	id: number;
@@ -151,15 +151,15 @@ const Page: React.FC = () => {
 	};
 
 	const getStatusClass = (estado: Status) => {
-		if (estado.includes("pendiente")) {
+		if (estado.includes("PENDIENTE")) {
 			return "bg-yellow-200";
-		} else if (estado.includes("aprobado")) {
+		} else if (estado.includes("APROBADO")) {
 			return "bg-green-200";
-		} else if (estado.includes("ejecutado")) {
+		} else if (estado.includes("EJECUTADO")) {
 			return "bg-green-600 text-white";
-		} else if (estado.includes("finalizado")) {
+		} else if (estado.includes("FINALIZADO")) {
 			return "bg-blue-200";
-		} else if (estado.includes("rechazado")) {
+		} else if (estado.includes("RECHAZADO")) {
 			return "bg-red-500 text-white";
 		} else {
 			return "";
@@ -169,7 +169,7 @@ const Page: React.FC = () => {
 	const handleApprove = async (id: number, tipo: string) => {
 		if (confirm("¿Está seguro de aprobar?")) {
 			try {
-				const response = await fetch(`/api/solicitudes/${tipo}/aprobar`, { method: "POST", body: JSON.stringify({ id }) });
+				const response = await fetch(`/api/solicitudes/${tipo.toLowerCase()}/aprobar`, { method: "POST", body: JSON.stringify({ id }) });
 				if (response.ok) {
 					setPopoverMessage("Aprobación exitosa");
 					setPopoverType("success");
@@ -239,7 +239,7 @@ const Page: React.FC = () => {
 		}
 		if (confirm("¿Está seguro de ejecutar?")) {
 			try {
-				const response = await fetch(`/api/solicitudes/${tipo}/ejecutar`, {
+				const response = await fetch(`/api/solicitudes/${tipo.toLowerCase()}/ejecutar`, {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
@@ -306,7 +306,7 @@ const Page: React.FC = () => {
 		}
 		if (confirm("¿Está seguro de rechazar?")) {
 			try {
-				const response = await fetch(`/api/solicitudes/${tipo}/rechazar`, {
+				const response = await fetch(`/api/solicitudes/${tipo.toLowerCase()}/rechazar`, {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
@@ -358,7 +358,7 @@ const Page: React.FC = () => {
 	const handleReject = async (id: number, tipo: string) => {
 		if (confirm("¿Está seguro de rechazar?")) {
 			try {
-				const response = await fetch(`/api/solicitudes/${tipo}/rechazar`, { method: "POST", body: JSON.stringify({ id }) });
+				const response = await fetch(`/api/solicitudes/${tipo.toLowerCase()}/rechazar`, { method: "POST", body: JSON.stringify({ id }) });
 				if (response.ok) {
 					setPopoverMessage("Rechazo exitoso");
 					setPopoverType("success");
@@ -469,10 +469,10 @@ const Page: React.FC = () => {
 							disabled
 						>
 							<option value="">Todos los estados</option>
-							<option value="pendiente">Pendiente</option>
-							<option value="aprobado">Aprobado</option>
-							<option value="ejecutado">Ejecutado</option>
-							<option value="rechazado">Rechazado</option>
+							<option value="PENDIENTE">Pendiente</option>
+							<option value="APROBADO">Aprobado</option>
+							<option value="EJECUTADO">Ejecutado</option>
+							<option value="RECHAZADO">Rechazado</option>
 							<option value="finalizado">Finalizado</option>
 						</select>
 					</div>
@@ -554,17 +554,17 @@ const Page: React.FC = () => {
 										<button onClick={() => handleView(row.id)} className="text-indigo-600 hover:text-indigo-900 mr-2">
 											<FaEye />
 										</button>
-										{row.estado !== "finalizado" && row.estado !== "aprobado-alta" && !row.estado.includes("aprobado") && !row.estado.includes("rechazado") && !row.estado.includes("ejecutado") && (
+										{row.estado !== "FINALIZADO" && row.estado !== "APROBADO-ALTA" && !row.estado.includes("APROBADO") && !row.estado.includes("RECHAZADO") && !row.estado.includes("EJECUTADO") && (
 											<button onClick={() => handleEdit(row.id)} className="text-green-600 hover:text-green-900 mr-2">
 												<FaEdit />
 											</button>
 										)}
-										{row.estado !== "finalizado" && row.estado === "ejecutado-alta" && (
+										{row.estado !== "FINALIZADO" && row.estado === "EJECUTADO-ALTA" && (
 											<button onClick={() => handleDelete(row.id)} className="text-red-600 hover:text-red-900 mr-2">
 												<FaMinus />
 											</button>
 										)}
-										{row.estado !== "finalizado" && !row.estado.includes("ejecutado") && !row.estado.includes("rechazado") && row.estado.includes("aprobado") && (
+										{row.estado !== "FINALIZADO" && !row.estado.includes("EJECUTADO") && !row.estado.includes("RECHAZADO") && row.estado.includes("APROBADO") && (
 											<button onClick={() => handleExecute(row.id)} className="text-blue-600 hover:text-blue-900">
 												<FaPlay />
 											</button>
@@ -578,7 +578,7 @@ const Page: React.FC = () => {
 			)}
 
 			{/* Modal */}
-			{isModalOpen && selectedRow && (selectedRow.estado.includes("alta") || selectedRow.estado.includes("rechazado") || selectedRow.estado.includes("finalizado")) && (
+			{isModalOpen && selectedRow && (selectedRow.estado.includes("ALTA") || selectedRow.estado.includes("RECHAZADO") || selectedRow.estado.includes("finalizado")) && (
 				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
 					<div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
 						<div className="p-6">
@@ -643,16 +643,16 @@ const Page: React.FC = () => {
 								<button onClick={closeModal} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
 									Cerrar
 								</button>
-								{selectedRow.estado === "pendiente-alta" && (
+								{selectedRow.estado === "PENDIENTE-ALTA" && (
 									<>
 										<button onClick={openRejectModal} className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
 											Rechazar
 										</button>
 									</>
 								)}
-								{selectedRow.estado !== "aprobado-alta" && !selectedRow.estado.includes("ejecutado") && (
+								{selectedRow.estado !== "APROBADO-ALTA" && !selectedRow.estado.includes("EJECUTADO") && (
 									<button
-										onClick={() => handleApprove(selectedRow.id, "alta")}
+										onClick={() => handleApprove(selectedRow.id, "ALTA")}
 										className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
 									>
 										Aprobar
@@ -663,7 +663,7 @@ const Page: React.FC = () => {
 					</div>
 				</div>
 			)}
-			{isModalOpen && selectedRow && selectedRow.estado.includes("baja") && (
+			{isModalOpen && selectedRow && selectedRow.estado.includes("BAJA") && (
 				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
 					<div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
 						<div className="p-6">
@@ -695,19 +695,19 @@ const Page: React.FC = () => {
 								<button onClick={closeModalBaja} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
 									Cerrar
 								</button>
-								{selectedRow.estado === "pendiente-baja" && (
+								{selectedRow.estado === "PENDIENTE-BAJA" && (
 									<>
 										<button
-											onClick={() => handleReject(selectedRow.id, "alta")}
+											onClick={() => handleReject(selectedRow.id, "ALTA")}
 											className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
 										>
 											Rechazar
 										</button>
 									</>
 								)}
-								{selectedRow.estado !== "aprobado-baja" && !selectedRow.estado.includes("ejecutado") && (
+								{selectedRow.estado !== "APROBADO-BAJA" && !selectedRow.estado.includes("EJECUTADO") && (
 									<button
-										onClick={() => handleApprove(selectedRow.id, "baja")}
+										onClick={() => handleApprove(selectedRow.id, "BAJA")}
 										className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
 									>
 										Aprobar
@@ -722,7 +722,7 @@ const Page: React.FC = () => {
 				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
 					<div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
 						<div className="p-6">
-							<h2 className="text-2xl font-bold mb-4">{`Ejecutar ${selectedRow?.estado.includes("alta") ? "Alta" : "Baja"} de Forzado`}</h2>
+							<h2 className="text-2xl font-bold mb-4">{`Ejecutar ${selectedRow?.estado.includes("ALTA") ? "Alta" : "Baja"} de Forzado`}</h2>
 							<div className="mb-4">
 								<label className="block text-sm font-medium text-gray-700 mb-1">Fecha de Ejecución</label>
 								<input type="datetime-local" value={executeDate} onChange={(e) => setExecuteDate(e.target.value)} className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 border-gray-300" />
@@ -754,7 +754,7 @@ const Page: React.FC = () => {
 									Cancelar
 								</button>
 								<button
-									onClick={() => handleExecuteConfirm(selectedExecuteRow?.estado.includes("alta") ? "alta" : "baja")}
+									onClick={() => handleExecuteConfirm(selectedExecuteRow?.estado.includes("ALTA") ? "Alta" : "Baja")}
 									className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
 									disabled={!executeDate}
 								>
@@ -783,7 +783,7 @@ const Page: React.FC = () => {
 									Cancelar
 								</button>
 								<button
-									onClick={() => selectedRow && handleRejectConfirm(selectedRow.id, "alta")}
+									onClick={() => selectedRow && handleRejectConfirm(selectedRow.id, "ALTA")}
 									disabled={!rejectReason} // Deshabilitar si no hay un motivo seleccionado
 									className={`px-4 py-2 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 ${
 										!rejectReason ? "bg-gray-400 cursor-not-allowed" : "bg-red-500 hover:bg-red-600 focus:ring-red-500"
