@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { UiContext } from "@/context/SidebarContext";
 import { UiContextType } from "@/types/SidebarOpen";
 import Image from "next/image";
+import useUserSession from "@/hooks/useSession";
 
 const Sidebar: React.FC = () => {
 	const context = useContext(UiContext) as UiContextType;
@@ -15,10 +16,13 @@ const Sidebar: React.FC = () => {
 	}
 
 	const { open } = context;
+	const { user } = useUserSession();
 
 	const [activeToggle, setActiveToggle] = useState<string | null>(null);
 	const pathname = usePathname();
 	console.log(pathname.split("/")[2]);
+
+	//TODO: añadir los roles verdaderos
 
 	useEffect(() => {
 		setActiveToggle(pathname.split("/")[2] || null);
@@ -31,30 +35,35 @@ const Sidebar: React.FC = () => {
 				label: "Consultas",
 				icon: <RiBuildingLine className="text-xl mr-3" />,
 				href: "/dashboard/consultas",
+				roles: ["admin", "user"],
 			},
 			{
 				id: "generar-alta",
 				label: "Generar Alta",
 				icon: <RiBriefcaseLine className="text-xl mr-3" />,
 				href: "/dashboard/generar-alta",
+				roles: ["admin", "user"],
 			},
 			{
 				id: "administrar-usuario",
 				label: "Administrar Usuarios",
 				icon: <RiDashboardLine className="text-xl mr-3" />,
 				href: "/dashboard/administrar-usuario",
+				roles: ["admin"],
 			},
 			{
 				id: "administrar-parametros",
 				label: "Administrar Parametros",
 				icon: <RiProductHuntLine className="text-xl mr-3" />,
 				href: "/dashboard/administrar-parametros",
+				roles: ["admin"],
 			},
 			{
 				id: "ajustes",
 				label: "Ajustes",
 				icon: <RiSettings2Line className="text-xl mr-3" />,
 				href: "/dashboard/ajustes",
+				roles: ["admin", "user"], // Roles permitidos
 			},
 		],
 		[]
@@ -73,16 +82,18 @@ const Sidebar: React.FC = () => {
 			</div>
 			<nav className="flex-1">
 				<ul>
-					{menuItems.map((item) => (
-						<li key={item.id} className="relative group">
-							<Link href={item.href}>
-								<div className={`flex items-center p-4 cursor-pointer text-gray-600 ${activeToggle === item.id ? "bg-gray-300 text-gray-400" : "hover:bg-gray-200"}`}>
-									{item.icon}
-									{item.label}
-								</div>
-							</Link>
-						</li>
-					))}
+					{menuItems
+						.filter((item) => user && item.roles.includes(user.role)) // Filtrar por rol
+						.map((item) => (
+							<li key={item.id} className="relative group">
+								<Link href={item.href}>
+									<div className={`flex items-center p-4 cursor-pointer text-gray-600 ${activeToggle === item.id ? "bg-gray-300 text-gray-400" : "hover:bg-gray-200"}`}>
+										{item.icon}
+										{item.label}
+									</div>
+								</Link>
+							</li>
+						))}
 				</ul>
 			</nav>
 		</div>

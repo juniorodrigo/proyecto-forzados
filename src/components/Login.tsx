@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { FaUser, FaLock, FaSignInAlt } from "react-icons/fa";
 import Popover from "@/components/Popover";
+import useUserSession from "@/hooks/useSession";
 
 const Login = () => {
 	const router = useRouter();
@@ -11,6 +12,7 @@ const Login = () => {
 	const [password, setPassword] = useState("");
 	const [errors, setErrors] = useState({ username: "", password: "" });
 	const [showPopover, setShowPopover] = useState(false);
+	const { fetchUserFromServer } = useUserSession(); // Obtener la función del hook
 
 	// Validaciones
 	const validateUsername = (username: string) => {
@@ -23,9 +25,9 @@ const Login = () => {
 	};
 
 	const handleLogin = async (e: React.FormEvent) => {
-		e.preventDefault(); // Evita el comportamiento predeterminado del formulario
+		e.preventDefault();
 
-		const upperUsername = username.toUpperCase(); // Convertir el usuario a mayúsculas
+		const upperUsername = username.toUpperCase();
 		const newErrors = { username: "", password: "" };
 
 		// Validación de usuario
@@ -42,18 +44,14 @@ const Login = () => {
 			newErrors.password = "La contraseña debe tener al menos 8 caracteres alfanuméricos";
 		}
 
-		// Si hay errores, los mostramos y salimos
 		if (newErrors.username || newErrors.password) {
 			setErrors(newErrors);
 
-			// Limpiar los mensajes de error después de 2 segundos
 			setTimeout(() => {
 				setErrors({ username: "", password: "" });
 			}, 2000);
 			return;
 		}
-
-		// Intentar iniciar sesión con NextAuth
 		const result = await signIn("credentials", {
 			redirect: false,
 			username: upperUsername,
@@ -61,15 +59,9 @@ const Login = () => {
 			callbackUrl: "/dashboard",
 		});
 
-		console.log(result, "____________________________________");
-
-		// _________________________ACA DEBERÍA LLAMARSE A UN ENDPOINT PARA TRAER LOS DATOS DEL USUARIo
-
 		if (result?.error) {
-			// Mostrar error si las credenciales son incorrectas
 			setErrors({ ...newErrors, password: "Credenciales incorrectas" });
 
-			// Limpiar los mensajes de error después de 2 segundos
 			setTimeout(() => {
 				setErrors({ username: "", password: "" });
 			}, 2000);
@@ -78,9 +70,10 @@ const Login = () => {
 
 		// Si la autenticación fue exitosa
 		setErrors({ username: "", password: "" });
-		setShowPopover(true); // Mostrar el popover de éxito
+		setShowPopover(true);
 
-		// Redirigir después de 2 segundos
+		await fetchUserFromServer(upperUsername);
+
 		setTimeout(() => {
 			setShowPopover(false);
 			router.push("/dashboard/consultas");

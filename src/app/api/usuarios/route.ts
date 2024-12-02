@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { poolPromise } from "@sql/lib/db";
 
-// TAG CENTRO_______________________________________________________________
-
 // Manejo del método GET
 export async function GET() {
 	try {
