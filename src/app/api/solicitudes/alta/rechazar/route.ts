@@ -9,7 +9,7 @@ export async function POST(request: Request) {
 				UPDATE TRS_Solicitud_forzado 
 				SET 
 					ESTADOSOLICITUD = 'RECHAZADO-ALTA', 
-					MOTIVORECHAZO_ID = @motivoRechazo, 
+					MOTIVORECHAZO_A_ID = @motivoRechazo, 
 					FECHA_MODIFICACION = GETDATE(), 
 					USUARIO_MODIFICACION = @usuario 
 				WHERE SOLICITUD_ID = @id
