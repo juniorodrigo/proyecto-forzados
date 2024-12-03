@@ -35,14 +35,16 @@ export default function useUserSession() {
 	// Obtener datos del usuario desde el servidor
 	const fetchUserFromServer = async (id: string) => {
 		try {
-			const response = await fetch(`/api/usuario/${id}`);
+			const response = await fetch(`/api/usuarios/${id}`);
 			if (!response.ok) {
 				throw new Error("Network response was not ok");
 			}
 			const userData: UserSession = await response.json();
 			saveUser(userData);
+			return true;
 		} catch (error) {
 			console.error("Error fetching user data:", error);
+			return false;
 		}
 	};
 

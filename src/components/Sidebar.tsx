@@ -1,6 +1,6 @@
 "use client";
 import React, { useContext, useEffect, useState, useMemo } from "react";
-import { RiDashboardLine, RiProductHuntLine, RiSettings2Line, RiBriefcaseLine, RiBuildingLine } from "react-icons/ri";
+import { RiDashboardLine, RiArrowRightUpLine, RiProductHuntLine, RiSettings2Line, RiArchiveDrawerLine, RiBarChartFill } from "react-icons/ri";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UiContext } from "@/context/SidebarContext";
@@ -28,21 +28,22 @@ const Sidebar: React.FC = () => {
 		setActiveToggle(pathname.split("/")[2] || null);
 	}, [pathname]);
 
+	// Para modificar rol, debe de agregarse el id del rol en la tabla de la db al arreglo
 	const menuItems = useMemo(
 		() => [
 			{
 				id: "consultas",
 				label: "Consultas",
-				icon: <RiBuildingLine className="text-xl mr-3" />,
+				icon: <RiArchiveDrawerLine className="text-xl mr-3" />,
 				href: "/dashboard/consultas",
-				roles: ["admin", "user"],
+				roles: ["admin", 2],
 			},
 			{
 				id: "generar-alta",
 				label: "Generar Alta",
-				icon: <RiBriefcaseLine className="text-xl mr-3" />,
+				icon: <RiArrowRightUpLine className="text-xl mr-3" />,
 				href: "/dashboard/generar-alta",
-				roles: ["admin", "user"],
+				roles: ["admin", 2],
 			},
 			{
 				id: "administrar-usuario",
@@ -63,11 +64,20 @@ const Sidebar: React.FC = () => {
 				label: "Ajustes",
 				icon: <RiSettings2Line className="text-xl mr-3" />,
 				href: "/dashboard/ajustes",
-				roles: ["admin", "user"], // Roles permitidos
+				roles: ["admin", 2], // Roles permitidos
+			},
+			{
+				id: "estadisticas",
+				label: "Estadísticas",
+				icon: <RiBarChartFill className="text-xl mr-3" />,
+				href: "/dashboard/ajustes",
+				roles: ["admin", 2], // Roles permitidos
 			},
 		],
 		[]
 	);
+
+	console.log(user);
 
 	return (
 		<div

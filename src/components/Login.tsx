@@ -68,11 +68,20 @@ const Login = () => {
 			return;
 		}
 
+		const result2 = await fetchUserFromServer(upperUsername);
+
+		if (!result2) {
+			setErrors({ ...newErrors, password: "Credenciales incorrectas" });
+
+			setTimeout(() => {
+				setErrors({ username: "", password: "" });
+			}, 2000);
+			return;
+		}
+
 		// Si la autenticación fue exitosa
 		setErrors({ username: "", password: "" });
 		setShowPopover(true);
-
-		await fetchUserFromServer(upperUsername);
 
 		setTimeout(() => {
 			setShowPopover(false);

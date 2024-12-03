@@ -13,6 +13,7 @@ export async function GET() {
 	}
 }
 
+//TODO: ACTUALIZAR MOTIVO RECHAZO ID
 const getAllSolicitudes = async () => {
 	const pool = await poolPromise;
 	const result = await pool.query(`
@@ -67,7 +68,7 @@ LEFT JOIN
 LEFT JOIN
     TURNO T ON SF.TURNO_ID = T.TURNO_ID
 LEFT JOIN
-    MOTIVO_RECHAZO MR ON SF.MOTIVORECHAZO_ID = MR.MOTIVORECHAZO_ID
+    MOTIVO_RECHAZO MR ON SF.MOTIVORECHAZO_A_ID = MR.MOTIVORECHAZO_ID
 LEFT JOIN
     TIPO_FORZADO TF ON SF.TIPOFORZADO_ID = TF.TIPOFORZADO_ID
 LEFT JOIN
@@ -196,7 +197,7 @@ const generateInsertQuery = (parameters: InsertQueryParameters) => {
     SUBAREA_ID,
     DISCIPLINA_ID,
     TURNO_ID,
-    MOTIVORECHAZO_ID,
+    MOTIVORECHAZO_A_ID,
     TIPOFORZADO_ID,
     TAGCENTRO_ID,
     TAGSUFIJO,
@@ -224,7 +225,7 @@ VALUES (
     ${parameters.tagPrefijo}, -- SUBAREA_ID
     ${parameters.disciplina}, -- DISCIPLINA_ID
     ${parameters.turno}, -- TURNO_ID
-    NULL, -- MOTIVORECHAZO_ID
+    NULL, -- MOTIVORECHAZO_A_ID
     ${parameters.tipoForzado}, -- TIPOFORZADO_ID
     ${parameters.tagCentro}, -- TAGCENTRO_ID
     '${parameters.tagSubfijo}', -- TAGSUFIJO

@@ -555,6 +555,7 @@ go
 create table TIPO_FORZADO (
    TIPOFORZADO_ID       int                  identity,
    DESCRIPCION          varchar(30)          null,
+   ESTADO               int                  null,
    constraint PK_TIPO_FORZADO primary key (TIPOFORZADO_ID)
 )
 create table TRS_SOLICITUD_FORZADO (
