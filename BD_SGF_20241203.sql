@@ -573,6 +573,7 @@ create table TRS_SOLICITUD_FORZADO (
    PROBABILIDAD_RIESGO  int                  null,
    TIPOSOLICITUD        int                  null,
    INTERLOCK            int                  null,
+   URGENCIA             int                  null,
    DESCRIPCIONFORZADO   varchar(100)         null,
    ESTADOSOLICITUD      varchar(100)         null,
    FECHAREALIZACION     datetime             null,
