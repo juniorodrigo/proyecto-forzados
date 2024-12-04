@@ -1,26 +1,79 @@
 import React, { useState, useEffect } from "react";
+import Popover from "./Popover"; // Importar Popover
+
+type UserData = {
+	id: number; // Cambiar usuarioId a id
+	areaId: string;
+	usuario: string;
+	nombre: string;
+	apePaterno: string;
+	apeMaterno: string;
+	dni: string;
+	correo: string;
+	rolId: string;
+	estado: number;
+	puestoId: string;
+};
 
 type ModalCreacionUsuarioProps = {
 	isOpen: boolean;
 	onClose: () => void;
-	isEditing: boolean; // Nueva prop
+	isEditing: boolean;
+	userData?: UserData; // Actualizar el tipo de userData
+	onSubmit: (formData: any, isEditing: boolean) => void; // Nueva prop para manejar el envío
 };
 
-const ModalCreacionUsuario: React.FC<ModalCreacionUsuarioProps> = ({ isOpen, onClose, isEditing }) => {
+const ModalCreacionUsuario: React.FC<ModalCreacionUsuarioProps> = ({ isOpen, onClose, isEditing, userData, onSubmit }) => {
 	const [areas, setAreas] = useState<{ id: string; descripcion: string }[]>([]);
 	const [puestos, setPuestos] = useState<{ id: string; descripcion: string }[]>([]);
-	const [formData, setFormData] = useState({
-		area: "",
+	const [roles, setRoles] = useState<{ id: string; descripcion: string }[]>([]);
+
+	const [formData, setFormData] = useState<{
+		areaId: string;
+		usuario: string;
+		nombre: string;
+		apePaterno: string;
+		apeMaterno: string;
+		dni: string;
+		correo: string;
+		rolId: string;
+		estado: string;
+		puestoId: string;
+		id?: number; // Cambiar usuarioId a id
+	}>({
+		areaId: "",
 		usuario: "",
 		nombre: "",
-		apellidoPaterno: "",
-		apellidoMaterno: "",
+		apePaterno: "",
+		apeMaterno: "",
 		dni: "",
 		correo: "",
-		rol: "",
+		rolId: "",
 		estado: "activo",
-		puesto: "",
+		puestoId: "",
+		id: undefined, // Inicializar id
 	});
+
+	const resetForm = () => {
+		setFormData({
+			areaId: "",
+			usuario: "",
+			nombre: "",
+			apePaterno: "",
+			apeMaterno: "",
+			dni: "",
+			correo: "",
+			rolId: "",
+			estado: "activo",
+			puestoId: "",
+			id: undefined, // Resetear id
+		});
+	};
+
+	const handleClose = () => {
+		resetForm();
+		onClose();
+	};
 
 	useEffect(() => {
 		const fetchAreas = async () => {
@@ -35,23 +88,79 @@ const ModalCreacionUsuario: React.FC<ModalCreacionUsuarioProps> = ({ isOpen, onC
 			setPuestos(data.values);
 		};
 
+		const fetchRoles = async () => {
+			const response = await fetch("/api/maestras/rol");
+			const data = await response.json();
+			setRoles(data.values);
+		};
+
 		fetchAreas();
 		fetchPuestos();
+		fetchRoles();
 	}, []);
+
+	useEffect(() => {
+		if (isEditing && userData) {
+			setFormData({
+				areaId: userData.areaId || "",
+				usuario: userData.usuario || "",
+				nombre: userData.nombre || "",
+				apePaterno: userData.apePaterno || "",
+				apeMaterno: userData.apeMaterno || "",
+				dni: userData.dni || "",
+				correo: userData.correo || "",
+				rolId: userData.rolId || "",
+				estado: userData.estado === 1 ? "activo" : "inactivo",
+				puestoId: userData.puestoId || "",
+				id: userData.id, // Asignar id
+			});
+		} else {
+			setFormData({
+				areaId: "",
+				usuario: "",
+				nombre: "",
+				apePaterno: "",
+				apeMaterno: "",
+				dni: "",
+				correo: "",
+				rolId: "",
+				estado: "activo",
+				puestoId: "",
+				id: undefined, // Resetear id
+			});
+		}
+	}, [isEditing, userData]);
+
+	const [isModified, setIsModified] = useState(false); // Estado para verificar si se ha modificado algún campo
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
 		const { name, value } = e.target;
 		setFormData({ ...formData, [name]: value });
+		setIsModified(true); // Marcar como modificado
 	};
 
-	const handleSubmit = (e: React.FormEvent) => {
+	const [showPopover, setShowPopover] = useState(false); // Estado para mostrar el Popover
+
+	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		// Handle form submission
-		onClose(); // Cerrar el modal después de enviar el formulario
+		const response = await fetch("/api/usuarios/usuario-existe", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ username: formData.usuario, userId: formData.id }),
+		});
+		const data = await response.json();
+		if (data.exists) {
+			setShowPopover(true);
+			setTimeout(() => setShowPopover(false), 3000); // Ocultar el popover después de 3 segundos
+			return;
+		}
+		onSubmit(formData, isEditing);
+		resetForm();
 	};
 
 	const handleResetPassword = async () => {
-		// Llamar a la API para reiniciar la contraseña
 		await fetch("/api/reset-password", {
 			method: "POST",
 			body: JSON.stringify({ usuario: formData.usuario }),
@@ -62,104 +171,127 @@ const ModalCreacionUsuario: React.FC<ModalCreacionUsuarioProps> = ({ isOpen, onC
 
 	return (
 		<>
-			<div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={onClose}></div>
-			<div className="fixed inset-0 flex items-center justify-center z-50">
-				<div className="bg-white p-8 rounded-lg shadow-lg relative max-w-lg mx-auto">
-					<button title="Close" className="absolute top-4 right-4 p-2 rounded-full bg-gray-200 hover:bg-gray-300 focus:outline-none" onClick={onClose}>
-						<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-						</svg>
-					</button>
-					<h2 className="text-2xl font-bold mb-4">{isEditing ? "Modificación" : "Creación"}</h2>
-					<form onSubmit={handleSubmit}>
-						{isEditing && (
-							<button type="button" onClick={handleResetPassword} className="mb-4 px-4 py-2 bg-yellow-500 text-white rounded-md text-lg focus:outline-none focus:ring-0">
-								Reiniciar Contraseña
-							</button>
-						)}
-						<select name="area" value={formData.area} onChange={handleChange} className="w-full px-6 py-4 bg-gray-100 text-black rounded-md text-lg focus:outline-none focus:ring-0">
-							<option value="">Seleccione un área</option>
-							{areas.map((area) => (
-								<option key={area.id} value={area.id}>
-									{area.descripcion}
-								</option>
-							))}
-						</select>
-						<input
-							type="text"
-							name="usuario"
-							value={formData.usuario}
-							onChange={handleChange}
-							placeholder="Usuario"
-							className="w-full px-6 py-4 bg-gray-100 text-black rounded-md text-lg focus:outline-none focus:ring-0 mt-4"
-						/>
-						<input
-							type="text"
-							name="nombre"
-							value={formData.nombre}
-							onChange={handleChange}
-							placeholder="Nombre"
-							className="w-full px-6 py-4 bg-gray-100 text-black rounded-md text-lg focus:outline-none focus:ring-0 mt-4"
-						/>
-						<input
-							type="text"
-							name="apellidoPaterno"
-							value={formData.apellidoPaterno}
-							onChange={handleChange}
-							placeholder="Apellido Paterno"
-							className="w-full px-6 py-4 bg-gray-100 text-black rounded-md text-lg focus:outline-none focus:ring-0 mt-4"
-						/>
-						<input
-							type="text"
-							name="apellidoMaterno"
-							value={formData.apellidoMaterno}
-							onChange={handleChange}
-							placeholder="Apellido Materno"
-							className="w-full px-6 py-4 bg-gray-100 text-black rounded-md text-lg focus:outline-none focus:ring-0 mt-4"
-						/>
-						<input
-							type="text"
-							name="dni"
-							value={formData.dni}
-							onChange={handleChange}
-							placeholder="DNI"
-							className="w-full px-6 py-4 bg-gray-100 text-black rounded-md text-lg focus:outline-none focus:ring-0 mt-4"
-						/>
-						<input
-							type="email"
-							name="correo"
-							value={formData.correo}
-							onChange={handleChange}
-							placeholder="Correo"
-							className="w-full px-6 py-4 bg-gray-100 text-black rounded-md text-lg focus:outline-none focus:ring-0 mt-4"
-						/>
-						<select name="rol" value={formData.rol} onChange={handleChange} className="w-full px-6 py-4 bg-gray-100 text-black rounded-md text-lg focus:outline-none focus:ring-0 mt-4">
-							<option value="">Seleccione un rol</option>
-							<option value="admin">Admin</option>
-							<option value="user">User</option>
-						</select>
-						<select name="estado" value={formData.estado} onChange={handleChange} className="w-full px-6 py-4 bg-gray-100 text-black rounded-md text-lg focus:outline-none focus:ring-0 mt-4">
-							<option value="activo">Activo</option>
-							<option value="inactivo">Inactivo</option>
-						</select>
-						<select name="puesto" value={formData.puesto} onChange={handleChange} className="w-full px-6 py-4 bg-gray-100 text-black rounded-md text-lg focus:outline-none focus:ring-0 mt-4">
-							<option value="">Seleccione un puesto</option>
-							{puestos.map((puesto) => (
-								<option key={puesto.id} value={puesto.id}>
-									{puesto.descripcion}
-								</option>
-							))}
-						</select>
-						<div className="flex justify-between mt-4">
-							<button type="submit" className="px-6 py-4 bg-blue-500 text-white rounded-md text-lg focus:outline-none focus:ring-0">
-								Guardar
-							</button>
-							<button type="button" onClick={onClose} className="px-6 py-4 bg-red-500 text-white rounded-md text-lg focus:outline-none focus:ring-0">
-								Cerrar
-							</button>
-						</div>
-					</form>
+			{/* Mostrar Popover si showPopover es true */}
+			<div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={handleClose}></div>
+			<div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+				<div className="bg-white rounded-lg shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+					<div className="p-8 relative">
+						<button title="Close" className="absolute top-4 right-4 p-2 rounded-full bg-gray-200 hover:bg-gray-300 focus:outline-none" onClick={handleClose}>
+							<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+							</svg>
+						</button>
+						<h2 className="text-2xl font-bold mb-4">{isEditing ? "Modificación" : "Creación"}</h2>
+						<form onSubmit={handleSubmit}>
+							{isEditing && (
+								<button type="button" onClick={handleResetPassword} className="mb-4 px-4 py-2 bg-yellow-500 text-white rounded-md text-lg focus:outline-none focus:ring-0">
+									Reiniciar Contraseña
+								</button>
+							)}
+							<label className="block text-sm font-medium text-gray-700">Área</label>
+							<select name="areaId" value={formData.areaId} onChange={handleChange} className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 border-gray-300 mb-4">
+								<option value="">Seleccione un área</option>
+								{areas.map((area) => (
+									<option key={area.id} value={area.id}>
+										{area.descripcion}
+									</option>
+								))}
+							</select>
+							<label className="block text-sm font-medium text-gray-700">Usuario</label>
+							<input
+								type="text"
+								name="usuario"
+								value={formData.usuario}
+								onChange={handleChange}
+								placeholder="Usuario"
+								className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 border-gray-300 mb-4"
+							/>
+							<label className="block text-sm font-medium text-gray-700">Nombre</label>
+							<input
+								type="text"
+								name="nombre"
+								value={formData.nombre}
+								onChange={handleChange}
+								placeholder="Nombre"
+								className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 border-gray-300 mb-4"
+							/>
+							<label className="block text-sm font-medium text-gray-700">Apellido Paterno</label>
+							<input
+								type="text"
+								name="apePaterno"
+								value={formData.apePaterno}
+								onChange={handleChange}
+								placeholder="Apellido Paterno"
+								className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 border-gray-300 mb-4"
+							/>
+							<label className="block text-sm font-medium text-gray-700">Apellido Materno</label>
+							<input
+								type="text"
+								name="apeMaterno"
+								value={formData.apeMaterno}
+								onChange={handleChange}
+								placeholder="Apellido Materno"
+								className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 border-gray-300 mb-4"
+							/>
+							<label className="block text-sm font-medium text-gray-700">DNI</label>
+							<input
+								type="text"
+								name="dni"
+								value={formData.dni}
+								onChange={handleChange}
+								placeholder="DNI"
+								className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 border-gray-300 mb-4"
+								pattern="\d*"
+								onInput={(e) => (e.currentTarget.value = e.currentTarget.value.replace(/\D/g, ""))}
+							/>
+							<label className="block text-sm font-medium text-gray-700">Correo</label>
+							<input
+								type="email"
+								name="correo"
+								value={formData.correo}
+								onChange={handleChange}
+								placeholder="Correo"
+								className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 border-gray-300 mb-4"
+							/>
+							<label className="block text-sm font-medium text-gray-700">Rol</label>
+							<select name="rolId" value={formData.rolId} onChange={handleChange} className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 border-gray-300 mb-4">
+								<option value="">Seleccione un rol</option>
+								{roles.map((rol) => (
+									<option key={rol.id} value={rol.id}>
+										{rol.descripcion}
+									</option>
+								))}
+							</select>
+							<label className="block text-sm font-medium text-gray-700">Estado</label>
+							<select name="estado" value={formData.estado} onChange={handleChange} className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 border-gray-300 mb-4">
+								<option value="activo">Activo</option>
+								<option value="inactivo">Inactivo</option>
+							</select>
+							<label className="block text-sm font-medium text-gray-700">Puesto</label>
+							<select name="puestoId" value={formData.puestoId} onChange={handleChange} className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 border-gray-300 mb-4">
+								<option value="">Seleccione un puesto</option>
+								{puestos.map((puesto) => (
+									<option key={puesto.id} value={puesto.id}>
+										{puesto.descripcion}
+									</option>
+								))}
+							</select>
+							<div className="flex justify-between mt-4">
+								<button
+									type="submit"
+									className={`px-4 py-2 rounded-md focus:outline-none focus:ring-2 ${isEditing && !isModified ? "bg-gray-500" : "bg-blue-500"} text-white`}
+									disabled={isEditing && !isModified}
+								>
+									Guardar
+								</button>
+								<button type="button" onClick={handleClose} className="px-4 py-2 bg-red-500 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+									Cerrar
+								</button>
+							</div>
+						</form>
+					</div>
 				</div>
+				{showPopover && <Popover message="El nombre de usuario ya existe" type="error" show={showPopover} />}
 			</div>
 		</>
 	);

@@ -1,6 +1,6 @@
 "use client";
 import React, { useContext, useEffect, useState, useMemo } from "react";
-import { RiDashboardLine, RiArrowRightUpLine, RiProductHuntLine, RiSettings2Line, RiArchiveDrawerLine, RiBarChartFill } from "react-icons/ri";
+import { RiDashboardLine, RiArrowRightUpLine, RiProductHuntLine, RiArchiveDrawerLine, RiBarChartFill } from "react-icons/ri";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UiContext } from "@/context/SidebarContext";
@@ -59,13 +59,6 @@ const Sidebar: React.FC = () => {
 				href: "/dashboard/administrar-parametros",
 				roles: ["admin"],
 			},
-			// {
-			// 	id: "ajustes",
-			// 	label: "Ajustes",
-			// 	icon: <RiSettings2Line className="text-xl mr-3" />,
-			// 	href: "/dashboard/ajustes",
-			// 	roles: ["admin", 2], // Roles permitidos
-			// },
 			{
 				id: "estadisticas",
 				label: "Estadísticas",

@@ -208,12 +208,7 @@ if exists (select 1
    drop table MATRIZ_RIESGO
 go
 
-if exists (select 1
-            from  sysobjects
-           where  id = object_id('MOTIVO_RECHAZO')
-            and   type = 'U')
-   drop table MOTIVO_RECHAZO
-go
+
 
 if exists (select 1
             from  sysobjects
@@ -335,6 +330,12 @@ if exists (select 1
            where  id = object_id('PROBABILIDAD')
             and   type = 'U')
    drop table PROBABILIDAD
+go
+if exists (select 1
+            from  sysobjects
+           where  id = object_id('MOTIVO_RECHAZO')
+            and   type = 'U')
+   drop table MOTIVO_RECHAZO
 go
 
 /*==============================================================*/
@@ -803,7 +804,13 @@ go
 
 
 
-insert into MOTIVO_RECHAZO (DESCRIPCION) values ('MOTIVO RECHAZO 1')
+insert into MOTIVO_RECHAZO (DESCRIPCION,TIPO,ESTADO,USUARIO_CREACION,FECHA_CREACION) values ('NO SE REQUIERE LA ALTA','A',1,'ADMIN',GETDATE())
+insert into MOTIVO_RECHAZO (DESCRIPCION,TIPO,ESTADO,USUARIO_CREACION,FECHA_CREACION) values ('NO CUMPLE CON REQUISITOS','A',1,'ADMIN',GETDATE())
+insert into MOTIVO_RECHAZO (DESCRIPCION,TIPO,ESTADO,USUARIO_CREACION,FECHA_CREACION) values ('ERROR DE INGRESO','A',1,'ADMIN',GETDATE())
+insert into MOTIVO_RECHAZO (DESCRIPCION,TIPO,ESTADO,USUARIO_CREACION,FECHA_CREACION) values ('YA NO SERA NECEZARIO','B',1,'ADMIN',GETDATE())
+insert into MOTIVO_RECHAZO (DESCRIPCION,TIPO,ESTADO,USUARIO_CREACION,FECHA_CREACION) values ('FECHA DE BAJA NO CORRECTA','B',1,'ADMIN',GETDATE())
+insert into MOTIVO_RECHAZO (DESCRIPCION,TIPO,ESTADO,USUARIO_CREACION,FECHA_CREACION) values ('NO SE REQUIERE LA BAJA','B',1,'ADMIN',GETDATE())
+
 go
 
 insert into PROBABILIDAD (DESCRIPCION) values ('RARO'), ('IMPROBABLE'), ('POSIBLE'), ('PROBABLE'), ('CASI SEGURO')
