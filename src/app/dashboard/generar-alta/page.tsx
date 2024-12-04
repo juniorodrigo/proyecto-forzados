@@ -3,7 +3,7 @@ import StepOne from "@/components/StepOne";
 import StepThree from "@/components/StepThree";
 import StepTwo from "@/components/StepTwo";
 import React, { useState } from "react";
-import { FaArrowLeft } from "react-icons/fa";
+import { FaArrowLeft, FaSpinner } from "react-icons/fa";
 import { useRouter, useSearchParams } from "next/navigation";
 import Popover from "@/components/Popover";
 import useUserSession from "@/hooks/useSession";
@@ -33,6 +33,7 @@ const ForcedRegistration: React.FC = () => {
 	const [popoverMessage, setPopoverMessage] = useState("");
 	const [popoverType, setPopoverType] = useState<"success" | "error">("success");
 	const [showPopover, setShowPopover] = useState(false);
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const { user } = useUserSession();
 	const router = useRouter();
@@ -48,72 +49,75 @@ const ForcedRegistration: React.FC = () => {
 	const nextStep = () => {
 		if (currentStep < steps.length) setCurrentStep(currentStep + 1);
 		else {
-			const method = id ? "PUT" : "POST";
-			const body: {
-				usuario: number;
-				tagPrefijo: string;
-				tagCentro: string;
-				tagSubfijo: string;
-				descripcion: string;
-				disciplina: string;
-				turno: string;
-				interlockSeguridad: string;
-				responsable: string;
-				riesgo: string;
-				probabilidad: string;
-				impacto: string;
-				solicitante: string;
-				aprobador: string;
-				ejecutor: string;
-				tipoForzado: string;
-				id?: string | null;
-			} = {
-				usuario: user?.id ?? 0,
-				tagPrefijo,
-				tagCentro,
-				tagSubfijo,
-				descripcion,
-				disciplina,
-				turno,
-				interlockSeguridad,
-				responsable,
-				riesgo,
-				probabilidad,
-				impacto,
-				solicitante,
-				aprobador,
-				ejecutor,
-				tipoForzado,
-				id,
-			};
-			fetch("/api/solicitudes/alta", {
-				method,
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(body),
-			})
-				.then((response) => response.json())
-				.then((data) => {
-					if (data.success) {
-						setPopoverMessage("Solicitud de forzado enviada exitosamente");
-						setPopoverType("success");
-						setShowPopover(true);
-						setTimeout(() => {
-							router.push("/dashboard/consultas");
-						}, 2000); // Espera de 2 segundos antes de redirigir
-					} else {
+			if (confirm("¿Está seguro de que desea enviar la solicitud?")) {
+				setIsSubmitting(true);
+				const method = id ? "PUT" : "POST";
+				const body: {
+					usuario: number;
+					tagPrefijo: string;
+					tagCentro: string;
+					tagSubfijo: string;
+					descripcion: string;
+					disciplina: string;
+					turno: string;
+					interlockSeguridad: string;
+					responsable: string;
+					riesgo: string;
+					probabilidad: string;
+					impacto: string;
+					solicitante: string;
+					aprobador: string;
+					ejecutor: string;
+					tipoForzado: string;
+					id?: string | null;
+				} = {
+					usuario: user?.id ?? 0,
+					tagPrefijo,
+					tagCentro,
+					tagSubfijo,
+					descripcion,
+					disciplina,
+					turno,
+					interlockSeguridad,
+					responsable,
+					riesgo,
+					probabilidad,
+					impacto,
+					solicitante,
+					aprobador,
+					ejecutor,
+					tipoForzado,
+					id,
+				};
+				fetch("/api/solicitudes/alta", {
+					method,
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(body),
+				})
+					.then((response) => response.json())
+					.then((data) => {
+						if (data.success) {
+							setPopoverMessage("Solicitud de forzado enviada exitosamente");
+							setPopoverType("success");
+							setShowPopover(true);
+							setTimeout(() => {
+								router.push("/dashboard/consultas");
+							}, 2000); // Espera de 2 segundos antes de redirigir
+						} else {
+							setPopoverMessage("Error al enviar la solicitud");
+							setPopoverType("error");
+							setShowPopover(true);
+						}
+					})
+					.catch((error) => {
+						console.error("Error:", error);
 						setPopoverMessage("Error al enviar la solicitud");
 						setPopoverType("error");
 						setShowPopover(true);
-					}
-				})
-				.catch((error) => {
-					console.error("Error:", error);
-					setPopoverMessage("Error al enviar la solicitud");
-					setPopoverType("error");
-					setShowPopover(true);
-				});
+					});
+			}
 		}
 	};
 
@@ -207,10 +211,15 @@ const ForcedRegistration: React.FC = () => {
 			<div className="flex justify-center mt-10 space-x-6">
 				<button
 					onClick={nextStep}
-					disabled={!isStepValid(currentStep)}
-					className={`px-6 py-3 text-white rounded-md flex items-center gap-2 ${!isStepValid(currentStep) ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"}`}
+					disabled={!isStepValid(currentStep) || isSubmitting}
+					className={`px-6 py-3 text-white rounded-md flex items-center gap-2 ${!isStepValid(currentStep) || isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"}`}
 				>
-					{currentStep === steps.length ? (
+					{isSubmitting ? (
+						<>
+							<FaSpinner className="animate-spin" />
+							<span>Enviando...</span>
+						</>
+					) : currentStep === steps.length ? (
 						<span>Realizar Solicitud</span>
 					) : (
 						<>

@@ -1,22 +1,32 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { FaCheckCircle, FaClock, FaTimesCircle, FaPlayCircle } from "react-icons/fa";
+import { FaCheckCircle, FaClock, FaTimesCircle, FaPlayCircle, FaArrowUp } from "react-icons/fa";
 
 const Estadisticas: React.FC = () => {
 	const [stats, setStats] = useState({
-		aprobadas: 0,
-		pendientes: 0,
-		rechazadas: 0,
-		ejecutadas: 0,
+		aprobadasAlta: 0,
+		aprobadasBaja: 0,
+
+		pendientesAlta: 0,
+		pendientesBaja: 0,
+
+		rechazadasAlta: 0,
+		rechazadasBaja: 0,
+
+		ejecutadasAlta: 0,
+		ejecutadasBaja: 0,
+
+		finalizadas: 0,
 	});
 
 	useEffect(() => {
 		const fetchStats = async () => {
 			try {
-				const response = await fetch("/api/solicitudes/estadisticas");
+				const response = await fetch("/api/estadisticas/solicitudes-por-estado");
 				const result = await response.json();
 				if (result.success) {
+					console.log(result.data);
 					setStats(result.data);
 				}
 			} catch {
@@ -34,29 +44,66 @@ const Estadisticas: React.FC = () => {
 				<div className="bg-white p-4 rounded-lg shadow flex items-center">
 					<FaCheckCircle className="text-green-500 w-10 h-10 mr-4" />
 					<div>
-						<h2 className="text-lg font-semibold">Aprobadas</h2>
-						<p className="text-2xl">{stats.aprobadas}</p>
+						<h2 className="text-lg font-semibold">Aprobadas Alta</h2>
+						<p className="text-2xl">{stats.aprobadasAlta}</p>
 					</div>
 				</div>
+
 				<div className="bg-white p-4 rounded-lg shadow flex items-center">
 					<FaClock className="text-yellow-500 w-10 h-10 mr-4" />
 					<div>
-						<h2 className="text-lg font-semibold">Pendientes</h2>
-						<p className="text-2xl">{stats.pendientes}</p>
-					</div>
-				</div>
-				<div className="bg-white p-4 rounded-lg shadow flex items-center">
-					<FaTimesCircle className="text-red-500 w-10 h-10 mr-4" />
-					<div>
-						<h2 className="text-lg font-semibold">Rechazadas</h2>
-						<p className="text-2xl">{stats.rechazadas}</p>
+						<h2 className="text-lg font-semibold">Pendientes Alta</h2>
+						<p className="text-2xl">{stats.pendientesAlta}</p>
 					</div>
 				</div>
 				<div className="bg-white p-4 rounded-lg shadow flex items-center">
 					<FaPlayCircle className="text-blue-500 w-10 h-10 mr-4" />
 					<div>
-						<h2 className="text-lg font-semibold">Ejecutadas</h2>
-						<p className="text-2xl">{stats.ejecutadas}</p>
+						<h2 className="text-lg font-semibold">Ejecutadas Alta</h2>
+						<p className="text-2xl">{stats.ejecutadasAlta}</p>
+					</div>
+				</div>
+				<div className="bg-white p-4 rounded-lg shadow flex items-center">
+					<FaTimesCircle className="text-red-500 w-10 h-10 mr-4" />
+					<div>
+						<h2 className="text-lg font-semibold">Rechazadas Alta</h2>
+						<p className="text-2xl">{stats.rechazadasAlta}</p>
+					</div>
+				</div>
+
+				<div className="bg-white p-4 rounded-lg shadow flex items-center">
+					<FaCheckCircle className="text-green-500 w-10 h-10 mr-4" />
+					<div>
+						<h2 className="text-lg font-semibold">Aprobadas Baja</h2>
+						<p className="text-2xl">{stats.aprobadasBaja}</p>
+					</div>
+				</div>
+				<div className="bg-white p-4 rounded-lg shadow flex items-center">
+					<FaClock className="text-yellow-500 w-10 h-10 mr-4" />
+					<div>
+						<h2 className="text-lg font-semibold">Pendientes Baja</h2>
+						<p className="text-2xl">{stats.pendientesBaja}</p>
+					</div>
+				</div>
+				<div className="bg-white p-4 rounded-lg shadow flex items-center">
+					<FaPlayCircle className="text-blue-500 w-10 h-10 mr-4" />
+					<div>
+						<h2 className="text-lg font-semibold">Ejecutadas Baja</h2>
+						<p className="text-2xl">{stats.ejecutadasBaja}</p>
+					</div>
+				</div>
+				<div className="bg-white p-4 rounded-lg shadow flex items-center">
+					<FaTimesCircle className="text-red-500 w-10 h-10 mr-4" />
+					<div>
+						<h2 className="text-lg font-semibold">Rechazadas Baja</h2>
+						<p className="text-2xl">{stats.rechazadasBaja}</p>
+					</div>
+				</div>
+				<div className="bg-white p-4 rounded-lg shadow flex items-center">
+					<FaArrowUp className="text-purple-500 w-10 h-10 mr-4" />
+					<div>
+						<h2 className="text-lg font-semibold">Finalizadas</h2>
+						<p className="text-2xl">{stats.finalizadas}</p>
 					</div>
 				</div>
 			</div>
