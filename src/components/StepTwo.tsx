@@ -43,7 +43,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
 	const [riesgos, setRiesgos] = useState<Option[]>([]);
 	const [probabilidades, setProbabilidades] = useState<Option[]>([]);
 	const [impactos, setImpactos] = useState<Option[]>([]);
-	const [usuarios, setUsuarios] = useState<{ id: string; nombre: string }[]>([]);
+	const [usuarios, setUsuarios] = useState<{ id: string; nombre: string; apePaterno: string; apeMaterno: string }[]>([]);
 
 	useEffect(() => {
 		const fetchData = async (url: string, setState: React.Dispatch<React.SetStateAction<Option[]>>) => {
@@ -209,7 +209,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
 					<option value="">Seleccione Solicitante del Forzado</option>
 					{usuarios.map((usuario) => (
 						<option key={usuario.id} value={usuario.id}>
-							{usuario.nombre}
+							{usuario.nombre + " " + usuario.apePaterno + " " + usuario.apeMaterno}
 						</option>
 					))}
 				</select>

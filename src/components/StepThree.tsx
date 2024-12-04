@@ -17,7 +17,7 @@ interface TipoForzado {
 const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor, setEjecutor, tipoForzado, setTipoForzado }) => {
 	const [tiposForzado, setTiposForzado] = useState<TipoForzado[]>([]);
 	const [usuarios, setUsuarios] = useState<{ id: string; nombre: string }[]>([]);
-	const [aprobadores, setAprobadores] = useState<{ id: string; nombre: string }[]>([]);
+	const [aprobadores, setAprobadores] = useState<{ id: string; nombre: string; apePaterno: string; apeMaterno: string }[]>([]);
 
 	useEffect(() => {
 		const fetchTiposForzado = async () => {
@@ -113,7 +113,7 @@ const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor
 					<option value="">Seleccione Ejecutor</option>
 					{usuarios.map((usuario) => (
 						<option key={usuario.id} value={usuario.id}>
-							{usuario.nombre}
+							{usuario.nombre + " " + usuario.apePaterno + " " + usuario.apeMaterno}
 						</option>
 					))}
 				</select>
