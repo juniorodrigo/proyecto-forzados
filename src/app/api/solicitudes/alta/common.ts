@@ -6,7 +6,7 @@ export const getSingleSolicitud = async (id: string) => {
 	const result = await pool.query(`
 SELECT SF.DESCRIPCIONFORZADO,
        SF.ESTADOSOLICITUD,
-       SF.FECHAREALIZACION,
+       SF.FECHAEJECUCION_A,
        SF.FECHACIERRE,
        SF.APROBADOR_A_ID,
 
@@ -80,7 +80,7 @@ WHERE SF.SOLICITUD_ID = ${id}
 	return result.recordset.map((record) => ({
 		descripcion: typeof record.DESCRIPCIONFORZADO === "string" ? record.DESCRIPCIONFORZADO.toUpperCase() : null,
 		estadoSolicitud: typeof record.ESTADOSOLICITUD === "string" ? record.ESTADOSOLICITUD.toUpperCase() : null,
-		fechaRealizacion: typeof record.FECHAREALIZACION === "string" ? record.FECHAREALIZACION.toUpperCase() : null,
+		fechaRealizacion: typeof record.FECHAEJECUCION_A === "string" ? record.FECHAEJECUCION_A.toUpperCase() : null,
 		fechaCierre: typeof record.FECHACIERRE === "string" ? record.FECHACIERRE.toUpperCase() : null,
 		aprobadorId: typeof record.APROBADOR_A_ID === "string" ? record.APROBADOR_A_ID.toUpperCase() : null,
 		aprobadorNombre: typeof record.APROBADOR_A_NOMBRE === "string" ? record.APROBADOR_A_NOMBRE.toUpperCase() : null,

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Popover from "./Popover"; // Importar Popover
+import useUserSession from "@/hooks/useSession";
 
 type UserData = {
 	id: number; // Cambiar usuarioId a id
@@ -27,6 +28,7 @@ const ModalCreacionUsuario: React.FC<ModalCreacionUsuarioProps> = ({ isOpen, onC
 	const [areas, setAreas] = useState<{ id: string; descripcion: string }[]>([]);
 	const [puestos, setPuestos] = useState<{ id: string; descripcion: string }[]>([]);
 	const [roles, setRoles] = useState<{ id: string; descripcion: string }[]>([]);
+	const { user } = useUserSession();
 
 	const [formData, setFormData] = useState<{
 		areaId: string;
@@ -39,7 +41,7 @@ const ModalCreacionUsuario: React.FC<ModalCreacionUsuarioProps> = ({ isOpen, onC
 		rolId: string;
 		estado: string;
 		puestoId: string;
-		id?: number; // Cambiar usuarioId a id
+		id?: number;
 	}>({
 		areaId: "",
 		usuario: "",
@@ -51,7 +53,7 @@ const ModalCreacionUsuario: React.FC<ModalCreacionUsuarioProps> = ({ isOpen, onC
 		rolId: "",
 		estado: "activo",
 		puestoId: "",
-		id: undefined, // Inicializar id
+		id: undefined,
 	});
 
 	const resetForm = () => {
@@ -66,7 +68,7 @@ const ModalCreacionUsuario: React.FC<ModalCreacionUsuarioProps> = ({ isOpen, onC
 			rolId: "",
 			estado: "activo",
 			puestoId: "",
-			id: undefined, // Resetear id
+			id: undefined,
 		});
 	};
 
@@ -112,7 +114,7 @@ const ModalCreacionUsuario: React.FC<ModalCreacionUsuarioProps> = ({ isOpen, onC
 				rolId: userData.rolId || "",
 				estado: userData.estado === 1 ? "activo" : "inactivo",
 				puestoId: userData.puestoId || "",
-				id: userData.id, // Asignar id
+				id: userData.id,
 			});
 		} else {
 			setFormData({
@@ -126,20 +128,22 @@ const ModalCreacionUsuario: React.FC<ModalCreacionUsuarioProps> = ({ isOpen, onC
 				rolId: "",
 				estado: "activo",
 				puestoId: "",
-				id: undefined, // Resetear id
+				id: undefined,
 			});
 		}
 	}, [isEditing, userData]);
 
-	const [isModified, setIsModified] = useState(false); // Estado para verificar si se ha modificado algún campo
+	const [isModified, setIsModified] = useState(false);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
 		const { name, value } = e.target;
 		setFormData({ ...formData, [name]: value });
-		setIsModified(true); // Marcar como modificado
+		setIsModified(true);
 	};
 
-	const [showPopover, setShowPopover] = useState(false); // Estado para mostrar el Popover
+	const [showPopover, setShowPopover] = useState(false);
+	const [popoverMessage, setPopoverMessage] = useState("");
+	const [popoverType, setPopoverType] = useState<"error" | "success">("error");
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -152,8 +156,10 @@ const ModalCreacionUsuario: React.FC<ModalCreacionUsuarioProps> = ({ isOpen, onC
 		});
 		const data = await response.json();
 		if (data.exists) {
+			setPopoverMessage("El nombre de usuario ya existe");
+			setPopoverType("error");
 			setShowPopover(true);
-			setTimeout(() => setShowPopover(false), 3000); // Ocultar el popover después de 3 segundos
+			setTimeout(() => setShowPopover(false), 3000);
 			return;
 		}
 		onSubmit(formData, isEditing);
@@ -161,10 +167,20 @@ const ModalCreacionUsuario: React.FC<ModalCreacionUsuarioProps> = ({ isOpen, onC
 	};
 
 	const handleResetPassword = async () => {
-		await fetch("/api/reset-password", {
-			method: "POST",
-			body: JSON.stringify({ usuario: formData.usuario }),
+		const response = await fetch("/api/usuarios/reiniciar-contrasena", {
+			method: "PUT",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ id: formData.id, usuario: user.id }),
 		});
+		const data = await response.json();
+		if (data.success) {
+			setPopoverMessage("Contraseña reiniciada con éxito");
+			setPopoverType("success");
+			setShowPopover(true);
+			setTimeout(() => setShowPopover(false), 3000);
+		}
 	};
 
 	if (!isOpen) return null;
@@ -291,7 +307,7 @@ const ModalCreacionUsuario: React.FC<ModalCreacionUsuarioProps> = ({ isOpen, onC
 						</form>
 					</div>
 				</div>
-				{showPopover && <Popover message="El nombre de usuario ya existe" type="error" show={showPopover} />}
+				{showPopover && <Popover message={popoverMessage} type={popoverType} show={showPopover} />}
 			</div>
 		</>
 	);

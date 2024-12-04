@@ -19,7 +19,7 @@ const getSingleSolicitud = async (id: string) => {
     SELECT
         SF.DESCRIPCIONFORZADO,
         SF.ESTADOSOLICITUD,
-        SF.FECHAREALIZACION,
+        SF.FECHAEJECUCION_A,
         SF.FECHACIERRE,
         SF.USUARIO_CREACION,
         SF.FECHA_CREACION,
@@ -76,7 +76,7 @@ const getSingleSolicitud = async (id: string) => {
 	return result.recordset.map((record) => ({
 		descripcion: record.DESCRIPCIONFORZADO,
 		estadoSolicitud: record.ESTADOSOLICITUD,
-		fechaRealizacion: record.FECHAREALIZACION,
+		fechaRealizacion: record.FECHAEJECUCION_A,
 		fechaCierre: record.FECHACIERRE,
 		usuarioCreacion: record.USUARIO_CREACION,
 		fechaCreacion: record.FECHA_CREACION,
