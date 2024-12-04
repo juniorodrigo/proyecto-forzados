@@ -21,7 +21,7 @@ SELECT
 		SF.SOLICITUD_ID,
     SF.DESCRIPCIONFORZADO,
     SF.ESTADOSOLICITUD,
-    SF.FECHAREALIZACION,
+    SF.FECHAEJECUCION_A, -- Actualizado
     SF.FECHACIERRE,
     SF.USUARIO_CREACION,
     SF.FECHA_CREACION,
@@ -32,7 +32,7 @@ SELECT
     SA.CODIGO AS SUBAREA_CODIGO,
     SA.DESCRIPCION AS SUBAREA_DESCRIPCION,
 
-    -- Datos de DISCIPLINA
+    -- Datos de DISCIPLINA  
     D.DESCRIPCION AS DISCIPLINA_DESCRIPCION,
 
     -- Datos de TURNO
@@ -88,7 +88,7 @@ LEFT JOIN
 		fecha: record.FECHA_CREACION,
 		descripcion: record.DESCRIPCIONFORZADO,
 		estadoSolicitud: record.ESTADOSOLICITUD,
-		fechaRealizacion: record.FECHAREALIZACION,
+		fechaRealizacion: record.FECHAEJECUCION_A, // Actualizado
 		fechaCierre: record.FECHACIERRE,
 		usuarioCreacion: record.USUARIO_CREACION,
 		fechaCreacion: record.FECHA_CREACION,
@@ -206,7 +206,7 @@ const generateInsertQuery = (parameters: InsertQueryParameters) => {
     TIPOSOLICITUD,
     INTERLOCK,
     DESCRIPCIONFORZADO,
-    FECHAREALIZACION,
+    FECHAEJECUCION_A, -- Actualizado
     FECHACIERRE,
 
     USUARIO_CREACION,
@@ -234,7 +234,7 @@ VALUES (
     2, -- TIPOSOLICITUD
     ${parameters.interlockSeguridad.toLowerCase() === "sí" ? 1 : 0}, -- INTERLOCK
     '${parameters.descripcion}', -- DESCRIPCIONFORZADO
-    NULL, -- FECHAREALIZACION
+    NULL, -- FECHAEJECUCION_A, Actualizado
     NULL, -- FECHACIERRE
     '${parameters.usuario}', -- USUARIO_CREACION
     GETDATE(), -- FECHA_CREACION

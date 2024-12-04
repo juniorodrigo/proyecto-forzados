@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 
 interface UserSession {
 	name: string;
-	id: string;
+	id: number;
 	area: string;
-	role: string;
+	role: number;
 	jwt: string;
 }
 

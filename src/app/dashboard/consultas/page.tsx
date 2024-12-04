@@ -47,6 +47,10 @@ const Page: React.FC = () => {
 	const router = useRouter();
 	const { user } = useUserSession();
 
+	const usuariosEjecutores = [4, 7];
+	const usuariosSolicitantes = [2, 5];
+	usuariosEjecutores.push(1, 2, 4, 5, 7);
+
 	const columns = [
 		{ key: "id", label: "ID" },
 		{ key: "nombre", label: "Descripción" },
@@ -216,7 +220,8 @@ const Page: React.FC = () => {
 
 	const handleExecute = async (id: number) => {
 		const row = rows.find((row) => row.id === id);
-		if (row) {
+		//TODO: xd
+		if (row && user && usuariosEjecutores.includes(user?.role)) {
 			openExecuteModal(row);
 		}
 	};
@@ -562,16 +567,21 @@ const Page: React.FC = () => {
 												<FaEdit />
 											</button>
 										)}
-										{row.estado !== "FINALIZADO" && row.estado === "EJECUTADO-ALTA" && (
+										{row.estado !== "FINALIZADO" && row.estado === "EJECUTADO-ALTA" && user && usuariosSolicitantes.includes(user.role) && (
 											<button onClick={() => handleDelete(row.id)} className="text-red-600 hover:text-red-900 mr-2">
 												<FaMinus />
 											</button>
 										)}
-										{row.estado !== "FINALIZADO" && !row.estado.includes("EJECUTADO") && !row.estado.includes("RECHAZADO") && row.estado.includes("APROBADO") && (
-											<button onClick={() => handleExecute(row.id)} className="text-blue-600 hover:text-blue-900">
-												<FaPlay />
-											</button>
-										)}
+										{row.estado !== "FINALIZADO" &&
+											!row.estado.includes("EJECUTADO") &&
+											!row.estado.includes("RECHAZADO") &&
+											row.estado.includes("APROBADO") &&
+											user &&
+											usuariosEjecutores.includes(user?.role) && (
+												<button onClick={() => handleExecute(row.id)} className="text-blue-600 hover:text-blue-900">
+													<FaPlay />
+												</button>
+											)}
 									</td>
 								</tr>
 							))}

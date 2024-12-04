@@ -1,5 +1,6 @@
 import React from "react";
 import { Row } from "@/app/dashboard/consultas/page";
+import useUserSession from "@/hooks/useSession";
 
 interface ModalsProps {
 	isModalOpen: boolean;
@@ -38,7 +39,6 @@ const Modals: React.FC<ModalsProps> = ({
 	handleApprove,
 	closeModalBaja,
 	handleReject,
-	handleApproveBaja,
 	isExecuteModalOpen,
 	selectedExecuteRow,
 	executeDate,
@@ -58,6 +58,12 @@ const Modals: React.FC<ModalsProps> = ({
 	getStatusClass,
 	formatDate,
 }) => {
+	const { user } = useUserSession();
+	const [dragActive] = React.useState(false);
+
+	const usuariosAprobadores = [3, 6];
+	usuariosAprobadores.push(1, 2, 4, 5, 7);
+
 	return (
 		<>
 			{isModalOpen && selectedRow && (selectedRow.estado.includes("ALTA") || selectedRow.estado.includes("RECHAZADO") || selectedRow.estado.includes("finalizado")) && (
@@ -125,14 +131,14 @@ const Modals: React.FC<ModalsProps> = ({
 								<button onClick={closeModal} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
 									Cerrar
 								</button>
-								{selectedRow.estado === "PENDIENTE-ALTA" && (
+								{selectedRow.estado === "PENDIENTE-ALTA" && user && usuariosAprobadores.includes(user.role) && (
 									<>
 										<button onClick={openRejectModal} className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
 											Rechazar
 										</button>
 									</>
 								)}
-								{selectedRow.estado !== "APROBADO-ALTA" && !selectedRow.estado.includes("EJECUTADO") && (
+								{selectedRow.estado !== "APROBADO-ALTA" && !selectedRow.estado.includes("EJECUTADO") && user && usuariosAprobadores.includes(user.role) && (
 									<button
 										onClick={() => handleApprove(selectedRow.id, "ALTA")}
 										className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
@@ -177,7 +183,7 @@ const Modals: React.FC<ModalsProps> = ({
 								<button onClick={closeModalBaja} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
 									Cerrar
 								</button>
-								{selectedRow.estado === "PENDIENTE-BAJA" && (
+								{selectedRow.estado === "PENDIENTE-BAJA" && user && usuariosAprobadores.includes(user.role) && (
 									<>
 										<button
 											onClick={() => handleReject(selectedRow.id, "ALTA")}
@@ -187,7 +193,7 @@ const Modals: React.FC<ModalsProps> = ({
 										</button>
 									</>
 								)}
-								{selectedRow.estado !== "APROBADO-BAJA" && !selectedRow.estado.includes("EJECUTADO") && (
+								{selectedRow.estado !== "APROBADO-BAJA" && !selectedRow.estado.includes("EJECUTADO") && user && usuariosAprobadores.includes(user.role) && (
 									<button
 										onClick={() => handleApprove(selectedRow.id, "BAJA")}
 										className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
