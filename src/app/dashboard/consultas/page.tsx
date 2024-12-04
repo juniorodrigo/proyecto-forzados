@@ -91,7 +91,7 @@ const Page: React.FC = () => {
 		fetchData();
 	}, []);
 
-	const [rejectReasons, setRejectReasons] = useState<{ id: number; descripcion: string }[]>([]);
+	const [rejectReasons, setRejectReasons] = useState<{ id: number; descripcion: string; tipo: string }[]>([]);
 
 	useEffect(() => {
 		const fetchRejectReasons = async () => {
@@ -100,7 +100,6 @@ const Page: React.FC = () => {
 				const result = await response.json();
 				if (result.success) {
 					setRejectReasons(result.values);
-					// console.log(rejectReasons, "LUJANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 				} else {
 					setError(result.message);
 				}
@@ -142,8 +141,12 @@ const Page: React.FC = () => {
 		setSelectedRow(null);
 	};
 
-	const handleEdit = (id: number) => {
-		router.push(`/dashboard/generar-alta?id=${id}`);
+	const handleEdit = (id: number, estado: Status) => {
+		if (estado === "PENDIENTE-BAJA") {
+			router.push(`/dashboard/generar-baja?id=${id}`);
+		} else {
+			router.push(`/dashboard/generar-alta?id=${id}`);
+		}
 	};
 
 	const handleDelete = (id: number) => {
@@ -176,7 +179,7 @@ const Page: React.FC = () => {
 	const handleApprove = async (id: number, tipo: string) => {
 		if (confirm("¿Está seguro de aprobar?")) {
 			try {
-				const response = await fetch(`/api/solicitudes/${tipo.toLowerCase()}/aprobar`, { method: "POST", body: JSON.stringify({ id }) });
+				const response = await fetch(`/api/solicitudes/${tipo.toLowerCase()}/aprobar`, { method: "POST", body: JSON.stringify({ id, usuario: user?.id }) });
 				if (response.ok) {
 					setPopoverMessage("Aprobación exitosa");
 					setPopoverType("success");
@@ -252,7 +255,7 @@ const Page: React.FC = () => {
 					headers: {
 						"Content-Type": "application/json",
 					},
-					body: JSON.stringify({ id: selectedExecuteRow?.id, fechaEjecucion: executeDate }),
+					body: JSON.stringify({ id: selectedExecuteRow?.id, fechaEjecucion: executeDate, usuario: user?.id }),
 				});
 				if (response.ok) {
 					setPopoverMessage("Ejecución exitosa");
@@ -563,7 +566,7 @@ const Page: React.FC = () => {
 											<FaEye />
 										</button>
 										{row.estado !== "FINALIZADO" && row.estado !== "APROBADO-ALTA" && !row.estado.includes("APROBADO") && !row.estado.includes("RECHAZADO") && !row.estado.includes("EJECUTADO") && (
-											<button onClick={() => handleEdit(row.id)} className="text-green-600 hover:text-green-900 mr-2">
+											<button onClick={() => handleEdit(row.id, row.estado)} className="text-green-600 hover:text-green-900 mr-2">
 												<FaEdit />
 											</button>
 										)}

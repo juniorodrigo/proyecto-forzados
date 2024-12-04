@@ -11,6 +11,7 @@ export async function GET() {
 			return {
 				id: singleValue.MOTIVORECHAZO_ID,
 				descripcion: singleValue.DESCRIPCION,
+				tipo: singleValue.TIPO,
 			};
 		});
 		return NextResponse.json({ success: true, values: turnos });

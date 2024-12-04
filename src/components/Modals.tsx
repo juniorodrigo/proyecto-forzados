@@ -24,7 +24,7 @@ interface ModalsProps {
 	isRejectModalOpen: boolean;
 	rejectReason: string;
 	setRejectReason: (reason: string) => void;
-	rejectReasons: { id: number; descripcion: string }[];
+	rejectReasons: { id: number; descripcion: string; tipo: string }[];
 	closeRejectModal: () => void;
 	handleRejectConfirm: (id: number, tipo: string) => void;
 	getStatusClass: (estado: string) => string;
@@ -63,6 +63,9 @@ const Modals: React.FC<ModalsProps> = ({
 
 	const usuariosAprobadores = [3, 6];
 	usuariosAprobadores.push(1, 2, 4, 5, 7);
+
+	// console.log(selectedRow, "SELECTEDROWWWWWWWWW_______________________________________");
+	console.log(rejectReasons, "SELECTEDROWWWWWWWWW_______________________________________");
 
 	return (
 		<>
@@ -210,7 +213,7 @@ const Modals: React.FC<ModalsProps> = ({
 				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
 					<div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
 						<div className="p-6">
-							<h2 className="text-2xl font-bold mb-4">{`Ejecutar ${selectedRow?.estado.includes("ALTA") ? "Alta" : "Baja"} de Forzado`}</h2>
+							<h2 className="text-2xl font-bold mb-4">{`Ejecutar ${selectedExecuteRow?.estado.includes("ALTA") ? "Alta" : "Baja"} de Forzado`}</h2>
 							<div className="mb-4">
 								<label className="block text-sm font-medium text-gray-700 mb-1">Fecha de Ejecución</label>
 								<input type="datetime-local" value={executeDate} onChange={(e) => setExecuteDate(e.target.value)} className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 border-gray-300" />
@@ -253,18 +256,53 @@ const Modals: React.FC<ModalsProps> = ({
 					</div>
 				</div>
 			)}
-			{isRejectModalOpen && (
+			{isRejectModalOpen && selectedRow.estado.includes("ALTA") && (
 				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
 					<div className="bg-white rounded-lg shadow-xl w-full max-w-md">
 						<div className="p-6">
 							<h2 className="text-2xl font-bold mb-4">Motivo del Rechazo</h2>
 							<select value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 border-gray-300 mb-4">
 								<option value="">Seleccione un motivo</option>
-								{rejectReasons.map((reason) => (
-									<option key={reason.id} value={reason.id}>
-										{reason.descripcion}
-									</option>
-								))}
+								{rejectReasons
+									.filter((reason) => reason.tipo === "A")
+									.map((reason) => (
+										<option key={reason.id} value={reason.id}>
+											{reason.descripcion}
+										</option>
+									))}
+							</select>
+							<div className="flex justify-end gap-4">
+								<button onClick={closeRejectModal} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+									Cancelar
+								</button>
+								<button
+									onClick={() => selectedRow && handleRejectConfirm(selectedRow.id, "ALTA")}
+									disabled={!rejectReason} // Deshabilitar si no hay un motivo seleccionado
+									className={`px-4 py-2 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+										!rejectReason ? "bg-gray-400 cursor-not-allowed" : "bg-red-500 hover:bg-red-600 focus:ring-red-500"
+									}`}
+								>
+									Confirmar Rechazo
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			)}
+			{isRejectModalOpen && selectedRow.estado.includes("BAJA") && (
+				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+					<div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+						<div className="p-6">
+							<h2 className="text-2xl font-bold mb-4">Motivo del Rechazo</h2>
+							<select value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 border-gray-300 mb-4">
+								<option value="">Seleccione un motivo</option>
+								{rejectReasons
+									.filter((reason) => reason.tipo === "B")
+									.map((reason) => (
+										<option key={reason.id} value={reason.id}>
+											{reason.descripcion}
+										</option>
+									))}
 							</select>
 							<div className="flex justify-end gap-4">
 								<button onClick={closeRejectModal} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">

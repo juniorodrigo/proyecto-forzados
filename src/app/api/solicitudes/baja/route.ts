@@ -30,18 +30,16 @@ type UpdateQueryParameters = {
 	solicitanteRetiro: string;
 	aprobadorRetiro: string;
 	ejecutorRetiro: string;
-	fechaCierre: string;
 	observaciones: string;
-	datosAdjuntos: object;
 	usuario: string;
 };
 
 const generateUpdateQuery = (parameters: UpdateQueryParameters) => {
-	// const fechaCierre = new Date(parameters.fechaCierre).toISOString().slice(0, 19).replace("T", " ");
 	return `UPDATE TRS_SOLICITUD_FORZADO SET
 		SOLICITANTE_B_ID = ${parameters.solicitanteRetiro},
 		APROBADOR_B_ID = ${parameters.aprobadorRetiro},
 		EJECUTOR_B_ID = ${parameters.ejecutorRetiro},
+		OBSERVACIONES_B = '${parameters.observaciones}',
 		-- FECHACIERRE = '${1}',
 
 		USUARIO_MODIFICACION = '${parameters.usuario}',

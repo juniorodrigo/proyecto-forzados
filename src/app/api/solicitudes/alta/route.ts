@@ -236,10 +236,12 @@ VALUES (
     '${parameters.descripcion}', -- DESCRIPCIONFORZADO
     NULL, -- FECHAEJECUCION_A, Actualizado
     NULL, -- FECHACIERRE
+
     '${parameters.usuario}', -- USUARIO_CREACION
     GETDATE(), -- FECHA_CREACION
     '${parameters.usuario}', -- USUARIO_MODIFICACION
     GETDATE(), -- FECHA_MODIFICACION
+    
     'PENDIENTE-ALTA',
 	${parameters.solicitante},
 	${parameters.aprobador},

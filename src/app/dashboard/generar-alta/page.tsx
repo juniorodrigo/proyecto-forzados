@@ -6,6 +6,7 @@ import React, { useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import { useRouter, useSearchParams } from "next/navigation";
 import Popover from "@/components/Popover";
+import useUserSession from "@/hooks/useSession";
 
 const ForcedRegistration: React.FC = () => {
 	const [currentStep, setCurrentStep] = useState(1);
@@ -33,6 +34,7 @@ const ForcedRegistration: React.FC = () => {
 	const [popoverType, setPopoverType] = useState<"success" | "error">("success");
 	const [showPopover, setShowPopover] = useState(false);
 
+	const { user } = useUserSession();
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const id = searchParams.get("id");
@@ -48,6 +50,7 @@ const ForcedRegistration: React.FC = () => {
 		else {
 			const method = id ? "PUT" : "POST";
 			const body: {
+				usuario: number;
 				tagPrefijo: string;
 				tagCentro: string;
 				tagSubfijo: string;
@@ -65,6 +68,7 @@ const ForcedRegistration: React.FC = () => {
 				tipoForzado: string;
 				id?: string | null;
 			} = {
+				usuario: user?.id ?? 0,
 				tagPrefijo,
 				tagCentro,
 				tagSubfijo,

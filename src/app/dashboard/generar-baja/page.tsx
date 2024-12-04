@@ -48,6 +48,28 @@ const BajaForzado = () => {
 		fetchUsuarios();
 	}, []);
 
+	useEffect(() => {
+		const fetchSolicitud = async () => {
+			if (id) {
+				try {
+					const response = await fetch(`/api/solicitudes/baja/${id}`);
+					const { data } = await response.json();
+					if (data) {
+						setFormData({
+							solicitanteRetiro: data.solicitante || "",
+							aprobadorRetiro: data.aprobador || "",
+							ejecutorRetiro: data.ejecutor || "",
+							observaciones: data.observaciones || "",
+						});
+					}
+				} catch (error) {
+					console.error("Error al obtener la solicitud:", error);
+				}
+			}
+		};
+		fetchSolicitud();
+	}, [id]);
+
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
 		const { name, value } = e.target as HTMLInputElement;
 		setFormData({
@@ -85,7 +107,7 @@ const BajaForzado = () => {
 						body: JSON.stringify({ ...formData, id }),
 					});
 					if (response.ok) {
-						setPopover({ show: true, message: "Baja generada exitosamente.", type: "success" });
+						setPopover({ show: true, message: "Baja solicitada exitosamente.", type: "success" });
 						setTimeout(() => {
 							window.location.href = "/dashboard/consultas";
 						}, 3000);
