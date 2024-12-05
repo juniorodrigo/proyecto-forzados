@@ -16,7 +16,7 @@ interface TipoForzado {
 
 const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor, setEjecutor, tipoForzado, setTipoForzado }) => {
 	const [tiposForzado, setTiposForzado] = useState<TipoForzado[]>([]);
-	const [usuarios, setUsuarios] = useState<{ id: string; nombre: string }[]>([]);
+	const [usuarios, setUsuarios] = useState<{ id: string; nombre: string; apePaterno: string; apeMaterno: string }[]>([]);
 	const [aprobadores, setAprobadores] = useState<{ id: string; nombre: string; apePaterno: string; apeMaterno: string }[]>([]);
 
 	useEffect(() => {

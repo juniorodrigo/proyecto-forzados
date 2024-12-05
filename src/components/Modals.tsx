@@ -38,7 +38,6 @@ const Modals: React.FC<ModalsProps> = ({
 	openRejectModal,
 	handleApprove,
 	closeModalBaja,
-	handleReject,
 	isExecuteModalOpen,
 	selectedExecuteRow,
 	executeDate,
@@ -63,9 +62,6 @@ const Modals: React.FC<ModalsProps> = ({
 
 	const usuariosAprobadores = [3, 6];
 	usuariosAprobadores.push(1, 2, 4, 5, 7);
-
-	// console.log(selectedRow, "SELECTEDROWWWWWWWWW_______________________________________");
-	console.log(rejectReasons, "SELECTEDROWWWWWWWWW_______________________________________");
 
 	return (
 		<>
@@ -189,7 +185,7 @@ const Modals: React.FC<ModalsProps> = ({
 								{selectedRow.estado === "PENDIENTE-BAJA" && user && usuariosAprobadores.includes(user.role) && (
 									<>
 										<button
-											onClick={() => handleReject(selectedRow.id, "ALTA")}
+											onClick={openRejectModal} // Cambiado para abrir el modal de rechazo
 											className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
 										>
 											Rechazar
@@ -289,39 +285,40 @@ const Modals: React.FC<ModalsProps> = ({
 					</div>
 				</div>
 			)}
-			{isRejectModalOpen && selectedRow.estado.includes("BAJA") && (
-				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-					<div className="bg-white rounded-lg shadow-xl w-full max-w-md">
-						<div className="p-6">
-							<h2 className="text-2xl font-bold mb-4">Motivo del Rechazo</h2>
-							<select value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 border-gray-300 mb-4">
-								<option value="">Seleccione un motivo</option>
-								{rejectReasons
-									.filter((reason) => reason.tipo === "B")
-									.map((reason) => (
-										<option key={reason.id} value={reason.id}>
-											{reason.descripcion}
-										</option>
-									))}
-							</select>
-							<div className="flex justify-end gap-4">
-								<button onClick={closeRejectModal} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
-									Cancelar
-								</button>
-								<button
-									onClick={() => selectedRow && handleRejectConfirm(selectedRow.id, "ALTA")}
-									disabled={!rejectReason} // Deshabilitar si no hay un motivo seleccionado
-									className={`px-4 py-2 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-										!rejectReason ? "bg-gray-400 cursor-not-allowed" : "bg-red-500 hover:bg-red-600 focus:ring-red-500"
-									}`}
-								>
-									Confirmar Rechazo
-								</button>
+			{isRejectModalOpen &&
+				selectedRow.estado.includes("BAJA") && ( // Asegurarse de que el modal de rechazo se abra para "BAJA"
+					<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+						<div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+							<div className="p-6">
+								<h2 className="text-2xl font-bold mb-4">Motivo del Rechazo</h2>
+								<select value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 border-gray-300 mb-4">
+									<option value="">Seleccione un motivo</option>
+									{rejectReasons
+										.filter((reason) => reason.tipo === "B")
+										.map((reason) => (
+											<option key={reason.id} value={reason.id}>
+												{reason.descripcion}
+											</option>
+										))}
+								</select>
+								<div className="flex justify-end gap-4">
+									<button onClick={closeRejectModal} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+										Cancelar
+									</button>
+									<button
+										onClick={() => selectedRow && handleRejectConfirm(selectedRow.id, "BAJA")} // Cambiado para manejar el rechazo de "BAJA"
+										disabled={!rejectReason} // Deshabilitar si no hay un motivo seleccionado
+										className={`px-4 py-2 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+											!rejectReason ? "bg-gray-400 cursor-not-allowed" : "bg-red-500 hover:bg-red-600 focus:ring-red-500"
+										}`}
+									>
+										Confirmar Rechazo
+									</button>
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
-			)}
+				)}
 		</>
 	);
 };
