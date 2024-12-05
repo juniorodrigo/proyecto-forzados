@@ -2,6 +2,7 @@
 import Table from "@/components/Table";
 import Popover from "@/components/Popover";
 import React, { useState, useEffect } from "react";
+import useUserSession from "@/hooks/useSession";
 
 const Page = () => {
 	const categories = [
@@ -31,6 +32,7 @@ const Page = () => {
 	const [showPopover, setShowPopover] = useState(false);
 	const [popoverMessage, setPopoverMessage] = useState("");
 	const [popoverType, setPopoverType] = useState<"success" | "error">("success");
+	const { user } = useUserSession();
 
 	const fetchData = async (category: string) => {
 		try {
@@ -84,7 +86,7 @@ const Page = () => {
 				body: JSON.stringify({
 					descripcion: newRecord.descripcion,
 					...(selectedCategoryObject?.needsCode && { codigo: newRecord.codigo }),
-					usuario: 1,
+					usuario: user?.id,
 				}),
 			})
 				.then((response) => response.json())
@@ -124,6 +126,7 @@ const Page = () => {
 					id: editingRecordId,
 					descripcion: newRecord.descripcion,
 					...(selectedCategoryObject?.needsCode && { codigo: newRecord.codigo }),
+					usuario: user?.id,
 				}),
 			})
 				.then((response) => response.json())
@@ -181,7 +184,7 @@ const Page = () => {
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify({ id }),
+				body: JSON.stringify({ id, usuario: user?.id }),
 			});
 			const data = await response.json();
 			if (data.success) {

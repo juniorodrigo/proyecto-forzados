@@ -322,7 +322,7 @@ const Page: React.FC = () => {
 					headers: {
 						"Content-Type": "application/json",
 					},
-					body: JSON.stringify({ id, motivoRechazo: rejectReason }),
+					body: JSON.stringify({ id, motivoRechazo: rejectReason, usuario: user?.id }),
 				});
 				if (response.ok) {
 					setPopoverMessage("Rechazo exitoso");
@@ -369,7 +369,7 @@ const Page: React.FC = () => {
 	const handleReject = async (id: number, tipo: string) => {
 		if (confirm("¿Está seguro de rechazar?")) {
 			try {
-				const response = await fetch(`/api/solicitudes/${tipo.toLowerCase()}/rechazar`, { method: "POST", body: JSON.stringify({ id }) });
+				const response = await fetch(`/api/solicitudes/${tipo.toLowerCase()}/rechazar`, { method: "POST", body: JSON.stringify({ id, usuario: user?.id }) });
 				if (response.ok) {
 					setPopoverMessage("Rechazo exitoso");
 					setPopoverType("success");

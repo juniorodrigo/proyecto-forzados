@@ -94,7 +94,7 @@ const Page = () => {
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify({ usuarioId: id }),
+				body: JSON.stringify({ usuarioId: id, usuario: user?.id }),
 			});
 			const result = await response.json();
 			if (response.ok) {
