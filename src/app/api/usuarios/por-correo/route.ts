@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { poolPromise } from "@sql/lib/db"; // Importar poolPromise para la conexión a la base de datos
 
-export async function GET(req: NextRequest, { params }: { params: { email: string } }) {
-	const { email } = params;
+export async function POST(req: NextRequest) {
 	try {
+		const { email } = await req.json();
 		const pool = await poolPromise;
 		const { recordset } = await pool
 			.request()
