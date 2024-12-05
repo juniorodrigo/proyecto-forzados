@@ -19,6 +19,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 			name: recordset[0].NOMBRE + " " + recordset[0].APEPATERNO + " " + recordset[0].APEMATERNO,
 			area: recordset[0].ADESC,
 			role: recordset[0].ROL_ID,
+			flagNuevoIngreso: recordset[0].FLAG_INGRESO,
 			jwt: "", // Asignar el valor adecuado para jwt si es necesario
 		};
 		return NextResponse.json(userData, { status: 200 });

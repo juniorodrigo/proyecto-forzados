@@ -54,14 +54,15 @@ export async function POST(request: Request) {
 	try {
 		const pool = await poolPromise;
 		const { areaId, puestoId, usuario, dni, nombre, apePaterno, apeMaterno, correo, rolId, estado, usuarioCreacion } = await request.json();
-		const password = await bcrypt.hash(dni, 10);
+		const newPassword = (apePaterno + dni).replace(/ /g, "").toLowerCase();
+		const passwordHash = await bcrypt.hash(newPassword, 10);
 
 		const result = await pool
 			.request()
 			.input("areaId", areaId)
 			.input("puestoId", puestoId)
 			.input("usuario", usuario)
-			.input("password", password)
+			.input("password", passwordHash)
 			.input("dni", dni)
 			.input("nombre", nombre)
 			.input("apePaterno", apePaterno)
@@ -71,7 +72,7 @@ export async function POST(request: Request) {
 			.input("estado", estado)
 			.input("usuarioCreacion", usuarioCreacion)
 			.query(`INSERT INTO MAE_USUARIO (AREA_ID, PUESTO_ID, USUARIO, PASSWORD, DNI, NOMBRE, APEPATERNO, APEMATERNO, CORREO, FLAG_INGRESO, ROL_ID, ESTADO, USUARIO_CREACION, FECHA_CREACION, USUARIO_MODIFICACION, FECHA_MODIFICACION) 
-			        VALUES (@areaId, @puestoId, @usuario, @password, @dni, @nombre, @apePaterno, @apeMaterno, @correo, 1 , @rolId, @estado, @usuarioCreacion, GETDATE(), @usuarioCreacion, GETDATE())`);
+			        VALUES (@areaId, @puestoId, @usuario, @passwordHash, @dni, @nombre, @apePaterno, @apeMaterno, @correo, 1 , @rolId, @estado, @usuarioCreacion, GETDATE(), @usuarioCreacion, GETDATE())`);
 
 		if (result.rowsAffected[0] > 0) {
 			return NextResponse.json({ success: true, message: "values inserted into database" });
