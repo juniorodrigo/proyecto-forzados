@@ -136,9 +136,14 @@ export async function DELETE(request: Request) {
 		const result = await pool.request().input("usuarioId", usuarioId).query(`DELETE FROM MAE_USUARIO WHERE USUARIO_ID = @usuarioId`);
 
 		if (result.rowsAffected[0] > 0) {
-			return NextResponse.json({ success: true, message: "user deleted successfully" });
+			return NextResponse.json({ success: true, message: "Usuario eliminado correctamente" });
 		} else {
-			return NextResponse.json({ success: false, message: "no user deleted" }, { status: 500 });
+			const result2 = await pool.request().input("usuarioId", usuarioId).query(`UPDATE MAE_USUARIO SET ESTADO = 0 WHERE USUARIO_ID = @usuarioId`);
+			if (result2.rowsAffected[0] > 0) {
+				return NextResponse.json({ success: true, message: "Usuario deshabilitado correctamente" });
+			} else {
+				return NextResponse.json({ success: false, message: "No se pudo eliminar ni deshabilitar el usuario" }, { status: 500 });
+			}
 		}
 	} catch (error) {
 		console.error("Error processing DELETE:", error);

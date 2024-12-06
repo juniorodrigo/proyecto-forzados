@@ -83,8 +83,8 @@ const Page = () => {
 			setPopoverType("error");
 			setShowPopover(true);
 		}
-		setTimeout(() => setShowPopover(false), 3000); // Ocultar el popover después de 3 segundos
-		setIsModalOpen(false); // Cerrar el modal después de enviar el formulario
+		setTimeout(() => setShowPopover(false), 3000);
+		setIsModalOpen(false);
 	};
 
 	const handleDeleteUser = async (id: number) => {
@@ -107,7 +107,7 @@ const Page = () => {
 						setPopoverMessage("Se ha eliminado el registro");
 						setPopoverType("success");
 						setShowPopover(true);
-						setTimeout(() => setShowPopover(false), 3000); // Ocultar el popover después de 3 segundos
+						setTimeout(() => setShowPopover(false), 3000);
 					}
 				};
 				fetchData();
@@ -115,7 +115,7 @@ const Page = () => {
 				setPopoverMessage(result.message || "Error en la operación");
 				setPopoverType("error");
 				setShowPopover(true);
-				setTimeout(() => setShowPopover(false), 3000); // Ocultar el popover después de 3 segundos
+				setTimeout(() => setShowPopover(false), 3000);
 			}
 		}
 	};
@@ -165,13 +165,7 @@ const Page = () => {
 					actions={["edit", "delete"]}
 				/>
 			</div>
-			<ModalCreacionUsuario
-				isOpen={isModalOpen}
-				onClose={() => setIsModalOpen(false)}
-				isEditing={isEditing}
-				userData={selectedUser} // Pasar los datos del usuario seleccionado
-				onSubmit={handleUserSubmit} // Pasar la función de envío
-			/>
+			<ModalCreacionUsuario isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} isEditing={isEditing} userData={selectedUser} onSubmit={handleUserSubmit} />
 			<Popover message={popoverMessage} type={popoverType} show={showPopover} />
 		</div>
 	);

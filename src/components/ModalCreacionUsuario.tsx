@@ -154,14 +154,17 @@ const ModalCreacionUsuario: React.FC<ModalCreacionUsuarioProps> = ({ isOpen, onC
 			},
 			body: JSON.stringify({ username: formData.usuario, userId: formData.id }),
 		});
+
 		const data = await response.json();
+
 		if (data.exists) {
-			setPopoverMessage("El nombre de usuario ya existe");
+			setPopoverMessage(data.message);
 			setPopoverType("error");
 			setShowPopover(true);
 			setTimeout(() => setShowPopover(false), 3000);
 			return;
 		}
+
 		onSubmit(formData, isEditing);
 		resetForm();
 	};
@@ -172,7 +175,7 @@ const ModalCreacionUsuario: React.FC<ModalCreacionUsuarioProps> = ({ isOpen, onC
 			headers: {
 				"Content-Type": "application/json",
 			},
-			body: JSON.stringify({ id: formData.id, usuario: user.id }),
+			body: JSON.stringify({ id: formData.id, usuario: user?.id }),
 		});
 		const data = await response.json();
 		if (data.success) {
