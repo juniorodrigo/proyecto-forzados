@@ -61,7 +61,14 @@ const Modals: React.FC<ModalsProps> = ({
 	const [dragActive] = React.useState(false);
 
 	const usuariosAprobadores = [3, 6];
-	usuariosAprobadores.push(1, 2, 4, 5, 7);
+	// usuariosAprobadores.push(1, 2, 4, 5, 7);
+
+	const formatStatus = (status: string) => {
+		return status
+			.split("-")
+			.map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+			.join(" ");
+	};
 
 	return (
 		<>
@@ -84,7 +91,7 @@ const Modals: React.FC<ModalsProps> = ({
 									<strong>Solicitante:</strong> {selectedRow.solicitante}
 								</p>
 								<p>
-									<strong>Estado:</strong> <span className={`p-2 rounded ${getStatusClass(selectedRow.estado)}`}>{selectedRow.estado}</span>
+									<strong>Estado:</strong> <span className={`p-2 rounded ${getStatusClass(selectedRow.estado)}`}>{formatStatus(selectedRow.estado)}</span>
 								</p>
 								<p>
 									<strong>Fecha:</strong> {selectedRow.fecha}
@@ -169,7 +176,7 @@ const Modals: React.FC<ModalsProps> = ({
 									<strong>Solicitante:</strong> {selectedRow.usuarioCreacion}
 								</p>
 								<p>
-									<strong>Estado:</strong> <span className={`p-2 rounded ${getStatusClass(selectedRow.estado)}`}>{selectedRow.estado}</span>
+									<strong>Estado:</strong> <span className={`p-2 rounded ${getStatusClass(selectedRow.estado)}`}>{formatStatus(selectedRow.estado)}</span>
 								</p>
 								<p>
 									<strong>Fecha:</strong> {selectedRow.fecha}
@@ -242,8 +249,10 @@ const Modals: React.FC<ModalsProps> = ({
 								</button>
 								<button
 									onClick={() => handleExecuteConfirm(selectedExecuteRow?.estado.includes("ALTA") ? "Alta" : "Baja")}
-									className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
 									disabled={!executeDate}
+									className={`px-4 py-2 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+										!executeDate ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600 focus:ring-blue-500"
+									}`}
 								>
 									Ejecutar
 								</button>

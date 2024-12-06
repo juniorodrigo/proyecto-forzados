@@ -44,20 +44,25 @@ const Page: React.FC = () => {
 	const [, setDragActive] = useState(false);
 	const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
 	const [rejectReason, setRejectReason] = useState("");
+	const [selectedEndDate, setSelectedEndDate] = useState<string | "">("");
 	const router = useRouter();
 	const { user } = useUserSession();
 
 	const usuariosEjecutores = [4, 7];
 	const usuariosSolicitantes = [2, 5];
-	usuariosEjecutores.push(1, 2, 4, 5, 7);
+	// usuariosEjecutores.push(1, 2, 4, 5, 7);
+
+	const uniqueAreas = Array.from(new Set(rows.map((row) => row.area)));
+	const uniqueSolicitantes = Array.from(new Set(rows.map((row) => row.solicitante)));
+	const uniqueEstados = Array.from(new Set(rows.map((row) => row.estado)));
 
 	const columns = [
 		{ key: "id", label: "ID" },
 		{ key: "nombre", label: "Descripción" },
-		{ key: "area", label: "Área", filterable: true },
-		{ key: "solicitante", label: "Solicitante" },
-		{ key: "estado", label: "Estado", filterable: true },
-		{ key: "fecha", label: "Fecha y Hora", filterable: true },
+		{ key: "area", label: "Área", filterable: true, options: uniqueAreas },
+		{ key: "solicitante", label: "Solicitante", filterable: true, options: uniqueSolicitantes },
+		{ key: "estado", label: "Estado", filterable: true, options: uniqueEstados },
+		{ key: "fecha", label: "Fecha y Hora", filterable: false },
 	];
 
 	const formatDate = (dateString: string) => {
@@ -158,6 +163,14 @@ const Page: React.FC = () => {
 		setSelectedSolicitante("");
 		setSelectedEstado("");
 		setSelectedArea("");
+		setSelectedEndDate("");
+	};
+
+	const formatStatus = (status: string) => {
+		return status
+			.split("-")
+			.map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+			.join(" ");
 	};
 
 	const getStatusClass = (estado: string) => {
@@ -438,9 +451,9 @@ const Page: React.FC = () => {
 
 			{/* Contenedor de filtros y botón */}
 			<div className="bg-white p-4 rounded-lg shadow mb-6">
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+				<div className="flex flex-col md:flex-row md:items-center mb-4">
 					{/* Solicitante */}
-					<div>
+					<div className="mb-4 md:mb-0 md:mr-6">
 						<label className="block text-sm font-medium text-gray-700 mb-1">Solicitante</label>
 						<div className="relative">
 							<input
@@ -454,76 +467,44 @@ const Page: React.FC = () => {
 						</div>
 					</div>
 
-					{/* Área */}
-					<div>
-						<label className="block text-sm font-medium text-gray-700 mb-1">Área</label>
-						<select
-							value={selectedArea}
-							onChange={(e) => setSelectedArea(e.target.value)}
-							className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-							disabled
-						>
-							<option value="">Todas las áreas</option>
-							<option value="Producción">Producción</option>
-							<option value="Mantenimiento">Mantenimiento</option>
-							<option value="Calidad">Calidad</option>
-						</select>
-					</div>
-
-					{/* Estado */}
-					<div>
-						<label className="block text-sm font-medium text-gray-700 mb-1">Estado</label>
-						<select
-							value={selectedEstado}
-							onChange={(e) => setSelectedEstado(e.target.value as Status)}
-							className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-							disabled
-						>
-							<option value="">Todos los estados</option>
-							<option value="PENDIENTE">Pendiente</option>
-							<option value="APROBADO">Aprobado</option>
-							<option value="EJECUTADO">Ejecutado</option>
-							<option value="RECHAZADO">Rechazado</option>
-							<option value="finalizado">Finalizado</option>
-						</select>
-					</div>
-
-					{/* Rango de fechas */}
-					<div>
-						<label className="block text-sm font-medium text-gray-700 mb-1">Rango de fechas</label>
-						<div className="flex gap-2">
-							<div className="relative flex-1">
-								<input
-									type="date"
-									value={selectedRange?.from?.toISOString().split("T")[0] || ""}
-									onChange={(e) => setSelectedRange({ from: new Date(e.target.value), to: selectedRange?.to })}
-									className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-									disabled
-								/>
-								<Calendar className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+					{/* Rango de fechas y botón Limpiar */}
+					<div className="flex items-center">
+						{/* Rango de fechas */}
+						<div>
+							<label className="block text-sm font-medium text-gray-700 mb-1">Rango de fechas</label>
+							<div className="flex gap-2">
+								<div className="relative flex-1">
+									<input
+										type="date"
+										value={selectedRange?.from?.toISOString().split("T")[0] || ""}
+										onChange={(e) => setSelectedRange({ from: new Date(e.target.value), to: selectedRange?.to })}
+										className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+									/>
+									<Calendar className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+								</div>
+								<div className="relative flex-1">
+									<input
+										type="date"
+										value={selectedRange?.to?.toISOString().split("T")[0] || ""}
+										onChange={(e) => setSelectedRange({ from: selectedRange?.from, to: new Date(e.target.value) })}
+										disabled={!selectedRange?.from}
+										className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+									/>
+									<Calendar className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+								</div>
 							</div>
-							{/* <div className="relative flex-1">
-								<input
-									type="date"
-									value={selectedRange?.to?.toISOString().split("T")[0] || ""}
-									onChange={(e) => setSelectedRange({ from: selectedRange?.from, to: new Date(e.target.value) })}
-									className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-								/>
-								<Calendar className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-							</div> */}
+						</div>
+						{/* Botón para limpiar filtros */}
+						<div className="flex items-center justify-center w-full h-full">
+							<button
+								onClick={handleClearFilters}
+								className="ml-4 flex items-center px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+							>
+								<X className="w-4 h-4 mr-1" />
+								Limpiar Filtros
+							</button>
 						</div>
 					</div>
-				</div>
-
-				{/* Botón para limpiar filtros */}
-				<div className="flex justify-end">
-					<button
-						onClick={handleClearFilters}
-						className="flex items-center px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-					>
-						<X className="w-4 h-4 mr-2" />
-						Limpiar Filtros
-					</button>
 				</div>
 			</div>
 
@@ -546,6 +527,23 @@ const Page: React.FC = () => {
 								{columns.map((column) => (
 									<th key={column.key} scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
 										{column.label}
+										{column.filterable && (
+											<select
+												onChange={(e) => {
+													if (column.key === "area") setSelectedArea(e.target.value);
+													if (column.key === "solicitante") setSelectedSolicitante(e.target.value);
+													if (column.key === "estado") setSelectedEstado(e.target.value as Status);
+												}}
+												className="ml-2 border border-gray-300 rounded-md"
+											>
+												<option value="">Todos</option>
+												{column.options?.map((option) => (
+													<option key={option} value={option}>
+														{option}
+													</option>
+												))}
+											</select>
+										)}
 									</th>
 								))}
 								<th scope="col" className="relative px-6 py-3">
@@ -558,7 +556,9 @@ const Page: React.FC = () => {
 								<tr key={row.id}>
 									{columns.map((column) => (
 										<td key={column.key} className="px-6 py-4 whitespace-nowrap">
-											<div className={`text-sm text-gray-900 ${column.key === "estado" ? `${getStatusClass(row.estado)} text-center rounded-full py-1 px-3` : ""}`}>{row[column.key]}</div>
+											<div className={`text-sm text-gray-900 ${column.key === "estado" ? `${getStatusClass(row.estado)} text-center rounded px-2 py-0.5 inline-block` : ""}`}>
+												{column.key === "estado" ? formatStatus(row[column.key] as string) : row[column.key]}
+											</div>
 										</td>
 									))}
 									<td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

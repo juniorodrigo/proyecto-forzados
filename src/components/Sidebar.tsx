@@ -50,7 +50,7 @@ const Sidebar: React.FC = () => {
 				label: "Administrar Usuarios",
 				icon: <RiDashboardLine className="text-xl mr-3" />,
 				href: "/dashboard/administrar-usuario",
-				roles: ["admin", 2],
+				roles: ["admin"],
 			},
 			{
 				id: "administrar-parametros",
@@ -64,7 +64,7 @@ const Sidebar: React.FC = () => {
 				label: "Estadísticas",
 				icon: <RiBarChartFill className="text-xl mr-3" />,
 				href: "/dashboard/estadisticas",
-				roles: ["admin", 2], // Roles permitidos
+				roles: ["admin", 2],
 			},
 		],
 		[]
