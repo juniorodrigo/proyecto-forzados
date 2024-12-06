@@ -3,6 +3,11 @@
 import React, { useEffect, useState } from "react";
 import { FaCheckCircle, FaClock, FaTimesCircle, FaPlayCircle, FaArrowUp } from "react-icons/fa";
 
+const getRandomColor = () => {
+	const colors = ["bg-red-500", "bg-green-500", "bg-blue-500", "bg-yellow-500", "bg-purple-500"];
+	return colors[Math.floor(Math.random() * colors.length)];
+};
+
 const Estadisticas: React.FC = () => {
 	const [stats, setStats] = useState({
 		aprobadasAlta: 0,
@@ -20,6 +25,8 @@ const Estadisticas: React.FC = () => {
 		finalizadas: 0,
 	});
 
+	const [areaStats, setAreaStats] = useState<{ [key: string]: number }>({});
+
 	useEffect(() => {
 		const fetchStats = async () => {
 			try {
@@ -34,7 +41,20 @@ const Estadisticas: React.FC = () => {
 			}
 		};
 
+		const fetchAreaStats = async () => {
+			try {
+				const response = await fetch("/api/estadisticas/solicitudes-por-area");
+				const result = await response.json();
+				if (result.success) {
+					setAreaStats(result.data);
+				}
+			} catch {
+				console.error("Error al cargar las estadísticas por área");
+			}
+		};
+
 		fetchStats();
+		fetchAreaStats();
 	}, []);
 
 	return (
@@ -105,6 +125,20 @@ const Estadisticas: React.FC = () => {
 						<h2 className="text-lg font-semibold">Finalizadas</h2>
 						<p className="text-2xl">{stats.finalizadas}</p>
 					</div>
+				</div>
+			</div>
+			<div className="mt-8">
+				<h2 className="text-2xl font-bold mb-6">Solicitudes por área</h2>
+				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+					{Object.entries(areaStats).map(([area, count]) => (
+						<div key={area} className="bg-white p-4 rounded-lg shadow flex items-center">
+							<div className={`w-10 h-10 rounded-full mr-4 ${getRandomColor()}`}></div>
+							<div>
+								<h3 className="text-lg font-semibold">{area}</h3>
+								<p className="text-2xl">{count}</p>
+							</div>
+						</div>
+					))}
 				</div>
 			</div>
 		</div>

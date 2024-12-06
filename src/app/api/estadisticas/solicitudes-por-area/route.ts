@@ -7,63 +7,21 @@ export async function GET() {
 		const pool = await poolPromise;
 		const { recordset } = await pool.request().query(`
 			SELECT
-				ESTADOSOLICITUD,
+				AR.DESCRIPCION,
 				COUNT(*) AS TOTAL_OCURRENCIAS
 			FROM
-				TRS_SOLICITUD_FORZADO
+				TRS_SOLICITUD_FORZADO SF
+			LEFT JOIN dbo.SUB_AREA AR ON SF.SUBAREA_ID =  AR.SUBAREA_ID
 			GROUP BY
-				ESTADOSOLICITUD
+				AR.DESCRIPCION
+
 			ORDER BY
 				TOTAL_OCURRENCIAS DESC;`);
 
-		const stats = {
-			aprobadasAlta: 0,
-			aprobadasBaja: 0,
-
-			pendientesAlta: 0,
-			pendientesBaja: 0,
-
-			rechazadasAlta: 0,
-			rechazadasBaja: 0,
-
-			ejecutadasAlta: 0,
-			ejecutadasBaja: 0,
-
-			finalizadas: 0,
-		};
+		const stats: { [key: string]: number } = {};
 
 		recordset.forEach((singleValue) => {
-			switch (singleValue.ESTADOSOLICITUD) {
-				case "APROBADO-BAJA":
-					stats.aprobadasBaja = singleValue.TOTAL_OCURRENCIAS;
-					break;
-				case "APROBADO-ALTA":
-					stats.aprobadasAlta = singleValue.TOTAL_OCURRENCIAS;
-					break;
-				case "PENDIENTE-ALTA":
-					stats.pendientesAlta = singleValue.TOTAL_OCURRENCIAS;
-					break;
-				case "PENDIENTE-BAJA":
-					stats.pendientesBaja = singleValue.TOTAL_OCURRENCIAS;
-					break;
-				case "RECHAZADO-ALTA":
-					stats.rechazadasAlta = singleValue.TOTAL_OCURRENCIAS;
-					break;
-				case "RECHAZADO-BAJA":
-					stats.rechazadasBaja = singleValue.TOTAL_OCURRENCIAS;
-					break;
-				case "EJECUTADO-ALTA":
-					stats.ejecutadasAlta = singleValue.TOTAL_OCURRENCIAS;
-					break;
-				case "EJECUTADO-BAJA":
-					stats.ejecutadasBaja = singleValue.TOTAL_OCURRENCIAS;
-					break;
-				case "FINALIZADO":
-					stats.finalizadas = singleValue.TOTAL_OCURRENCIAS;
-					break;
-				default:
-					break;
-			}
+			stats[singleValue.DESCRIPCION] = singleValue.TOTAL_OCURRENCIAS;
 		});
 
 		return NextResponse.json({ success: true, data: stats });
