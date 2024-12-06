@@ -13,13 +13,8 @@ import useUserSession from "@/hooks/useSession";
 const Navbar: React.FC = () => {
 	const context = useContext(UiContext) as UiContextType;
 	const { user } = useUserSession();
-	const [modalOpen, setModalOpen] = useState(false);
 	const { open, setOpen } = context;
 	const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
-
-	const toggleModal = () => {
-		setModalOpen(!modalOpen);
-	};
 
 	const toggleSidebar = () => {
 		setOpen(!open);
@@ -35,20 +30,6 @@ const Navbar: React.FC = () => {
 				<button className={`text-3xl text-gray-400 focus:outline-none transition-transform duration-300 ${open ? "rotate-0" : "rotate-180"}`} onClick={toggleSidebar} aria-label="Toggle Sidebar">
 					<FiChevronsLeft />
 				</button>
-
-				<div className="flex items-center flex-grow px-4">
-					<button className="text-gray-300 hover:text-white md:hidden text-2xl" onClick={toggleModal} aria-label="Open Search">
-						<FiSearch />
-					</button>
-					<div className="relative hidden md:flex w-96">
-						<input type="text" placeholder="Buscar..." className="w-full bg-slate-50 rounded-md py-2 px-4 focus:outline-none focus:ring-0 placeholder-gray-400 border border-gray-400" />
-						<div className="absolute inset-y-0 right-0 flex items-center pr-3">
-							<FiSearch className="text-gray-400 text-xl" />
-						</div>
-					</div>
-
-					<SearchModal isOpen={modalOpen} onClose={toggleModal} />
-				</div>
 
 				<div className="flex items-center space-x-4 relative">
 					<button type="button" className="flex items-center focus:outline-none space-x-2" onClick={toggleDropdown} aria-haspopup="true" aria-expanded={dropdownOpen}>

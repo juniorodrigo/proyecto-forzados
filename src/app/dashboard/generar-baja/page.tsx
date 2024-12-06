@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Popover from "../../../components/Popover";
 import { useSearchParams } from "next/navigation";
+import useUserSession from "@/hooks/useSession";
 
 const BajaForzado = () => {
 	const [formData, setFormData] = useState({
@@ -15,8 +16,9 @@ const BajaForzado = () => {
 	const [errors, setErrors] = useState<Record<string, boolean>>({});
 	// const [dragActive, setDragActive] = useState(false);
 	const [popover, setPopover] = useState({ show: false, message: "", type: "success" as "success" | "error" });
-	const [usuarios, setUsuarios] = useState<{ id: string; nombre: string }[]>([]);
+	const [usuarios, setUsuarios] = useState<{ id: string; nombre: string; apePaterno: string; apeMaterno: string }[]>([]);
 	const [aprobadores, setAprobadores] = useState<{ id: string; nombre: string }[]>([]);
+	const { user } = useUserSession();
 
 	const searchParams = useSearchParams();
 	const id = searchParams.get("id");
@@ -104,7 +106,7 @@ const BajaForzado = () => {
 						headers: {
 							"Content-Type": "application/json",
 						},
-						body: JSON.stringify({ ...formData, id }),
+						body: JSON.stringify({ ...formData, id, usuario: user?.id }),
 					});
 					if (response.ok) {
 						setPopover({ show: true, message: "Baja solicitada exitosamente.", type: "success" });
@@ -138,7 +140,7 @@ const BajaForzado = () => {
 						<option value="">Seleccione un usuario</option>
 						{usuarios.map((usuario) => (
 							<option key={usuario.id} value={usuario.id}>
-								{usuario.nombre}
+								{usuario.nombre + " " + usuario.apePaterno + " " + usuario.apeMaterno}
 							</option>
 						))}
 					</select>
@@ -176,7 +178,7 @@ const BajaForzado = () => {
 						<option value="">Seleccione un usuario</option>
 						{usuarios.map((usuario) => (
 							<option key={usuario.id} value={usuario.id}>
-								{usuario.nombre}
+								{usuario.nombre + " " + usuario.apePaterno + " " + usuario.apeMaterno}
 							</option>
 						))}
 					</select>

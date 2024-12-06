@@ -72,15 +72,104 @@ const Modals: React.FC<ModalsProps> = ({
 
 	return (
 		<>
-			{isModalOpen && selectedRow && (selectedRow.estado.includes("ALTA") || selectedRow.estado.includes("RECHAZADO") || selectedRow.estado.includes("finalizado")) && (
+			{isModalOpen &&
+				!selectedRow.estado.includes("BAJA") &&
+				selectedRow &&
+				(selectedRow.estado.includes("ALTA") || selectedRow.estado.includes("RECHAZADO") || selectedRow.estado.includes("finalizado")) && (
+					<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+						<div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+							<div className="p-6">
+								<h2 className="text-2xl font-bold mb-4">Detalles del Registro</h2>
+								<div className="bg-gray-100 p-4 rounded-lg mb-4 grid grid-cols-2 gap-4">
+									{/* <p>
+									<strong>ID:</strong> {selectedRow.id}
+								</p> */}
+									{/* <p>
+									<strong>Descripcion:</strong> {selectedRow.nombre}
+								</p> */}
+									<p>
+										<strong>Estado:</strong> <span className={`p-2 rounded ${getStatusClass(selectedRow.estado)}`}>{formatStatus(selectedRow.estado)}</span>
+									</p>
+									<p>
+										<strong>Área:</strong> {selectedRow.area}
+									</p>
+									<p>
+										<strong>Solicitante:</strong> {selectedRow.solicitante}
+									</p>
+
+									<p>
+										<strong>Fecha:</strong> {selectedRow.fecha}
+									</p>
+									<p>
+										<strong>Descripción:</strong> {selectedRow.descripcion}
+									</p>
+									<p>
+										<strong>Disciplina:</strong> {selectedRow.disciplinaDescripcion}
+									</p>
+									<p>
+										<strong>Estado Solicitud:</strong> {selectedRow.estadoSolicitud}
+									</p>
+									<p>
+										<strong>Fecha Cierre:</strong> {selectedRow.fechaCierre ? formatDate(selectedRow.fechaCierre.toString()) : "N/A"}
+									</p>
+									<p>
+										<strong>Fecha Realización:</strong> {selectedRow.fechaRealizacion ? formatDate(selectedRow.fechaRealizacion.toString()) : "N/A"}
+									</p>
+									<p>
+										<strong>Motivo de Rechazo:</strong> {selectedRow.motivoRechazoDescripcion}
+									</p>
+									<p>
+										<strong>Gerencia Responsable:</strong> {selectedRow.responsableNombre}
+									</p>
+									<p>
+										<strong>Elemento de Riesgo:</strong> {selectedRow.riesgoDescripcion}
+									</p>
+									<p>
+										<strong>Subárea:</strong> {selectedRow.subareaDescripcion}
+									</p>
+									<p>
+										<strong>Tag Centro:</strong> {selectedRow.tagCentroDescripcion}
+									</p>
+									<p>
+										<strong>Tipo Forzado:</strong> {selectedRow.tipoForzadoDescripcion}
+									</p>
+									<p>
+										<strong>Turno:</strong> TURNO {selectedRow.turnoDescripcion}
+									</p>
+								</div>
+								<div className="flex justify-end gap-4">
+									<button onClick={closeModal} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+										Cerrar
+									</button>
+									{selectedRow.estado === "PENDIENTE-ALTA" && user && usuariosAprobadores.includes(user.role) && (
+										<>
+											<button onClick={openRejectModal} className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+												Rechazar
+											</button>
+										</>
+									)}
+									{selectedRow.estado !== "APROBADO-ALTA" && !selectedRow.estado.includes("RECHAZADO") && !selectedRow.estado.includes("EJECUTADO") && user && usuariosAprobadores.includes(user.role) && (
+										<button
+											onClick={() => handleApprove(selectedRow.id, "ALTA")}
+											className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+										>
+											Aprobar
+										</button>
+									)}
+								</div>
+							</div>
+						</div>
+					</div>
+				)}
+			{isModalOpen && selectedRow && (selectedRow.estado.includes("BAJA") || selectedRow.estado.includes("FINALIZADO")) && (
 				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
 					<div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
 						<div className="p-6">
-							<h2 className="text-2xl font-bold mb-4">Detalles del Registro</h2>
+							<h2 className="text-2xl font-bold mb-4">Detalles del Registro de Baja</h2>
 							<div className="bg-gray-100 p-4 rounded-lg mb-4 grid grid-cols-2 gap-4">
-								<p>
+								{/* <p>
 									<strong>ID:</strong> {selectedRow.id}
-								</p>
+								</p> */}
 								<p>
 									<strong>Nombre:</strong> {selectedRow.nombre}
 								</p>
@@ -89,91 +178,6 @@ const Modals: React.FC<ModalsProps> = ({
 								</p>
 								<p>
 									<strong>Solicitante:</strong> {selectedRow.solicitante}
-								</p>
-								<p>
-									<strong>Estado:</strong> <span className={`p-2 rounded ${getStatusClass(selectedRow.estado)}`}>{formatStatus(selectedRow.estado)}</span>
-								</p>
-								<p>
-									<strong>Fecha:</strong> {selectedRow.fecha}
-								</p>
-								<p>
-									<strong>Descripción:</strong> {selectedRow.descripcion}
-								</p>
-								<p>
-									<strong>Disciplina:</strong> {selectedRow.disciplinaDescripcion}
-								</p>
-								<p>
-									<strong>Estado Solicitud:</strong> {selectedRow.estadoSolicitud}
-								</p>
-								<p>
-									<strong>Fecha Cierre:</strong> {selectedRow.fechaCierre ? formatDate(selectedRow.fechaCierre.toString()) : "N/A"}
-								</p>
-								<p>
-									<strong>Fecha Realización:</strong> {selectedRow.fechaRealizacion ? formatDate(selectedRow.fechaRealizacion.toString()) : "N/A"}
-								</p>
-								<p>
-									<strong>Motivo de Rechazo:</strong> {selectedRow.motivoRechazoDescripcion}
-								</p>
-								<p>
-									<strong>Responsable Nombre:</strong> {selectedRow.responsableNombre}
-								</p>
-								<p>
-									<strong>Riesgo A:</strong> {selectedRow.riesgoDescripcion}
-								</p>
-								<p>
-									<strong>Subárea:</strong> {selectedRow.subareaDescripcion}
-								</p>
-								<p>
-									<strong>Tag Centro:</strong> {selectedRow.tagCentroDescripcion}
-								</p>
-								<p>
-									<strong>Tipo Forzado:</strong> {selectedRow.tipoForzadoDescripcion}
-								</p>
-								<p>
-									<strong>Turno:</strong> Turno {selectedRow.turnoDescripcion}
-								</p>
-							</div>
-							<div className="flex justify-end gap-4">
-								<button onClick={closeModal} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
-									Cerrar
-								</button>
-								{selectedRow.estado === "PENDIENTE-ALTA" && user && usuariosAprobadores.includes(user.role) && (
-									<>
-										<button onClick={openRejectModal} className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
-											Rechazar
-										</button>
-									</>
-								)}
-								{selectedRow.estado !== "APROBADO-ALTA" && !selectedRow.estado.includes("EJECUTADO") && user && usuariosAprobadores.includes(user.role) && (
-									<button
-										onClick={() => handleApprove(selectedRow.id, "ALTA")}
-										className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-									>
-										Aprobar
-									</button>
-								)}
-							</div>
-						</div>
-					</div>
-				</div>
-			)}
-			{isModalOpen && selectedRow && selectedRow.estado.includes("BAJA") && (
-				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-					<div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-						<div className="p-6">
-							<h2 className="text-2xl font-bold mb-4">Detalles del Registro de Baja</h2>
-							<div className="bg-gray-100 p-4 rounded-lg mb-4 grid grid-cols-2 gap-4">
-								<p>
-									<strong>ID:</strong> {selectedRow.id}
-								</p>
-								<p>
-									<strong>Nombre:</strong> {selectedRow.nombre}
-								</p>
-								<p>
-									<strong>Área:</strong> {selectedRow.area}
-								</p>
-								<p>
-									<strong>Solicitante:</strong> {selectedRow.usuarioCreacion}
 								</p>
 								<p>
 									<strong>Estado:</strong> <span className={`p-2 rounded ${getStatusClass(selectedRow.estado)}`}>{formatStatus(selectedRow.estado)}</span>
@@ -199,7 +203,7 @@ const Modals: React.FC<ModalsProps> = ({
 										</button>
 									</>
 								)}
-								{selectedRow.estado !== "APROBADO-BAJA" && !selectedRow.estado.includes("EJECUTADO") && user && usuariosAprobadores.includes(user.role) && (
+								{selectedRow.estado !== "APROBADO-BAJA" && !selectedRow.estado.includes("RECHAZADO") && !selectedRow.estado.includes("EJECUTADO") && user && usuariosAprobadores.includes(user.role) && (
 									<button
 										onClick={() => handleApprove(selectedRow.id, "BAJA")}
 										className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"

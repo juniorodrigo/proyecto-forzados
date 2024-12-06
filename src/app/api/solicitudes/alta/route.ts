@@ -233,7 +233,7 @@ VALUES (
     ${parameters.riesgo}, -- RIESGOA_ID
     2, -- TIPOSOLICITUD
     ${parameters.interlockSeguridad.toLowerCase() === "sí" ? 1 : 0}, -- INTERLOCK
-    '${parameters.descripcion}', -- DESCRIPCIONFORZADO
+    '${parameters.descripcion.toUpperCase()}', -- DESCRIPCIONFORZADO
     NULL, -- FECHAEJECUCION_A, Actualizado
     NULL, -- FECHACIERRE
 
@@ -271,7 +271,7 @@ const generateUpdateQuery = (parameters: UpdateQueryParameters) => {
 		USUARIO_MODIFICACION = '${parameters.usuario}',
 		FECHA_MODIFICACION = GETDATE(),
 
-		ESTADOSOLICITUD = 'pendiente'
+		ESTADOSOLICITUD = 'PENDIENTE-ALTA'
 	WHERE SOLICITUD_ID = ${parameters.id};`;
 };
 

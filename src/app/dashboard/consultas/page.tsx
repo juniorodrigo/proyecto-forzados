@@ -520,7 +520,8 @@ const Page: React.FC = () => {
 			{isLoading ? (
 				<div className="text-center py-4">Cargando datos...</div>
 			) : (
-				<div className="bg-white rounded-lg shadow overflow-hidden">
+				// Añadir 'overflow-auto' al contenedor de la tabla
+				<div className="bg-white rounded-lg shadow overflow-auto">
 					<table className="min-w-full divide-y divide-gray-200">
 						<thead className="bg-gray-50">
 							<tr>
@@ -555,7 +556,7 @@ const Page: React.FC = () => {
 							{filteredRows.map((row) => (
 								<tr key={row.id}>
 									{columns.map((column) => (
-										<td key={column.key} className="px-6 py-4 whitespace-nowrap">
+										<td key={column.key} className={`px-6 py-4 ${column.key === "nombre" ? "max-w-xs break-words" : "whitespace-nowrap"}`}>
 											<div className={`text-sm text-gray-900 ${column.key === "estado" ? `${getStatusClass(row.estado)} text-center rounded px-2 py-0.5 inline-block` : ""}`}>
 												{column.key === "estado" ? formatStatus(row[column.key] as string) : row[column.key]}
 											</div>
@@ -565,11 +566,16 @@ const Page: React.FC = () => {
 										<button onClick={() => handleView(row.id)} className="text-indigo-600 hover:text-indigo-900 mr-2">
 											<FaEye />
 										</button>
-										{row.estado !== "FINALIZADO" && row.estado !== "APROBADO-ALTA" && !row.estado.includes("APROBADO") && !row.estado.includes("RECHAZADO") && !row.estado.includes("EJECUTADO") && (
-											<button onClick={() => handleEdit(row.id, row.estado)} className="text-green-600 hover:text-green-900 mr-2">
-												<FaEdit />
-											</button>
-										)}
+										{row.estado !== "FINALIZADO" &&
+											usuariosSolicitantes.includes(user.role) &&
+											row.estado !== "APROBADO-ALTA" &&
+											!row.estado.includes("APROBADO") &&
+											!row.estado.includes("RECHAZADO") &&
+											!row.estado.includes("EJECUTADO") && (
+												<button onClick={() => handleEdit(row.id, row.estado)} className="text-green-600 hover:text-green-900 mr-2">
+													<FaEdit />
+												</button>
+											)}
 										{row.estado !== "FINALIZADO" && row.estado === "EJECUTADO-ALTA" && user && usuariosSolicitantes.includes(user.role) && (
 											<button onClick={() => handleDelete(row.id)} className="text-red-600 hover:text-red-900 mr-2">
 												<FaMinus />

@@ -62,7 +62,7 @@ export async function POST(request: Request) {
 			.input("areaId", areaId)
 			.input("puestoId", puestoId)
 			.input("usuario", usuario)
-			.input("password", passwordHash)
+			.input("passwordHash", passwordHash)
 			.input("dni", dni)
 			.input("nombre", nombre)
 			.input("apePaterno", apePaterno)
@@ -130,9 +130,11 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+	const { usuarioId } = await request.json();
+
 	try {
 		const pool = await poolPromise;
-		const { usuarioId } = await request.json();
+		// const { usuarioId } = await request.json();
 		const result = await pool.request().input("usuarioId", usuarioId).query(`DELETE FROM MAE_USUARIO WHERE USUARIO_ID = @usuarioId`);
 
 		if (result.rowsAffected[0] > 0) {
@@ -147,6 +149,20 @@ export async function DELETE(request: Request) {
 		}
 	} catch (error) {
 		console.error("Error processing DELETE:", error);
-		return NextResponse.json({ success: false, message: "Error deleting user" }, { status: 500 });
+		try {
+			const pool = await poolPromise;
+			// const { usuarioId } = await request.json();
+
+			const result2 = await pool.request().input("usuarioId", usuarioId).query(`UPDATE MAE_USUARIO SET ESTADO = 0 WHERE USUARIO_ID = @usuarioId`);
+			if (result2.rowsAffected[0] > 0) {
+				return NextResponse.json({ success: true, message: "Usuario deshabilitado correctamente" });
+			} else {
+				return NextResponse.json({ success: false, message: "No se pudo deshabilitar el usuario" }, { status: 500 });
+			}
+		} catch (updateError) {
+			console.error("Error deshabilitando usuario:", updateError);
+			return NextResponse.json({ success: false, message: "Error deshabilitando el usuario" }, { status: 500 });
+		}
 	}
+	return NextResponse.json({ success: false, message: "Error deleting user" }, { status: 500 });
 }

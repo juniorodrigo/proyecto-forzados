@@ -85,6 +85,7 @@ const Page = () => {
 		}
 		setTimeout(() => setShowPopover(false), 3000);
 		setIsModalOpen(false);
+		setSelectedUser(null); // Restablecer selectedUser después de enviar
 	};
 
 	const handleDeleteUser = async (id: number) => {
@@ -165,7 +166,16 @@ const Page = () => {
 					actions={["edit", "delete"]}
 				/>
 			</div>
-			<ModalCreacionUsuario isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} isEditing={isEditing} userData={selectedUser} onSubmit={handleUserSubmit} />
+			<ModalCreacionUsuario
+				isOpen={isModalOpen}
+				onClose={() => {
+					setIsModalOpen(false);
+					setSelectedUser(null); // Restablecer selectedUser al cerrar
+				}}
+				isEditing={isEditing}
+				userData={selectedUser}
+				onSubmit={handleUserSubmit}
+			/>
 			<Popover message={popoverMessage} type={popoverType} show={showPopover} />
 		</div>
 	);

@@ -28,7 +28,11 @@ const Sidebar: React.FC = () => {
 		setActiveToggle(pathname.split("/")[2] || null);
 	}, [pathname]);
 
-	// Para modificar rol, debe de agregarse el id del rol en la tabla de la db al arreglo
+	const solicitantes = useMemo(() => [2, 5], []);
+	const aprobadores = useMemo(() => [3, 6], []);
+	const ejecutores = useMemo(() => [4, 7], []);
+	const administradores = useMemo(() => [8], []);
+
 	const menuItems = useMemo(
 		() => [
 			{
@@ -36,38 +40,38 @@ const Sidebar: React.FC = () => {
 				label: "Consultas",
 				icon: <RiArchiveDrawerLine className="text-xl mr-3" />,
 				href: "/dashboard/consultas",
-				roles: ["admin", 2],
+				roles: [...administradores, ...solicitantes, ...aprobadores, ...ejecutores],
 			},
 			{
 				id: "generar-alta",
 				label: "Generar Alta",
 				icon: <RiArrowRightUpLine className="text-xl mr-3" />,
 				href: "/dashboard/generar-alta",
-				roles: ["admin", 2],
+				roles: [...solicitantes, ...administradores], // Cambiar a solicitantes
 			},
 			{
 				id: "administrar-usuario",
 				label: "Administrar Usuarios",
 				icon: <RiDashboardLine className="text-xl mr-3" />,
 				href: "/dashboard/administrar-usuario",
-				roles: ["admin"],
+				roles: [...administradores],
 			},
 			{
 				id: "administrar-parametros",
 				label: "Administrar Parametros",
 				icon: <RiProductHuntLine className="text-xl mr-3" />,
 				href: "/dashboard/administrar-parametros",
-				roles: ["admin"],
+				roles: [...administradores],
 			},
 			{
 				id: "estadisticas",
 				label: "Estadísticas",
 				icon: <RiBarChartFill className="text-xl mr-3" />,
 				href: "/dashboard/estadisticas",
-				roles: ["admin", 2],
+				roles: [...administradores, ...solicitantes, ...aprobadores, ...ejecutores],
 			},
 		],
-		[]
+		[administradores, aprobadores, ejecutores, solicitantes]
 	);
 
 	console.log(user);

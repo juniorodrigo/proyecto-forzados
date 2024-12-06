@@ -103,6 +103,7 @@ const ModalCreacionUsuario: React.FC<ModalCreacionUsuarioProps> = ({ isOpen, onC
 
 	useEffect(() => {
 		if (isEditing && userData) {
+			// Asegurarse de que userData existe
 			setFormData({
 				areaId: userData.areaId || "",
 				usuario: userData.usuario || "",
@@ -185,6 +186,9 @@ const ModalCreacionUsuario: React.FC<ModalCreacionUsuarioProps> = ({ isOpen, onC
 			setTimeout(() => setShowPopover(false), 3000);
 		}
 	};
+
+	const isFormValid =
+		formData.areaId && formData.usuario && formData.nombre && formData.apePaterno && formData.apeMaterno && formData.dni && formData.correo && formData.rolId && formData.estado && formData.puestoId;
 
 	if (!isOpen) return null;
 
@@ -296,11 +300,7 @@ const ModalCreacionUsuario: React.FC<ModalCreacionUsuarioProps> = ({ isOpen, onC
 								))}
 							</select>
 							<div className="flex justify-between mt-4">
-								<button
-									type="submit"
-									className={`px-4 py-2 rounded-md focus:outline-none focus:ring-2 ${isEditing && !isModified ? "bg-gray-500" : "bg-blue-500"} text-white`}
-									disabled={isEditing && !isModified}
-								>
+								<button type="submit" className={`px-4 py-2 rounded-md focus:outline-none focus:ring-2 ${isFormValid ? "bg-blue-500" : "bg-gray-500"} text-white`} disabled={!isFormValid}>
 									Guardar
 								</button>
 								<button type="button" onClick={handleClose} className="px-4 py-2 bg-red-500 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
