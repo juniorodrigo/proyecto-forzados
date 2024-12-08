@@ -20,7 +20,6 @@ const Sidebar: React.FC = () => {
 
 	const [activeToggle, setActiveToggle] = useState<string | null>(null);
 	const pathname = usePathname();
-	console.log(pathname.split("/")[2]);
 
 	//TODO: añadir los roles verdaderos
 

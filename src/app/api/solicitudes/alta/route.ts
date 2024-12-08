@@ -18,7 +18,7 @@ const getAllSolicitudes = async () => {
 	const pool = await poolPromise;
 	const result = await pool.query(`
 SELECT
-		SF.SOLICITUD_ID,
+    SF.SOLICITUD_ID,
     SF.DESCRIPCIONFORZADO,
     SF.ESTADOSOLICITUD,
     SF.FECHAEJECUCION_A, -- Actualizado
@@ -32,7 +32,7 @@ SELECT
     SA.CODIGO AS SUBAREA_CODIGO,
     SA.DESCRIPCION AS SUBAREA_DESCRIPCION,
 
-    -- Datos de DISCIPLINA  
+    -- Datos de DISCIPLINA
     D.DESCRIPCION AS DISCIPLINA_DESCRIPCION,
 
     -- Datos de TURNO
@@ -55,9 +55,36 @@ SELECT
     RA.DESCRIPCION AS RIESGOA_DESCRIPCION,
 
     -- USUARIO:
-    UX.NOMBRE AS NOMBRE_SOLICITANTE,
-    UX.APEPATERNO AS AP_SOLICITANTE,
-    UX.APEMATERNO AS AM_SOLICITANTE
+    SF.SOLICITANTE_A_ID,
+    UXSA.NOMBRE AS NOMBRE_SOLICITANTE_A,
+    UXSA.APEPATERNO AS AP_SOLICITANTE_A,
+    UXSA.APEMATERNO AS AM_SOLICITANTE_A,
+
+    SF.APROBADOR_A_ID,
+    UXAA.NOMBRE AS NOMBRE_APROBADOR_A,
+    UXAA.APEPATERNO AS AP_APROBADOR_A,
+    UXAA.APEMATERNO AS AM_APROBADOR_A,
+
+    SF.EJECUTOR_A_ID,
+    UXEA.NOMBRE AS NOMBRE_EJECUTOR_A,
+    UXEA.APEPATERNO AS AP_EJECUTOR_A,
+    UXEA.APEMATERNO AS AM_EJECUTOR_A,
+
+    -- USUARIO:
+    SF.SOLICITANTE_B_ID,
+    UXSB.NOMBRE AS NOMBRE_SOLICITANTE_B,
+    UXSB.APEPATERNO AS AP_SOLICITANTE_B,
+    UXSB.APEMATERNO AS AM_SOLICITANTE_B,
+
+    SF.APROBADOR_B_ID,
+    UXAB.NOMBRE AS NOMBRE_APROBADOR_B,
+    UXAB.APEPATERNO AS AP_APROBADOR_B,
+    UXAB.APEMATERNO AS AM_APROBADOR_B,
+
+    SF.EJECUTOR_B_ID,
+    UXEB.NOMBRE AS NOMBRE_EJECUTOR_B,
+    UXEB.APEPATERNO AS AP_EJECUTOR_B,
+    UXEB.APEMATERNO AS AM_EJECUTOR_B
 
 FROM
     TRS_SOLICITUD_FORZADO SF
@@ -77,13 +104,47 @@ LEFT JOIN
     RESPONSABLE R ON SF.RESPONSABLE_ID = R.RESPONSABLE_ID
 LEFT JOIN
     MAE_RIESGO_A RA ON SF.RIESGOA_ID = RA.RIESGOA_ID
-    LEFT JOIN MAE_USUARIO UX ON SF.USUARIO_CREACION = CAST(UX.USUARIO_ID AS CHAR)
+
+LEFT JOIN
+    MAE_USUARIO UXSA ON SF.SOLICITANTE_A_ID = CAST(UXSA.USUARIO_ID AS CHAR)
+LEFT JOIN
+    MAE_USUARIO UXSB ON SF.SOLICITANTE_B_ID = CAST(UXSB.USUARIO_ID AS CHAR)
+
+LEFT JOIN
+    MAE_USUARIO UXAA ON SF.APROBADOR_A_ID = CAST(UXAA.USUARIO_ID AS CHAR)
+LEFT JOIN
+    MAE_USUARIO UXAB ON SF.APROBADOR_B_ID = CAST(UXAB.USUARIO_ID AS CHAR)
+
+LEFT JOIN
+    MAE_USUARIO UXEA ON SF.EJECUTOR_A_ID = CAST(UXEA.USUARIO_ID AS CHAR)
+LEFT JOIN
+    MAE_USUARIO UXEB ON SF.EJECUTOR_B_ID = CAST(UXEB.USUARIO_ID AS CHAR)
 	`);
 	return result.recordset.map((record) => ({
 		id: record.SOLICITUD_ID,
 		nombre: record.DESCRIPCIONFORZADO,
 		area: record.SUBAREA_DESCRIPCION,
-		solicitante: record.NOMBRE_SOLICITANTE + " " + record.AP_SOLICITANTE + " " + record.AM_SOLICITANTE,
+		tipo: record.SOLICITANTE_B_ID === null ? "alta" : "baja",
+		solicitante:
+			record.SOLICITANTE_B_ID === null
+				? record.NOMBRE_SOLICITANTE_A + " " + record.AP_SOLICITANTE_A + " " + record.AM_SOLICITANTE_A
+				: record.NOMBRE_SOLICITANTE_B + " " + record.AP_SOLICITANTE_B + " " + record.AM_SOLICITANTE_B,
+		aprobador:
+			record.APROBADOR_B_ID === null
+				? record.NOMBRE_APROBADOR_A + " " + record.AP_APROBADOR_A + " " + record.AM_APROBADOR_A
+				: record.NOMBRE_APROBADOR_B + " " + record.AP_APROBADOR_B + " " + record.AM_APROBADOR_B,
+		ejecutor:
+			record.EJECUTOR_B_ID === null
+				? record.NOMBRE_EJECUTOR_A + " " + record.AP_EJECUTOR_A + " " + record.AM_EJECUTOR_A
+				: record.NOMBRE_EJECUTOR_B + " " + record.AP_EJECUTOR_B + " " + record.AM_EJECUTOR_B,
+
+		solicitanteAId: record.SOLICITANTE_A_ID,
+		aprobadorAId: record.APROBADOR_A_ID,
+		ejecutorAId: record.EJECUTOR_A_ID,
+		solicitanteBId: record.SOLICITANTE_B_ID,
+		aprobadorBId: record.APROBADOR_B_ID,
+		ejecutorBId: record.EJECUTOR_B_ID,
+
 		estado: record.ESTADOSOLICITUD,
 		fecha: record.FECHA_CREACION,
 		descripcion: record.DESCRIPCIONFORZADO,
@@ -268,6 +329,10 @@ const generateUpdateQuery = (parameters: UpdateQueryParameters) => {
         INTERLOCK = ${typeof parameters.interlockSeguridad === "string" && parameters.interlockSeguridad.toLowerCase() === "sí" ? 1 : 0},
 		DESCRIPCIONFORZADO = '${parameters.descripcion}',
 
+        SOLICITANTE_A_ID = ${parameters.solicitante},
+        APROBADOR_A_ID = ${parameters.aprobador},
+        EJECUTOR_A_ID = ${parameters.ejecutor},
+
 		USUARIO_MODIFICACION = '${parameters.usuario}',
 		FECHA_MODIFICACION = GETDATE(),
 
@@ -363,8 +428,7 @@ const createSolicitudHTML = (solicitud: ResumenSolicitud) => {
             margin: 30px auto 0;
             padding: 10px;
             text-align: center;
-            background-color: #007BFF;
-			text-color: white;
+            background-color: #103483;
             color: white;
             text-decoration: none;
             border-radius: 5px;

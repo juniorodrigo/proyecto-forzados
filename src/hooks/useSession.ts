@@ -4,6 +4,7 @@ interface UserSession {
 	name: string;
 	id: number;
 	area: string;
+	roleName: string;
 	role: number;
 	jwt: string;
 }

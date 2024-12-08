@@ -9,7 +9,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 			.request()
 			.input("id", id)
 			.query(
-				"SELECT USX.*,  AR.DESCRIPCION AS ADESC, RO.DESCRIPCION as RODESC FROM MAE_USUARIO USX LEFT JOIN MAE_AREA AR ON  USX.AREA_ID = AR.AREA_ID LEFT JOIN MAE_ROL RO ON USX.ROL_ID = RO.ROL_ID WHERE USUARIO = @id"
+				"SELECT USX.*, AR.DESCRIPCION AS ADESC, RO.DESCRIPCION as RODESC FROM MAE_USUARIO USX LEFT JOIN MAE_AREA AR ON  USX.AREA_ID = AR.AREA_ID LEFT JOIN MAE_ROL RO ON USX.ROL_ID = RO.ROL_ID WHERE USUARIO = @id"
 			);
 		if (recordset.length === 0) {
 			return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -19,6 +19,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 			name: recordset[0].NOMBRE + " " + recordset[0].APEPATERNO + " " + recordset[0].APEMATERNO,
 			area: recordset[0].ADESC,
 			role: recordset[0].ROL_ID,
+			roleName: recordset[0].RODESC,
 			flagNuevoIngreso: recordset[0].FLAG_INGRESO,
 			jwt: "", // Asignar el valor adecuado para jwt si es necesario
 		};

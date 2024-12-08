@@ -8,9 +8,10 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Search, Calendar, X } from "lucide-react";
 import Popover from "@/components/Popover";
-import { FaEye, FaEdit, FaPlay, FaMinus } from "react-icons/fa";
+import { FaEye, FaEdit, FaPlay, FaMinus, FaCheck, FaArrowUp, FaArrowDown } from "react-icons/fa";
 import useUserSession from "@/hooks/useSession";
 import Modals from "@/components/Modals";
+import ModalAprobacionRechazo from "@/components/ModalAprobacionRechazo";
 
 type Status = "RECHAZADO-ALTA" | "PENDIENTE-ALTA" | "APROBADO-ALTA" | "EJECUTADO-ALTA" | "RECHAZADO" | "PENDIENTE-BAJA" | "APROBADO-BAJA" | "EJECUTADO-BAJA" | "FINALIZADO";
 
@@ -21,6 +22,16 @@ export interface Row {
 	solicitante: string;
 	estado: Status;
 	fecha: string;
+	fechaModificacion: string;
+	tipo: string;
+	aprobador: string;
+	ejecutor: string;
+	solicitanteAId: number;
+	aprobadorAId: number;
+	ejecutorAId: number;
+	solicitanteBId: number;
+	aprobadorBId: number;
+	ejecutorBId: number;
 	[key: string]: string | number;
 }
 
@@ -31,6 +42,9 @@ const Page: React.FC = () => {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [selectedRow, setSelectedRow] = useState<Row | null>(null);
 	const [selectedArea, setSelectedArea] = useState<string | "">("");
+	const [selectedTipo, setSelectedTipo] = useState<string | "">("");
+	const [selectedAprobador, setSelectedAprobador] = useState<string | "">("");
+	const [selectedEjecutor, setSelectedEjecutor] = useState<string | "">("");
 	const [rows, setRows] = useState<Row[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -45,54 +59,63 @@ const Page: React.FC = () => {
 	const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
 	const [rejectReason, setRejectReason] = useState("");
 	const [selectedEndDate, setSelectedEndDate] = useState<string | "">("");
+	const [isApprovalModalOpen, setIsApprovalModalOpen] = useState(false);
+	const [selectedApprovalRow, setSelectedApprovalRow] = useState<Row | null>(null);
 	const router = useRouter();
 	const { user } = useUserSession();
 
 	const usuariosEjecutores = [4, 7];
 	const usuariosSolicitantes = [2, 5];
-	// usuariosEjecutores.push(1, 2, 4, 5, 7);
+	const usuariosAprobadores = [3, 6];
+	const usuariosAdministradores = [8];
 
 	const uniqueAreas = Array.from(new Set(rows.map((row) => row.area)));
 	const uniqueSolicitantes = Array.from(new Set(rows.map((row) => row.solicitante)));
 	const uniqueEstados = Array.from(new Set(rows.map((row) => row.estado)));
+	const uniqueAprobadores = Array.from(new Set(rows.map((row) => row.aprobador)));
+	const uniqueEjecutores = Array.from(new Set(rows.map((row) => row.ejecutor)));
 
 	const columns = [
 		{ key: "id", label: "ID" },
+		{ key: "tipo", label: "Tipo", filterable: true, options: ["alta", "baja"] }, // Nueva columna con filtro
+		{ key: "estado", label: "Estado", filterable: true, options: uniqueEstados },
 		{ key: "nombre", label: "Descripción" },
 		{ key: "area", label: "Área", filterable: true, options: uniqueAreas },
 		{ key: "solicitante", label: "Solicitante", filterable: true, options: uniqueSolicitantes },
-		{ key: "estado", label: "Estado", filterable: true, options: uniqueEstados },
-		{ key: "fecha", label: "Fecha y Hora", filterable: false },
+		{ key: "aprobador", label: "Aprobador", filterable: true, options: uniqueAprobadores }, // Nueva columna con filtro
+		{ key: "ejecutor", label: "Ejecutor", filterable: true, options: uniqueEjecutores }, // Nueva columna con filtro
+		{ key: "fecha", label: "Fecha Actualización", filterable: false },
 	];
 
 	const formatDate = (dateString: string) => {
 		return format(new Date(dateString), "dd/MM/yy HH:mm", { locale: es });
 	};
 
-	useEffect(() => {
-		const fetchData = async () => {
-			setIsLoading(true);
-			setError(null);
-			try {
-				const response = await fetch("/api/solicitudes/alta");
-				const result = await response.json();
-				if (result.success) {
-					const formattedData = result.data.map((row: Row) => ({
-						...row,
-						fecha: formatDate(row.fecha),
-					}));
-					console.log(formattedData);
-					setRows(formattedData);
-				} else {
-					setError(result.message);
-				}
-			} catch {
-				setError("Error al cargar los datos. Por favor, intente nuevamente.");
-			} finally {
-				setIsLoading(false);
-			}
-		};
+	const fetchData = async () => {
+		setIsLoading(true);
+		setError(null);
+		try {
+			const response = await fetch("/api/solicitudes/alta");
+			const result = await response.json();
 
+			if (result.success) {
+				const formattedData = result.data.map((row: Row) => ({
+					...row,
+					fecha: formatDate(row.fechaModificacion),
+				}));
+
+				setRows(formattedData);
+			} else {
+				setError(result.message);
+			}
+		} catch {
+			setError("Error al cargar los datos. Por favor, intente nuevamente.");
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	useEffect(() => {
 		fetchData();
 	}, []);
 
@@ -116,17 +139,34 @@ const Page: React.FC = () => {
 		fetchRejectReasons();
 	}, []);
 
+	useEffect(() => {
+		if (user) {
+			if (usuariosSolicitantes.includes(user.role)) {
+				setSelectedSolicitante(user.name);
+			}
+			if (usuariosAprobadores.includes(user.role)) {
+				setSelectedAprobador(user.name);
+			}
+			if (usuariosEjecutores.includes(user.role)) {
+				setSelectedEjecutor(user.name);
+			}
+		}
+	}, [user]);
+
 	const filteredRows = useMemo(() => {
 		return rows.filter((row) => {
-			const rowDate = new Date(row.fecha);
+			const rowDate = new Date(row.fechaModificacion);
 			const isWithinDateRange = (!selectedRange?.from || rowDate >= selectedRange.from) && (!selectedRange?.to || rowDate <= selectedRange.to);
 			const matchesSolicitante = selectedSolicitante ? row.solicitante.toLowerCase().includes(selectedSolicitante.toLowerCase()) : true;
 			const matchesEstado = selectedEstado ? row.estado === selectedEstado : true;
 			const matchesArea = selectedArea ? row.area === selectedArea : true;
+			const matchesTipo = selectedTipo ? row.tipo === selectedTipo : true;
+			const matchesAprobador = selectedAprobador ? row.aprobador.toLowerCase().includes(selectedAprobador.toLowerCase()) : true;
+			const matchesEjecutor = selectedEjecutor ? row.ejecutor.toLowerCase().includes(selectedEjecutor.toLowerCase()) : true;
 
-			return isWithinDateRange && matchesSolicitante && matchesEstado && matchesArea;
+			return isWithinDateRange && matchesSolicitante && matchesEstado && matchesArea && matchesTipo && matchesAprobador && matchesEjecutor;
 		});
-	}, [rows, selectedRange, selectedSolicitante, selectedEstado, selectedArea]);
+	}, [rows, selectedRange, selectedSolicitante, selectedEstado, selectedArea, selectedTipo, selectedAprobador, selectedEjecutor]);
 
 	const handleView = (id: number) => {
 		const row = rows.find((row) => row.id === id);
@@ -164,7 +204,17 @@ const Page: React.FC = () => {
 		setSelectedEstado("");
 		setSelectedArea("");
 		setSelectedEndDate("");
+		setSelectedAprobador("");
+		setSelectedEjecutor("");
+		const selects = document.querySelectorAll("select");
+		selects.forEach((select) => {
+			select.value = "";
+		});
 	};
+
+	const areFiltersApplied = useMemo(() => {
+		return selectedRange || selectedSolicitante || selectedEstado || selectedArea || selectedEndDate || selectedAprobador || selectedEjecutor;
+	}, [selectedRange, selectedSolicitante, selectedEstado, selectedArea, selectedEndDate, selectedAprobador, selectedEjecutor]);
 
 	const formatStatus = (status: string) => {
 		return status
@@ -196,29 +246,7 @@ const Page: React.FC = () => {
 				if (response.ok) {
 					setPopoverMessage("Aprobación exitosa");
 					setPopoverType("success");
-					// Recargar datos
-					const fetchData = async () => {
-						setIsLoading(true);
-						setError(null);
-						try {
-							const response = await fetch("/api/solicitudes/alta");
-							const result = await response.json();
-							if (result.success) {
-								const formattedData = result.data.map((row: Row) => ({
-									...row,
-									fecha: formatDate(row.fecha),
-								}));
-								setRows(formattedData);
-							} else {
-								setError(result.message);
-							}
-						} catch {
-							setError("Error al cargar los datos. Por favor, intente nuevamente.");
-						} finally {
-							setIsLoading(false);
-						}
-					};
-					fetchData();
+					fetchData(); // Recargar datos
 					closeModal(); // Cerrar modal
 				} else {
 					setPopoverMessage("Error al aprobar");
@@ -237,7 +265,7 @@ const Page: React.FC = () => {
 	const handleExecute = async (id: number) => {
 		const row = rows.find((row) => row.id === id);
 		//TODO: xd
-		if (row && user && usuariosEjecutores.includes(user?.role)) {
+		if (row && user && (usuariosEjecutores.includes(user?.role) || usuariosAdministradores.includes(user?.role || -1))) {
 			openExecuteModal(row);
 		}
 	};
@@ -273,29 +301,7 @@ const Page: React.FC = () => {
 				if (response.ok) {
 					setPopoverMessage("Ejecución exitosa");
 					setPopoverType("success");
-					// Recargar datos
-					const fetchData = async () => {
-						setIsLoading(true);
-						setError(null);
-						try {
-							const response = await fetch("/api/solicitudes/alta");
-							const result = await response.json();
-							if (result.success) {
-								const formattedData = result.data.map((row: Row) => ({
-									...row,
-									fecha: formatDate(row.fecha),
-								}));
-								setRows(formattedData);
-							} else {
-								setError(result.message);
-							}
-						} catch {
-							setError("Error al cargar los datos. Por favor, intente nuevamente.");
-						} finally {
-							setIsLoading(false);
-						}
-					};
-					fetchData();
+					fetchData(); // Recargar datos
 					closeExecuteModal(); // Cerrar modal
 				} else {
 					setPopoverMessage("Error al ejecutar");
@@ -312,7 +318,11 @@ const Page: React.FC = () => {
 	};
 
 	const openRejectModal = () => {
+		if (selectedApprovalRow) {
+			setSelectedRow(selectedApprovalRow);
+		}
 		setIsRejectModalOpen(true);
+		setIsApprovalModalOpen(false); // Cerrar el modal de aprobación al abrir el de rechazo
 	};
 
 	const closeRejectModal = () => {
@@ -340,29 +350,7 @@ const Page: React.FC = () => {
 				if (response.ok) {
 					setPopoverMessage("Rechazo exitoso");
 					setPopoverType("success");
-					// Recargar datos
-					const fetchData = async () => {
-						setIsLoading(true);
-						setError(null);
-						try {
-							const response = await fetch("/api/solicitudes/alta");
-							const result = await response.json();
-							if (result.success) {
-								const formattedData = result.data.map((row: Row) => ({
-									...row,
-									fecha: formatDate(row.fecha),
-								}));
-								setRows(formattedData);
-							} else {
-								setError(result.message);
-							}
-						} catch {
-							setError("Error al cargar los datos. Por favor, intente nuevamente.");
-						} finally {
-							setIsLoading(false);
-						}
-					};
-					fetchData();
+					fetchData(); // Recargar datos
 					closeRejectModal(); // Cerrar modal de rechazo
 					closeModal(); // Cerrar modal de detalles
 				} else {
@@ -445,6 +433,11 @@ const Page: React.FC = () => {
 		}
 	};
 
+	const handleOpenApprovalModal = (row: Row) => {
+		setSelectedApprovalRow(row);
+		setIsApprovalModalOpen(true);
+	};
+
 	return (
 		<div className="p-6 bg-gray-50 min-h-screen">
 			<h1 className="text-2xl font-bold mb-6">Consultas</h1>
@@ -466,7 +459,34 @@ const Page: React.FC = () => {
 							<Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
 						</div>
 					</div>
-
+					{/* Aprobador */}
+					<div className="mb-4 md:mb-0 md:mr-6">
+						<label className="block text-sm font-medium text-gray-700 mb-1">Aprobador</label>
+						<div className="relative">
+							<input
+								type="text"
+								value={selectedAprobador}
+								onChange={(e) => setSelectedAprobador(e.target.value)}
+								placeholder="Nombre del aprobador"
+								className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+							/>
+							<Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+						</div>
+					</div>
+					{/* Ejecutor */}
+					<div className="mb-4 md:mb-0 md:mr-6">
+						<label className="block text-sm font-medium text-gray-700 mb-1">Ejecutor</label>
+						<div className="relative">
+							<input
+								type="text"
+								value={selectedEjecutor}
+								onChange={(e) => setSelectedEjecutor(e.target.value)}
+								placeholder="Nombre del ejecutor"
+								className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+							/>
+							<Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+						</div>
+					</div>
 					{/* Rango de fechas y botón Limpiar */}
 					<div className="flex items-center">
 						{/* Rango de fechas */}
@@ -498,7 +518,10 @@ const Page: React.FC = () => {
 						<div className="flex items-center justify-center w-full h-full">
 							<button
 								onClick={handleClearFilters}
-								className="ml-4 flex items-center px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+								className={`ml-4 flex items-center px-3 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+									areFiltersApplied ? "bg-red-500 text-white hover:bg-red-600 focus:ring-red-500" : "bg-gray-300 text-gray-500 cursor-not-allowed"
+								}`}
+								disabled={!areFiltersApplied}
 							>
 								<X className="w-4 h-4 mr-1" />
 								Limpiar Filtros
@@ -534,6 +557,9 @@ const Page: React.FC = () => {
 													if (column.key === "area") setSelectedArea(e.target.value);
 													if (column.key === "solicitante") setSelectedSolicitante(e.target.value);
 													if (column.key === "estado") setSelectedEstado(e.target.value as Status);
+													if (column.key === "tipo") setSelectedTipo(e.target.value);
+													if (column.key === "aprobador") setSelectedAprobador(e.target.value);
+													if (column.key === "ejecutor") setSelectedEjecutor(e.target.value);
 												}}
 												className="ml-2 border border-gray-300 rounded-md"
 											>
@@ -553,47 +579,67 @@ const Page: React.FC = () => {
 							</tr>
 						</thead>
 						<tbody className="bg-white divide-y divide-gray-200">
-							{filteredRows.map((row) => (
-								<tr key={row.id}>
-									{columns.map((column) => (
-										<td key={column.key} className={`px-6 py-4 ${column.key === "nombre" ? "max-w-xs break-words" : "whitespace-nowrap"}`}>
-											<div className={`text-sm text-gray-900 ${column.key === "estado" ? `${getStatusClass(row.estado)} text-center rounded px-2 py-0.5 inline-block` : ""}`}>
-												{column.key === "estado" ? formatStatus(row[column.key] as string) : row[column.key]}
-											</div>
-										</td>
-									))}
-									<td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-										<button onClick={() => handleView(row.id)} className="text-indigo-600 hover:text-indigo-900 mr-2">
-											<FaEye />
-										</button>
-										{row.estado !== "FINALIZADO" &&
-											usuariosSolicitantes.includes(user.role) &&
-											row.estado !== "APROBADO-ALTA" &&
-											!row.estado.includes("APROBADO") &&
-											!row.estado.includes("RECHAZADO") &&
-											!row.estado.includes("EJECUTADO") && (
-												<button onClick={() => handleEdit(row.id, row.estado)} className="text-green-600 hover:text-green-900 mr-2">
-													<FaEdit />
-												</button>
-											)}
-										{row.estado !== "FINALIZADO" && row.estado === "EJECUTADO-ALTA" && user && usuariosSolicitantes.includes(user.role) && (
-											<button onClick={() => handleDelete(row.id)} className="text-red-600 hover:text-red-900 mr-2">
-												<FaMinus />
+							{filteredRows.length > 0 ? (
+								filteredRows.map((row) => (
+									<tr key={row.id}>
+										{columns.map((column) => (
+											<td key={column.key} className={`px-6 py-4 ${column.key === "nombre" ? "max-w-xs break-words" : "whitespace-nowrap"}`}>
+												<div className={`text-sm text-gray-900 ${column.key === "estado" ? `${getStatusClass(row.estado)} text-center rounded px-2 py-0.5 inline-block` : ""}`}>
+													{column.key === "estado" ? (
+														formatStatus(row[column.key] as string)
+													) : column.key === "tipo" ? (
+														<span className={row.tipo === "alta" ? "text-green-500" : "text-red-500"}>{row.tipo === "alta" ? <FaArrowUp /> : <FaArrowDown />}</span>
+													) : (
+														row[column.key]
+													)}
+												</div>
+											</td>
+										))}
+										<td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+											<button onClick={() => handleView(row.id)} className="text-indigo-600 hover:text-indigo-900 mr-2">
+												<FaEye />
 											</button>
-										)}
-										{row.estado !== "FINALIZADO" &&
-											!row.estado.includes("EJECUTADO") &&
-											!row.estado.includes("RECHAZADO") &&
-											row.estado.includes("APROBADO") &&
-											user &&
-											usuariosEjecutores.includes(user?.role) && (
-												<button onClick={() => handleExecute(row.id)} className="text-blue-600 hover:text-blue-900">
-													<FaPlay />
+											{/* Botón de Aprobar/Rechazar */}
+											{row.estado.startsWith("PENDIENTE") && user && (usuariosAprobadores.includes(user.role) || usuariosAdministradores.includes(user.role)) && (
+												<button onClick={() => handleOpenApprovalModal(row)} className="text-green-600 hover:text-green-900 mr-2">
+													<FaCheck />
 												</button>
 											)}
+											{row.estado !== "FINALIZADO" &&
+												(usuariosSolicitantes.includes(user?.role || -1) || usuariosAdministradores.includes(user?.role || -1)) &&
+												row.estado !== "APROBADO-ALTA" &&
+												!row.estado.includes("APROBADO") &&
+												!row.estado.includes("RECHAZADO") &&
+												!row.estado.includes("EJECUTADO") && (
+													<button onClick={() => handleEdit(row.id, row.estado)} className="text-green-600 hover:text-green-900 mr-2">
+														<FaEdit />
+													</button>
+												)}
+											{row.estado !== "FINALIZADO" && row.estado === "EJECUTADO-ALTA" && user && (usuariosSolicitantes.includes(user.role) || usuariosAdministradores.includes(user?.role || -1)) && (
+												<button onClick={() => handleDelete(row.id)} className="text-red-600 hover:text-red-900 mr-2">
+													<FaMinus />
+												</button>
+											)}
+											{row.estado !== "FINALIZADO" &&
+												!row.estado.includes("EJECUTADO") &&
+												!row.estado.includes("RECHAZADO") &&
+												row.estado.includes("APROBADO") &&
+												user &&
+												(usuariosEjecutores.includes(user?.role) || usuariosAdministradores.includes(user?.role || -1)) && (
+													<button onClick={() => handleExecute(row.id)} className="text-blue-600 hover:text-blue-900">
+														<FaPlay />
+													</button>
+												)}
+										</td>
+									</tr>
+								))
+							) : (
+								<tr>
+									<td colSpan={columns.length + 1} className="px-6 py-4 text-center text-sm text-gray-500">
+										No se encontraron registros
 									</td>
 								</tr>
-							))}
+							)}
 						</tbody>
 					</table>
 				</div>
@@ -626,6 +672,12 @@ const Page: React.FC = () => {
 				handleRejectConfirm={handleRejectConfirm}
 				getStatusClass={getStatusClass}
 				formatDate={formatDate}
+			/>
+			<ModalAprobacionRechazo
+				isOpen={isApprovalModalOpen}
+				onClose={() => setIsApprovalModalOpen(false)}
+				onApprove={() => selectedApprovalRow && handleApprove(selectedApprovalRow.id, selectedApprovalRow.estado.includes("ALTA") ? "ALTA" : "BAJA")}
+				onReject={openRejectModal}
 			/>
 			<Popover message={popoverMessage} type={popoverType} show={showPopover} />
 		</div>

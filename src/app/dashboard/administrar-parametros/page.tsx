@@ -84,8 +84,8 @@ const Page = () => {
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({
-					descripcion: newRecord.descripcion,
-					...(selectedCategoryObject?.needsCode && { codigo: newRecord.codigo }),
+					descripcion: newRecord.descripcion.toUpperCase(),
+					...(selectedCategoryObject?.needsCode && { codigo: newRecord.codigo.toUpperCase() }),
 					usuario: user?.id,
 				}),
 			})
@@ -124,8 +124,8 @@ const Page = () => {
 				},
 				body: JSON.stringify({
 					id: editingRecordId,
-					descripcion: newRecord.descripcion,
-					...(selectedCategoryObject?.needsCode && { codigo: newRecord.codigo }),
+					descripcion: newRecord.descripcion.toUpperCase(),
+					...(selectedCategoryObject?.needsCode && { codigo: newRecord.codigo.toUpperCase() }),
 					usuario: user?.id,
 				}),
 			})

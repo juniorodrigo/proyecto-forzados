@@ -60,6 +60,7 @@ const Modals: React.FC<ModalsProps> = ({
 	const { user } = useUserSession();
 	const [dragActive] = React.useState(false);
 
+	const usuariosAdministradores = [8];
 	const usuariosAprobadores = [3, 6];
 	// usuariosAprobadores.push(1, 2, 4, 5, 7);
 
@@ -141,21 +142,6 @@ const Modals: React.FC<ModalsProps> = ({
 									<button onClick={closeModal} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
 										Cerrar
 									</button>
-									{selectedRow.estado === "PENDIENTE-ALTA" && user && usuariosAprobadores.includes(user.role) && (
-										<>
-											<button onClick={openRejectModal} className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
-												Rechazar
-											</button>
-										</>
-									)}
-									{selectedRow.estado !== "APROBADO-ALTA" && !selectedRow.estado.includes("RECHAZADO") && !selectedRow.estado.includes("EJECUTADO") && user && usuariosAprobadores.includes(user.role) && (
-										<button
-											onClick={() => handleApprove(selectedRow.id, "ALTA")}
-											className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-										>
-											Aprobar
-										</button>
-									)}
 								</div>
 							</div>
 						</div>
@@ -193,7 +179,8 @@ const Modals: React.FC<ModalsProps> = ({
 								<button onClick={closeModalBaja} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
 									Cerrar
 								</button>
-								{selectedRow.estado === "PENDIENTE-BAJA" && user && usuariosAprobadores.includes(user.role) && (
+								const usuariosAdministradores = [8];
+								{selectedRow.estado === "PENDIENTE-BAJA" && user && (usuariosAprobadores.includes(user.role) || usuariosAdministradores.includes(user?.role || -1)) && (
 									<>
 										<button
 											onClick={openRejectModal} // Cambiado para abrir el modal de rechazo
@@ -203,14 +190,18 @@ const Modals: React.FC<ModalsProps> = ({
 										</button>
 									</>
 								)}
-								{selectedRow.estado !== "APROBADO-BAJA" && !selectedRow.estado.includes("RECHAZADO") && !selectedRow.estado.includes("EJECUTADO") && user && usuariosAprobadores.includes(user.role) && (
-									<button
-										onClick={() => handleApprove(selectedRow.id, "BAJA")}
-										className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-									>
-										Aprobar
-									</button>
-								)}
+								{selectedRow.estado !== "APROBADO-BAJA" &&
+									!selectedRow.estado.includes("RECHAZADO") &&
+									!selectedRow.estado.includes("EJECUTADO") &&
+									user &&
+									(usuariosAprobadores.includes(user.role) || usuariosAdministradores.includes(user?.role || -1)) && (
+										<button
+											onClick={() => handleApprove(selectedRow.id, "BAJA")}
+											className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+										>
+											Aprobar
+										</button>
+									)}
 							</div>
 						</div>
 					</div>
@@ -265,7 +256,7 @@ const Modals: React.FC<ModalsProps> = ({
 					</div>
 				</div>
 			)}
-			{isRejectModalOpen && selectedRow.estado.includes("ALTA") && (
+			{isRejectModalOpen && selectedRow && selectedRow.estado.includes("ALTA") && (
 				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
 					<div className="bg-white rounded-lg shadow-xl w-full max-w-md">
 						<div className="p-6">
@@ -299,6 +290,7 @@ const Modals: React.FC<ModalsProps> = ({
 				</div>
 			)}
 			{isRejectModalOpen &&
+				selectedRow &&
 				selectedRow.estado.includes("BAJA") && ( // Asegurarse de que el modal de rechazo se abra para "BAJA"
 					<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
 						<div className="bg-white rounded-lg shadow-xl w-full max-w-md">

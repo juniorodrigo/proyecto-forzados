@@ -287,7 +287,7 @@ const ModalCreacionUsuario: React.FC<ModalCreacionUsuarioProps> = ({ isOpen, onC
 								))}
 							</select>
 							<label className="block text-sm font-medium text-gray-700">Estado</label>
-							<select name="estado" value={formData.estado} onChange={handleChange} className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 border-gray-300 mb-4">
+							<select name="estado" value={formData.estado} onChange={handleChange} className="w-full px-3 py-2 border border-gray-400 rounded focus:outline-none focus:ring-2 bg-gray-100 mb-4" disabled>
 								<option value="activo">Activo</option>
 								<option value="inactivo">Inactivo</option>
 							</select>

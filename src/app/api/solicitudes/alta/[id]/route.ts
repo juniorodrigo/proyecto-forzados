@@ -38,7 +38,10 @@ const getSingleSolicitud = async (id: string) => {
             FECHA_CREACION,
             USUARIO_MODIFICACION,
             FECHA_MODIFICACION,
-            ESTADOSOLICITUD
+            ESTADOSOLICITUD,
+			APROBADOR_A_ID,
+			EJECUTOR_A_ID,
+			SOLICITANTE_A_ID
         FROM 
             TRS_SOLICITUD_FORZADO
         WHERE 
@@ -57,9 +60,11 @@ const getSingleSolicitud = async (id: string) => {
 		riesgo: record.RIESGOA_ID,
 		probabilidad: record.RIESGOA_ID,
 		impacto: record.RIESGOA_ID,
-		solicitante: record.USUARIO_CREACION,
-		aprobador: record.USUARIO_MODIFICACION,
-		ejecutor: record.USUARIO_MODIFICACION,
+
+		solicitante: record.SOLICITANTE_A_ID,
+		aprobador: record.APROBADOR_A_ID,
+		ejecutor: record.EJECUTOR_A_ID,
+
 		autorizacion: record.ESTADOSOLICITUD,
 		tipoForzado: record.TIPOFORZADO_ID,
 	}));

@@ -51,7 +51,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
 				const response = await fetch(url);
 				const data = await response.json();
 
-				console.log(data.values, `data values from ${url}`);
+				// console.log(data.values, `data values from ${url}`);
 
 				setState(data.values);
 			} catch (error) {
@@ -96,6 +96,8 @@ const StepTwo: React.FC<StepTwoProps> = ({
 				try {
 					const response = await fetch(`/api/solicitudes/alta/${id}`);
 					const result = await response.json();
+
+					console.log(result, "SOLICITUD DATA");
 
 					if (result.success && result.data.length > 0) {
 						const solicitud = result.data[0];

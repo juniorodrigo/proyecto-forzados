@@ -51,6 +51,7 @@ const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor
 			try {
 				const response = await fetch("/api/usuarios/aprobadores");
 				const data = await response.json();
+				console.log(data, "APROBADORES))))))))))))))))");
 				setAprobadores(data.values);
 			} catch (error) {
 				console.error("Error al obtener usuarios:", error);
@@ -67,6 +68,8 @@ const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor
 				try {
 					const response = await fetch(`/api/solicitudes/alta/${id}`);
 					const result = await response.json();
+
+					console.log(result, "REGISTRO))))))))))))))))");
 
 					if (result.success && result.data.length > 0) {
 						const solicitud = result.data[0];
