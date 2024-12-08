@@ -1,9 +1,7 @@
 "use client";
 
 import React, { useState, useContext } from "react";
-import { FiSearch, FiChevronDown, FiUser, FiSettings, FiLogOut, FiChevronsLeft } from "react-icons/fi";
-import SearchModal from "./SearchModal";
-import Link from "next/link";
+import { FiChevronDown, FiLogOut, FiChevronsLeft } from "react-icons/fi";
 import { UiContext } from "@/context/SidebarContext";
 import { UiContextType } from "@/types/SidebarOpen";
 import Image from "next/image";
@@ -42,27 +40,13 @@ const Navbar: React.FC = () => {
 					</button>
 
 					{dropdownOpen && (
-						<div className="absolute right-0 mt-52 w-48 bg-[#ededed] shadow-lg z-10">
-							<ul>
-								<li className="hover:bg-gray-300">
-									<Link href="#" className="flex items-center p-3">
-										<FiUser className="mr-2 text-xl" />
-										Perfil
-									</Link>
-								</li>
-								<li className="hover:bg-gray-300">
-									<Link href="#" className="flex items-center p-3">
-										<FiSettings className="mr-2 text-xl" />
-										Configuraciones
-									</Link>
-								</li>
-								<li className="hover:bg-gray-300">
-									<button onClick={() => signOut({ callbackUrl: "/auth/ingresar" })} className="flex items-center p-3 w-full text-left">
-										<FiLogOut className="mr-2 text-xl" />
-										Salir
-									</button>
-								</li>
-							</ul>
+						<div className="absolute right-0 mt-36 w-48 bg-[#ededed] shadow-lg z-10">
+							<div className="hover:bg-gray-300">
+								<button onClick={() => signOut({ callbackUrl: "/auth/ingresar" })} className="flex items-center p-3 w-full text-left">
+									<FiLogOut className="mr-2 text-xl" />
+									Salir
+								</button>
+							</div>
 						</div>
 					)}
 				</div>

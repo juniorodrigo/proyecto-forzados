@@ -429,7 +429,7 @@ const createSolicitudHTML = (solicitud: ResumenSolicitud) => {
             padding: 10px;
             text-align: center;
             background-color: #103483;
-            color: white;
+            color: #ffffff !important; /* Blanco puro */
             text-decoration: none;
             border-radius: 5px;
             transition: background-color 0.3s ease, box-shadow 0.3s ease;
