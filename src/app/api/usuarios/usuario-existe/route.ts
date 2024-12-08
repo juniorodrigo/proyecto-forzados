@@ -7,7 +7,13 @@ export async function POST(request: Request) {
 		const { username, userId, mail } = await request.json();
 
 		const result = await pool.request().input("username", username).input("userId", userId).query(`SELECT * FROM MAE_USUARIO WHERE USUARIO = @username AND MAE_USUARIO.USUARIO_ID <> @userId`);
-		const result2 = await pool.request().input("mail", mail).input("userId", userId).query(`SELECT * FROM MAE_USUARIO WHERE CORREO = @mail AND MAE_USUARIO.USUARIO_ID <> @userId`);
+		const result2 = await pool
+			.request()
+			.input("mail", mail)
+			.input("userId", userId)
+			.query(`SELECT * FROM MAE_USUARIO WHERE CORREO COLLATE SQL_Latin1_General_CP1_CI_AS = @mail AND MAE_USUARIO.USUARIO_ID <> @userId`);
+
+		console.log(result2, "RESU:LT222222222222222 - ", mail, "MAIL");
 
 		if (result.rowsAffected[0] > 0) {
 			return NextResponse.json({ exists: true, message: "El nombre de usuario ya existe" });

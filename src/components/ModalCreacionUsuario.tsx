@@ -134,7 +134,7 @@ const ModalCreacionUsuario: React.FC<ModalCreacionUsuarioProps> = ({ isOpen, onC
 		}
 	}, [isEditing, userData]);
 
-	const [isModified, setIsModified] = useState(false);
+	const [, setIsModified] = useState(false);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
 		const { name, value } = e.target;
@@ -153,7 +153,7 @@ const ModalCreacionUsuario: React.FC<ModalCreacionUsuarioProps> = ({ isOpen, onC
 			headers: {
 				"Content-Type": "application/json",
 			},
-			body: JSON.stringify({ username: formData.usuario, userId: formData.id }),
+			body: JSON.stringify({ username: formData.usuario, userId: formData.id, mail: formData.correo }),
 		});
 
 		const data = await response.json();
@@ -265,6 +265,7 @@ const ModalCreacionUsuario: React.FC<ModalCreacionUsuarioProps> = ({ isOpen, onC
 								placeholder="DNI"
 								className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 border-gray-300 mb-4"
 								pattern="\d*"
+								maxLength={8} // Limitar a 8 caracteres
 								onInput={(e) => (e.currentTarget.value = e.currentTarget.value.replace(/\D/g, ""))}
 							/>
 							<label className="block text-sm font-medium text-gray-700">Correo</label>
