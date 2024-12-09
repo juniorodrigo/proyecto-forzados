@@ -92,7 +92,7 @@ WHERE SF.SOLICITUD_ID = ${id}
 		subareaDescripcion: typeof record.SUBAREA_DESCRIPCION === "string" ? record.SUBAREA_DESCRIPCION.toUpperCase() : null,
 		disciplinaDescripcion: typeof record.DISCIPLINA_DESCRIPCION === "string" ? record.DISCIPLINA_DESCRIPCION.toUpperCase() : null,
 		turnoDescripcion: typeof record.TURNO_DESCRIPCION === "string" ? record.TURNO_DESCRIPCION.toUpperCase() : null,
-		motivoRechazoDescripcion: typeof record.MOTIVORECHAZO_DESCRIPCION === "string" ? record.MOTIVORECHAZO_DESCRIPCION.toUpperCase() : null,
+		motivoRechazoDescripcion: typeof record.MOTIVORECHAZO_A_DESCRIPCION === "string" ? record.MOTIVORECHAZO_A_DESCRIPCION.toUpperCase() : null,
 		tipoForzadoDescripcion: typeof record.TIPOFORZADO_DESCRIPCION === "string" ? record.TIPOFORZADO_DESCRIPCION.toUpperCase() : null,
 		tagCentroCodigo: typeof record.TAGCENTRO_CODIGO === "string" ? record.TAGCENTRO_CODIGO.toUpperCase() : null,
 		tagCentroDescripcion: typeof record.TAGCENTRO_DESCRIPCION === "string" ? record.TAGCENTRO_DESCRIPCION.toUpperCase() : null,

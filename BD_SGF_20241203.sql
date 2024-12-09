@@ -592,6 +592,7 @@ create table TRS_SOLICITUD_FORZADO (
    USUARIO_MODIFICACION varchar(20)          null,
    FECHA_MODIFICACION   datetime             null,
    OBSERVACIONES_B   varchar(2000)         null,
+    ACTION_TOKEN        varchar(100)         null
 
    constraint PK_TRS_SOLICITUD_FORZADO primary key (SOLICITUD_ID)
 )

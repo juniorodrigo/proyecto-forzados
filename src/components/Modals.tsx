@@ -1,6 +1,5 @@
 import React from "react";
 import { Row } from "@/app/dashboard/consultas/page";
-import useUserSession from "@/hooks/useSession";
 
 interface ModalsProps {
 	isModalOpen: boolean;
@@ -35,8 +34,6 @@ const Modals: React.FC<ModalsProps> = ({
 	isModalOpen,
 	selectedRow,
 	closeModal,
-	openRejectModal,
-	handleApprove,
 	closeModalBaja,
 	isExecuteModalOpen,
 	selectedExecuteRow,
@@ -57,12 +54,7 @@ const Modals: React.FC<ModalsProps> = ({
 	getStatusClass,
 	formatDate,
 }) => {
-	const { user } = useUserSession();
 	const [dragActive] = React.useState(false);
-
-	const usuariosAdministradores = [8];
-	const usuariosAprobadores = [3, 6];
-	// usuariosAprobadores.push(1, 2, 4, 5, 7);
 
 	const formatStatus = (status: string) => {
 		return status
@@ -179,29 +171,6 @@ const Modals: React.FC<ModalsProps> = ({
 								<button onClick={closeModalBaja} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
 									Cerrar
 								</button>
-								const usuariosAdministradores = [8];
-								{selectedRow.estado === "PENDIENTE-BAJA" && user && (usuariosAprobadores.includes(user.role) || usuariosAdministradores.includes(user?.role || -1)) && (
-									<>
-										<button
-											onClick={openRejectModal} // Cambiado para abrir el modal de rechazo
-											className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-										>
-											Rechazar
-										</button>
-									</>
-								)}
-								{selectedRow.estado !== "APROBADO-BAJA" &&
-									!selectedRow.estado.includes("RECHAZADO") &&
-									!selectedRow.estado.includes("EJECUTADO") &&
-									user &&
-									(usuariosAprobadores.includes(user.role) || usuariosAdministradores.includes(user?.role || -1)) && (
-										<button
-											onClick={() => handleApprove(selectedRow.id, "BAJA")}
-											className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-										>
-											Aprobar
-										</button>
-									)}
 							</div>
 						</div>
 					</div>

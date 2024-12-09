@@ -2,6 +2,17 @@ import { NextResponse } from "next/server";
 import { poolPromise } from "@sql/lib/db";
 import { mailer, MailOptions } from "@/lib/mailer";
 import { getSingleSolicitud } from "@/app/api/solicitudes/alta/common";
+import bcrypt from "bcrypt";
+
+const generateRandomString = (length: number): string => {
+	const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	let result = "";
+	const charactersLength = characters.length;
+	for (let i = 0; i < length; i++) {
+		result += characters.charAt(Math.floor(Math.random() * charactersLength));
+	}
+	return result;
+};
 
 export async function GET() {
 	try {
@@ -181,6 +192,33 @@ export async function PUT(request: Request) {
 		const result = await pool.query(query);
 
 		if (result.rowsAffected && result.rowsAffected[0] > 0) {
+			const randomString = generateRandomString(5);
+			const actionToken = await bcrypt.hash(randomString, 10);
+			const updateTokenQuery = `UPDATE TRS_SOLICITUD_FORZADO SET ACTION_TOKEN = '${actionToken}' WHERE SOLICITUD_ID = ${data.id}`;
+			await pool.query(updateTokenQuery);
+
+			const updatedSolicitud = await getSingleSolicitud(data.id);
+			const updatedSolicitudHtml = createSolicitudHTML(updatedSolicitud[0], randomString, data.id, data.usuario, "modificación");
+
+			const mailOptions: MailOptions = {
+				from: "test@prot.one",
+				to: "jvniorrodrigo@gmail.com",
+				subject: "[FORZADOS] Solicitud de forzado modificada",
+				html: updatedSolicitudHtml,
+			};
+
+			// Envío de correo de forma no bloqueante
+			mailer
+				.sendMail(mailOptions)
+				.then((mailResult) => {
+					if (!mailResult) {
+						console.error("Failed to send email");
+					}
+				})
+				.catch((error) => {
+					console.error("Error sending email:", error);
+				});
+
 			return NextResponse.json({ success: true, message: "Record updated successfully", data });
 		} else {
 			return NextResponse.json({ success: false, message: "Failed to update record" }, { status: 500 });
@@ -197,7 +235,6 @@ export async function POST(request: Request) {
 		console.log(data);
 
 		const query = generateInsertQuery(data);
-		console.log(query);
 
 		const pool = await poolPromise;
 		const result = await pool.query(query);
@@ -205,21 +242,32 @@ export async function POST(request: Request) {
 		if (result.recordset && result.recordset.length > 0) {
 			const insertedId = result.recordset[0].SOLICITUD_ID;
 
+			const randomString = generateRandomString(5);
+			const actionToken = await bcrypt.hash(randomString, 10);
+			const updateTokenQuery = `UPDATE TRS_SOLICITUD_FORZADO SET ACTION_TOKEN = '${actionToken}' WHERE SOLICITUD_ID = ${insertedId}`;
+			await pool.query(updateTokenQuery);
+
 			const newSolicitud = await getSingleSolicitud(insertedId);
-			const newSolicitudHtml = createSolicitudHTML(newSolicitud[0]);
+			const newSolicitudHtml = createSolicitudHTML(newSolicitud[0], randomString, insertedId, data.usuario, "creación");
 
 			const mailOptions: MailOptions = {
 				from: "test@prot.one",
 				to: "jvniorrodrigo@gmail.com",
-				subject: "[ALTA-FORZADO] Nueva Solicitud Creada",
+				subject: "[FORZADOS] Nueva solicitud de alta de forzado",
 				html: newSolicitudHtml,
 			};
 
-			const mailResult: boolean = await mailer.sendMail(mailOptions);
-
-			if (!mailResult) {
-				return NextResponse.json({ success: false, message: "Failed to send email" }, { status: 500 });
-			}
+			// Envío de correo de forma no bloqueante
+			mailer
+				.sendMail(mailOptions)
+				.then((mailResult) => {
+					if (!mailResult) {
+						console.error("Failed to send email");
+					}
+				})
+				.catch((error) => {
+					console.error("Error sending email:", error);
+				});
 
 			return NextResponse.json({
 				success: true,
@@ -357,7 +405,7 @@ type ResumenSolicitud = {
 	responsableNombre: string;
 	riesgoDescripcion: string;
 };
-const createSolicitudHTML = (solicitud: ResumenSolicitud) => {
+const createSolicitudHTML = (solicitud: ResumenSolicitud, actionToken: string, insertedId: string, usuario: string, tipo: string) => {
 	const createField = (label: string, value: string | null | undefined) => {
 		if (!value || value === "null") {
 			return ""; // Si el valor no es válido, no se genera el campo
@@ -438,6 +486,14 @@ const createSolicitudHTML = (solicitud: ResumenSolicitud) => {
             background-color: #0056b3;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
+        .button-reject {
+            background-color: #d9534f;
+            color: #ffffff !important; /* Blanco puro */
+        }
+        .button-reject:hover {
+            background-color: #c9302c;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
         @media (max-width: 600px) {
             .field-group {
                 grid-template-columns: 1fr;
@@ -447,7 +503,7 @@ const createSolicitudHTML = (solicitud: ResumenSolicitud) => {
 </head>
 <body>
     <div class="container">
-        <h1>Resumen de Solicitud</h1>
+        <h1>Resumen de (${tipo}) de solicitud</h1>
         <div class="field-group">
             ${createField("Descripción", solicitud.descripcion)}
             ${createField("Estado de Solicitud", solicitud.estadoSolicitud)}
@@ -465,7 +521,8 @@ const createSolicitudHTML = (solicitud: ResumenSolicitud) => {
             ${createField("Responsable", solicitud.responsableNombre)}
             ${createField("Riesgo", solicitud.riesgoDescripcion)}
         </div>
-        <a href="https://google.com" class="button">Aprobar</a>
+        <a href="http://localhost:3000/acciones/aprobar/alta?token=${actionToken}&id=${insertedId}&bxs=${usuario}" class="button">Aprobar</a>
+        <a href="http://localhost:3000/acciones/rechazar/alta?token=${actionToken}&id=${insertedId}&bxs=${usuario}" class="button button-reject">Rechazar</a>
     </div>
 </body>
 </html>
