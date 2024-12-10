@@ -17,6 +17,7 @@ interface SolicitudAprobada {
 	NOMBRE_EJECUTOR_B: string;
 	AP_EJECUTOR_B: string;
 	AM_EJECUTOR_B: string;
+	OBSERVACIONES_B: string;
 }
 
 const createApprovalHTML = (solicitud: SolicitudAprobada) => {
@@ -80,6 +81,10 @@ const createApprovalHTML = (solicitud: SolicitudAprobada) => {
             <label>Ejecutor:</label>
             <span>${solicitud.NOMBRE_EJECUTOR_B} ${solicitud.AP_EJECUTOR_B} ${solicitud.AM_EJECUTOR_B}</span>
         </div>
+		<div class="field">
+            <label>Observaciones de baja:</label>
+            <span>${solicitud.OBSERVACIONES_B} </span>
+        </div>
     </div>
 </body>
 </html>
@@ -135,6 +140,7 @@ export async function POST(request: Request) {
 
 		const solicitudResult = await transaction.request().input("id", id).query(`
 				SELECT SF.SOLICITUD_ID,
+					SF.OBSERVACIONES_B,
 					SF.SOLICITANTE_B_ID,
 					UXSB.NOMBRE     AS NOMBRE_SOLICITANTE_B,
 					UXSB.APEPATERNO AS AP_SOLICITANTE_B,
@@ -164,7 +170,7 @@ export async function POST(request: Request) {
 			const mailOptions: MailOptions = {
 				from: "test@prot.one",
 				to: `${solicitud.SOLICITANTE_B_CORREO}, ${solicitud.APROBADOR_B_CORREO}, ${solicitud.EJECUTOR_B_CORREO}`,
-				subject: "[FORZADOS] Solicitud de baja aprobada",
+				subject: "[FORZADOS] Solicitud de baja de forzado aprobada",
 				html: createApprovalHTML(solicitud),
 			};
 

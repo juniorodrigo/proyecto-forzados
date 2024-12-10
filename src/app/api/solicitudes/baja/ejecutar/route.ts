@@ -57,7 +57,7 @@ const createApprovalHTML = (solicitud: Solicitud) => {
             <span>${solicitud.SOLICITUD_ID}</span>
         </div>
         <div class="field">
-            <label>Observaciones    :</label>
+            <label>Observaciones:</label>
             <span>${solicitud.OBSERVACIONES_B ?? ""}</span>
         </div>
     </div>
@@ -78,7 +78,7 @@ export async function POST(request: Request) {
 
 		if (result.rowsAffected[0] > 0) {
 			const motivoResult = await pool.request().input("id", id).query(`
-				SELECT SF.SOLICITUD_ID, MR.OBSERVACIONES_B,
+				SELECT SF.SOLICITUD_ID, SF.OBSERVACIONES_B,
 					UA.CORREO AS APROBADOR_CORREO,
 					UE.CORREO AS EJECUTOR_CORREO,
 					US.CORREO AS SOLICITANTE_CORREO
