@@ -218,26 +218,26 @@ export async function PUT(request: Request) {
 			const mailOptionsAprobador: MailOptions = {
 				from: "test@prot.one",
 				to: aprobadorCorreo,
-				subject: "[FORZADOS] Solicitud de forzado modificada",
+				subject: "[FORZADOS] Una solicitud de forzado ha sido modificada",
 				html: updatedSolicitudHtmlAprobador,
 			};
-			await mailer.sendMail(mailOptionsAprobador);
+			mailer.sendMail(mailOptionsAprobador).catch(console.error);
 
 			const mailOptionsSolicitante: MailOptions = {
 				from: "test@prot.one",
 				to: solicitanteCorreo,
-				subject: "[FORZADOS] Solicitud de forzado modificada",
+				subject: "[FORZADOS] Una solicitud de forzado ha sido modificada",
 				html: updatedSolicitudHtmlOtros,
 			};
-			await mailer.sendMail(mailOptionsSolicitante);
+			mailer.sendMail(mailOptionsSolicitante).catch(console.error);
 
 			const mailOptionsEjecutor: MailOptions = {
 				from: "test@prot.one",
 				to: ejecutorCorreo,
-				subject: "[FORZADOS] Solicitud de forzado modificada",
+				subject: "[FORZADOS] Una solicitud de forzado ha sido modificada",
 				html: updatedSolicitudHtmlOtros,
 			};
-			await mailer.sendMail(mailOptionsEjecutor);
+			mailer.sendMail(mailOptionsEjecutor).catch(console.error);
 
 			return NextResponse.json({ success: true, message: "Record updated successfully", data });
 		} else {
@@ -289,26 +289,26 @@ export async function POST(request: Request) {
 			const mailOptionsAprobador: MailOptions = {
 				from: "test@prot.one",
 				to: aprobadorCorreo,
-				subject: "[FORZADOS] Nueva solicitud de alta de forzado",
+				subject: "[FORZADOS] Ha sido designado como aprobador en una solicitud de forzado",
 				html: newSolicitudHtmlAprobador,
 			};
-			await mailer.sendMail(mailOptionsAprobador);
+			mailer.sendMail(mailOptionsAprobador).catch(console.error);
 
 			const mailOptionsSolicitante: MailOptions = {
 				from: "test@prot.one",
 				to: solicitanteCorreo,
-				subject: "[FORZADOS] Solicitud de forzado modificada",
+				subject: "[FORZADOS] Ha sido designado como solicitante en una solicitud de forzado",
 				html: newSolicitudHtmlOtros,
 			};
-			await mailer.sendMail(mailOptionsSolicitante);
+			mailer.sendMail(mailOptionsSolicitante).catch(console.error);
 
 			const mailOptionsEjecutor: MailOptions = {
 				from: "test@prot.one",
 				to: ejecutorCorreo,
-				subject: "[FORZADOS] Solicitud de forzado modificada",
+				subject: "[FORZADOS] Ha sido designado como ejecutor en una solicitud de forzado",
 				html: newSolicitudHtmlOtros,
 			};
-			await mailer.sendMail(mailOptionsEjecutor);
+			mailer.sendMail(mailOptionsEjecutor).catch(console.error);
 
 			return NextResponse.json({
 				success: true,

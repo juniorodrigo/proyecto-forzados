@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 interface ModalAprobacionRechazoProps {
 	isOpen: boolean;
@@ -10,6 +10,8 @@ interface ModalAprobacionRechazoProps {
 const ModalAprobacionRechazo: React.FC<ModalAprobacionRechazoProps> = ({ isOpen, onClose, onApprove, onReject }) => {
 	if (!isOpen) return null;
 
+	const [isRejecting, setIsRejecting] = useState(false);
+
 	return (
 		<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
 			<div className="bg-white rounded-lg shadow-xl w-full max-w-md">
@@ -20,11 +22,19 @@ const ModalAprobacionRechazo: React.FC<ModalAprobacionRechazoProps> = ({ isOpen,
 							Cancelar
 						</button>
 						<button
-							onClick={() => {
-								onReject();
-								onClose();
+							onClick={async () => {
+								setIsRejecting(true);
+								try {
+									await onReject();
+								} finally {
+									setIsRejecting(false);
+									onClose();
+								}
 							}}
-							className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+							disabled={isRejecting}
+							className={`px-4 py-2 ${
+								isRejecting ? "bg-gray-500 cursor-not-allowed" : "bg-red-500 hover:bg-red-600"
+							} text-white rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2`}
 						>
 							Rechazar
 						</button>
