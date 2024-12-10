@@ -70,6 +70,7 @@ const createRejectionHTML = (solicitud: SolicitudRechazo) => {
 export async function POST(request: Request) {
 	const pool = await poolPromise;
 	const transaction = await pool.transaction();
+	await transaction.begin();
 
 	try {
 		const { id, motivoRechazo, usuario, token } = await request.json();
