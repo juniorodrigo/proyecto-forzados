@@ -55,6 +55,7 @@ const Modals: React.FC<ModalsProps> = ({
 	formatDate,
 }) => {
 	const [dragActive] = React.useState(false);
+	const [isSubmitting, setIsSubmitting] = React.useState(false);
 
 	const formatStatus = (status: string) => {
 		return status
@@ -241,14 +242,23 @@ const Modals: React.FC<ModalsProps> = ({
 									))}
 							</select>
 							<div className="flex justify-end gap-4">
-								<button onClick={closeRejectModal} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+								<button
+									onClick={closeRejectModal}
+									disabled={isSubmitting} // Deshabilitar si está enviando
+									className={`px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 ${
+										isSubmitting ? "cursor-not-allowed" : ""
+									}`}
+								>
 									Cancelar
 								</button>
 								<button
-									onClick={() => selectedRow && handleRejectConfirm(selectedRow.id, "ALTA")}
-									disabled={!rejectReason} // Deshabilitar si no hay un motivo seleccionado
+									onClick={() => {
+										setIsSubmitting(true);
+										if (selectedRow) handleRejectConfirm(selectedRow.id, "ALTA");
+									}}
+									disabled={!rejectReason || isSubmitting} // Deshabilitar si no hay un motivo seleccionado o si está enviando
 									className={`px-4 py-2 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-										!rejectReason ? "bg-gray-400 cursor-not-allowed" : "bg-red-500 hover:bg-red-600 focus:ring-red-500"
+										!rejectReason || isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-red-500 hover:bg-red-600 focus:ring-red-500"
 									}`}
 								>
 									Confirmar Rechazo
@@ -276,14 +286,23 @@ const Modals: React.FC<ModalsProps> = ({
 										))}
 								</select>
 								<div className="flex justify-end gap-4">
-									<button onClick={closeRejectModal} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+									<button
+										onClick={closeRejectModal}
+										disabled={isSubmitting} // Deshabilitar si está enviando
+										className={`px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 ${
+											isSubmitting ? "cursor-not-allowed" : ""
+										}`}
+									>
 										Cancelar
 									</button>
 									<button
-										onClick={() => selectedRow && handleRejectConfirm(selectedRow.id, "BAJA")} // Cambiado para manejar el rechazo de "BAJA"
-										disabled={!rejectReason} // Deshabilitar si no hay un motivo seleccionado
+										onClick={() => {
+											setIsSubmitting(true);
+											handleRejectConfirm(selectedRow.id, "BAJA");
+										}}
+										disabled={!rejectReason || isSubmitting} // Deshabilitar si no hay un motivo seleccionado o si está enviando
 										className={`px-4 py-2 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-											!rejectReason ? "bg-gray-400 cursor-not-allowed" : "bg-red-500 hover:bg-red-600 focus:ring-red-500"
+											!rejectReason || isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-red-500 hover:bg-red-600 focus:ring-red-500"
 										}`}
 									>
 										Confirmar Rechazo

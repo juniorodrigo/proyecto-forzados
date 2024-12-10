@@ -148,21 +148,21 @@ export async function POST(request: Request) {
 		const mailOptionsAprobador: MailOptions = {
 			from: "test@prot.one",
 			to: solicitud.aprobadorACorreo,
-			subject: "[FORZADOS] Solicitud de forzado rechazada",
+			subject: "[FORZADOS] Solicitud de alta de forzado rechazada",
 			html: createRejectionHTML(solicitud),
 		};
 
 		const mailOptionsEjecutor: MailOptions = {
 			from: "test@prot.one",
 			to: solicitud.ejecutorACorreo,
-			subject: "[FORZADOS] Solicitud de forzado rechazada",
+			subject: "[FORZADOS] Solicitud de alta de forzado rechazada",
 			html: createRejectionHTML(solicitud),
 		};
 
 		const mailOptionsSolicitante: MailOptions = {
 			from: "test@prot.one",
 			to: solicitud.solicitanteACorreo,
-			subject: "[FORZADOS] Solicitud de forzado rechazada",
+			subject: "[FORZADOS] Solicitud de alta de forzado rechazada",
 			html: createRejectionHTML(solicitud),
 		};
 

@@ -4,7 +4,7 @@ import { mailer, MailOptions } from "@/lib/mailer";
 
 interface Solicitud {
 	SOLICITUD_ID: number;
-	DESCRIPCION: string;
+	OBSERVACIONES_B: string;
 }
 
 const createApprovalHTML = (solicitud: Solicitud) => {
@@ -57,8 +57,8 @@ const createApprovalHTML = (solicitud: Solicitud) => {
             <span>${solicitud.SOLICITUD_ID}</span>
         </div>
         <div class="field">
-            <label>Descripción:</label>
-            <span>${solicitud.DESCRIPCION ?? ""}</span>
+            <label>Observaciones    :</label>
+            <span>${solicitud.OBSERVACIONES_B ?? ""}</span>
         </div>
     </div>
 </body>
@@ -78,7 +78,7 @@ export async function POST(request: Request) {
 
 		if (result.rowsAffected[0] > 0) {
 			const motivoResult = await pool.request().input("id", id).query(`
-				SELECT SF.SOLICITUD_ID, MR.DESCRIPCION,
+				SELECT SF.SOLICITUD_ID, MR.OBSERVACIONES_B,
 					UA.CORREO AS APROBADOR_CORREO,
 					UE.CORREO AS EJECUTOR_CORREO,
 					US.CORREO AS SOLICITANTE_CORREO

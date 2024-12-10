@@ -1,8 +1,16 @@
 import { NextResponse } from "next/server";
 import { poolPromise } from "@sql/lib/db";
 import { mailer, MailOptions } from "@/lib/mailer";
+import { getSingleSolicitud } from "../common";
 
-const createExecutionHTML = (id: number) => {
+interface Solicitud {
+	descripcion: string;
+	turnoDescripcion: string;
+	ejecutorNombre: string;
+	motivoRechazoDescripcion: string;
+}
+
+const createExecutionHTML = (solicitud: Solicitud, id: string) => {
 	return `
 <!DOCTYPE html>
 <html lang="es">
@@ -51,6 +59,18 @@ const createExecutionHTML = (id: number) => {
             <label>ID de Solicitud:</label>
             <span>${id}</span>
         </div>
+        <div class="field">
+            <label>Descripción del Forzado:</label>
+            <span>${solicitud.descripcion}</span>
+        </div>
+        <div class="field">
+            <label>Turno:</label>
+            <span>${solicitud.turnoDescripcion}</span>
+        </div>
+        <div class="field">
+            <label>Encargado de ejecución:</label>
+            <span>${solicitud.ejecutorNombre}</span>
+        </div>
     </div>
 </body>
 </html>
@@ -81,23 +101,13 @@ export async function POST(request: Request) {
 			`);
 
 		if (result.rowsAffected[0] > 0) {
-			const emailQuery = `
-				SELECT UA.CORREO AS aprobadorCorreo, UE.CORREO AS ejecutorCorreo, US.CORREO AS solicitanteCorreo 
-				FROM TRS_SOLICITUD_FORZADO SF 
-				LEFT JOIN MAE_USUARIO UA ON SF.APROBADOR_A_ID = UA.USUARIO_ID 
-				LEFT JOIN MAE_USUARIO UE ON SF.EJECUTOR_A_ID = UE.USUARIO_ID 
-				LEFT JOIN MAE_USUARIO US ON SF.SOLICITANTE_A_ID = US.USUARIO_ID 
-				WHERE SF.SOLICITUD_ID = @id
-			`;
-
-			const emailResult = await pool.request().input("id", id).query(emailQuery);
-			const { aprobadorCorreo, ejecutorCorreo, solicitanteCorreo } = emailResult.recordset[0];
+			const [solicitud] = await getSingleSolicitud(id);
 
 			const mailOptions: MailOptions = {
 				from: "test@prot.one",
-				to: `${solicitanteCorreo}, ${aprobadorCorreo}, ${ejecutorCorreo}`,
+				to: `${solicitud.solicitanteACorreo}, ${solicitud.aprobadorACorreo}, ${solicitud.ejecutorACorreo}`,
 				subject: "[FORZADOS] Solicitud de alta ejecutada correctamente",
-				html: createExecutionHTML(id),
+				html: createExecutionHTML(solicitud, id),
 			};
 
 			mailer.sendMail(mailOptions).catch((error) => console.error("Error sending email:", error));

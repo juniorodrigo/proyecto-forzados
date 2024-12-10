@@ -77,10 +77,6 @@ const createAprobacionHTML = (solicitud: Solicitud) => {
             <label>Encargado de aprobación:</label>
             <span>${solicitud.aprobadorNombre}</span>
         </div>
-        <div class="field">
-            <label>Motivo de Rechazo:</label>
-            <span>${solicitud.motivoRechazoDescripcion}</span>
-        </div>
     </div>
 </body>
 </html>
@@ -147,21 +143,21 @@ export async function POST(request: Request) {
 		const mailOptionsAprobador: MailOptions = {
 			from: "test@prot.one",
 			to: solicitud.aprobadorACorreo,
-			subject: "[FORZADOS] Solicitud de forzado aprobada",
+			subject: "[FORZADOS] Solicitud de alta de forzado aprobada",
 			html: createAprobacionHTML(solicitud),
 		};
 
 		const mailOptionsEjecutor: MailOptions = {
 			from: "test@prot.one",
 			to: solicitud.ejecutorACorreo,
-			subject: "[FORZADOS] Solicitud de forzado aprobada",
+			subject: "[FORZADOS] Solicitud de alta de forzado aprobada",
 			html: createAprobacionHTML(solicitud),
 		};
 
 		const mailOptionsSolicitante: MailOptions = {
 			from: "test@prot.one",
 			to: solicitud.solicitanteACorreo,
-			subject: "[FORZADOS] Solicitud de forzado aprobada",
+			subject: "[FORZADOS] Solicitud de alta de forzado aprobada",
 			html: createAprobacionHTML(solicitud),
 		};
 
