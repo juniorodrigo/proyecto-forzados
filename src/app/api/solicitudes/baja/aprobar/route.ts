@@ -89,12 +89,13 @@ const createApprovalHTML = (solicitud: SolicitudAprobada) => {
 export async function POST(request: Request) {
 	const pool = await poolPromise;
 	const transaction = await pool.transaction();
+	await transaction.begin();
 
 	try {
 		const { id, usuario, token } = await request.json();
 
 		if (token) {
-			const register = await pool.request().input("id", id).query("SELECT ACTION_TOKEN FROM TRS_SOLICITUD_FORZADO WHERE SOLICITUD_ID = @id");
+			const register = await transaction.request().input("id", id).query("SELECT ACTION_TOKEN FROM TRS_SOLICITUD_FORZADO WHERE SOLICITUD_ID = @id");
 
 			if (!register.recordset.length || !register.recordset[0].ACTION_TOKEN) {
 				return NextResponse.json(
@@ -118,7 +119,7 @@ export async function POST(request: Request) {
 			}
 		}
 
-		const result = await pool.request().input("id", id).input("usuario", usuario).query(`
+		const result = await transaction.request().input("id", id).input("usuario", usuario).query(`
                 UPDATE TRS_Solicitud_forzado 
                 SET ESTADOSOLICITUD = 'APROBADO-BAJA', 
                     USUARIO_MODIFICACION = @usuario, 
@@ -132,7 +133,7 @@ export async function POST(request: Request) {
 			return NextResponse.json({ success: false, message: "Failed to update record" }, { status: 500 });
 		}
 
-		const solicitudResult = await pool.request().input("id", id).query(`
+		const solicitudResult = await transaction.request().input("id", id).query(`
 				SELECT SF.SOLICITUD_ID,
 					SF.SOLICITANTE_B_ID,
 					UXSB.NOMBRE     AS NOMBRE_SOLICITANTE_B,

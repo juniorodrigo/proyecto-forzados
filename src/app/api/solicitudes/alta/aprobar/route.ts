@@ -92,6 +92,7 @@ export async function POST(request: Request) {
 
 	// Iniciar transacción
 	const transaction = await pool.transaction();
+	await transaction.begin();
 
 	try {
 		const { id, usuario, token } = await request.json();
@@ -164,12 +165,12 @@ export async function POST(request: Request) {
 			html: createAprobacionHTML(solicitud),
 		};
 
-		// Enviar correos de forma no bloqueante
-		await Promise.all([
+		// Enviar correos de forma asíncrona sin `await`
+		Promise.all([
 			mailer.sendMail(mailOptionsAprobador).catch((error) => console.error("Error sending email to aprobador:", error)),
 			mailer.sendMail(mailOptionsEjecutor).catch((error) => console.error("Error sending email to ejecutor:", error)),
 			mailer.sendMail(mailOptionsSolicitante).catch((error) => console.error("Error sending email to solicitante:", error)),
-		]);
+		]).catch((error) => console.error("Error sending emails:", error));
 
 		await transaction.commit();
 		return NextResponse.json({
