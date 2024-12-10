@@ -186,7 +186,6 @@ export async function PUT(request: Request) {
 
 		// generar el query
 		const query = generateUpdateQuery(data);
-		console.log(query);
 
 		const pool = await poolPromise;
 		const result = await pool.query(query);
@@ -198,26 +197,47 @@ export async function PUT(request: Request) {
 			await pool.query(updateTokenQuery);
 
 			const updatedSolicitud = await getSingleSolicitud(data.id);
-			const updatedSolicitudHtml = createSolicitudHTML(updatedSolicitud[0], randomString, data.id, data.usuario, "modificación");
+			const updatedSolicitudHtmlAprobador = createSolicitudHTML(updatedSolicitud[0], randomString, data.id, data.usuario, "modificación");
+			const updatedSolicitudHtmlOtros = createSolicitudHTMLOtros(updatedSolicitud[0], data.id, data.usuario, "modificación");
 
-			const mailOptions: MailOptions = {
+			// Obtener los correos de las personas involucradas
+			const emailQuery = `
+				SELECT UA.CORREO AS aprobadorCorreo,
+                    UE.CORREO AS ejecutorCorreo,
+                    US.CORREO AS solicitanteCorreo
+				FROM TRS_SOLICITUD_FORZADO SF
+				LEFT JOIN MAE_USUARIO UA ON SF.APROBADOR_A_ID = UA.USUARIO_ID
+				LEFT JOIN MAE_USUARIO UE ON SF.EJECUTOR_A_ID = UE.USUARIO_ID
+				LEFT JOIN MAE_USUARIO US ON SF.SOLICITANTE_A_ID = US.USUARIO_ID
+				WHERE SF.SOLICITUD_ID = ${data.id}
+			`;
+			const emailResult = await pool.query(emailQuery);
+			const { aprobadorCorreo, ejecutorCorreo, solicitanteCorreo } = emailResult.recordset[0];
+
+			// Enviar correo al aprobador con botones
+			const mailOptionsAprobador: MailOptions = {
 				from: "test@prot.one",
-				to: "jvniorrodrigo@gmail.com",
+				to: aprobadorCorreo,
 				subject: "[FORZADOS] Solicitud de forzado modificada",
-				html: updatedSolicitudHtml,
+				html: updatedSolicitudHtmlAprobador,
 			};
+			await mailer.sendMail(mailOptionsAprobador);
 
-			// Envío de correo de forma no bloqueante
-			mailer
-				.sendMail(mailOptions)
-				.then((mailResult) => {
-					if (!mailResult) {
-						console.error("Failed to send email");
-					}
-				})
-				.catch((error) => {
-					console.error("Error sending email:", error);
-				});
+			const mailOptionsSolicitante: MailOptions = {
+				from: "test@prot.one",
+				to: solicitanteCorreo,
+				subject: "[FORZADOS] Solicitud de forzado modificada",
+				html: updatedSolicitudHtmlOtros,
+			};
+			await mailer.sendMail(mailOptionsSolicitante);
+
+			const mailOptionsEjecutor: MailOptions = {
+				from: "test@prot.one",
+				to: ejecutorCorreo,
+				subject: "[FORZADOS] Solicitud de forzado modificada",
+				html: updatedSolicitudHtmlOtros,
+			};
+			await mailer.sendMail(mailOptionsEjecutor);
 
 			return NextResponse.json({ success: true, message: "Record updated successfully", data });
 		} else {
@@ -248,26 +268,47 @@ export async function POST(request: Request) {
 			await pool.query(updateTokenQuery);
 
 			const newSolicitud = await getSingleSolicitud(insertedId);
-			const newSolicitudHtml = createSolicitudHTML(newSolicitud[0], randomString, insertedId, data.usuario, "creación");
+			const newSolicitudHtmlAprobador = createSolicitudHTML(newSolicitud[0], randomString, insertedId, data.usuario, "creación");
+			const newSolicitudHtmlOtros = createSolicitudHTMLOtros(newSolicitud[0], insertedId, data.usuario, "creación");
 
-			const mailOptions: MailOptions = {
+			// Obtener los correos de las personas involucradas
+			const emailQuery = `
+				SELECT UA.CORREO AS aprobadorCorreo,
+					   UE.CORREO AS ejecutorCorreo,
+					   US.CORREO AS solicitanteCorreo
+				FROM TRS_SOLICITUD_FORZADO SF
+				LEFT JOIN MAE_USUARIO UA ON SF.APROBADOR_A_ID = UA.USUARIO_ID
+				LEFT JOIN MAE_USUARIO UE ON SF.EJECUTOR_A_ID = UE.USUARIO_ID
+				LEFT JOIN MAE_USUARIO US ON SF.SOLICITANTE_A_ID = US.USUARIO_ID
+				WHERE SF.SOLICITUD_ID = ${insertedId}
+			`;
+			const emailResult = await pool.query(emailQuery);
+			const { aprobadorCorreo, ejecutorCorreo, solicitanteCorreo } = emailResult.recordset[0];
+
+			// Enviar correo al aprobador con botones
+			const mailOptionsAprobador: MailOptions = {
 				from: "test@prot.one",
-				to: "jvniorrodrigo@gmail.com",
+				to: aprobadorCorreo,
 				subject: "[FORZADOS] Nueva solicitud de alta de forzado",
-				html: newSolicitudHtml,
+				html: newSolicitudHtmlAprobador,
 			};
+			await mailer.sendMail(mailOptionsAprobador);
 
-			// Envío de correo de forma no bloqueante
-			mailer
-				.sendMail(mailOptions)
-				.then((mailResult) => {
-					if (!mailResult) {
-						console.error("Failed to send email");
-					}
-				})
-				.catch((error) => {
-					console.error("Error sending email:", error);
-				});
+			const mailOptionsSolicitante: MailOptions = {
+				from: "test@prot.one",
+				to: solicitanteCorreo,
+				subject: "[FORZADOS] Solicitud de forzado modificada",
+				html: newSolicitudHtmlOtros,
+			};
+			await mailer.sendMail(mailOptionsSolicitante);
+
+			const mailOptionsEjecutor: MailOptions = {
+				from: "test@prot.one",
+				to: ejecutorCorreo,
+				subject: "[FORZADOS] Solicitud de forzado modificada",
+				html: newSolicitudHtmlOtros,
+			};
+			await mailer.sendMail(mailOptionsEjecutor);
 
 			return NextResponse.json({
 				success: true,
@@ -527,4 +568,126 @@ const createSolicitudHTML = (solicitud: ResumenSolicitud, actionToken: string, i
 </body>
 </html>
     `;
+};
+
+const createSolicitudHTMLOtros = (solicitud: ResumenSolicitud, insertedId: string, usuario: string, tipo: string) => {
+	const createField = (label: string, value: string | null | undefined) => {
+		if (!value || value === "null") {
+			return ""; // Si el valor no es válido, no se genera el campo
+		}
+		return `
+            <div class="field">
+                <label>${label}:</label>
+                <span>${value}</span>
+            </div>
+        `;
+	};
+
+	return `
+		<!DOCTYPE html>
+		<html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Resumen de Solicitud</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    margin: 0;
+                    padding: 0;
+                    background-color: #f4f4f4;
+                }
+                .container {
+                    width: 90%;
+                    max-width: 800px;
+                    margin: 20px auto;
+                    background-color: #fff;
+                    padding: 20px;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                }
+                h1 {
+                    text-align: center;
+                    color: #444;
+                    margin-bottom: 20px;
+                }
+                .field-group {
+                    display: grid;
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                    gap: 20px;
+                }
+                .field {
+                    background-color: #f9f9f9;
+                    padding: 15px;
+                    border: 1px solid #ddd;
+                    border-radius: 5px;
+                    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+                }
+                .field label {
+                    font-weight: bold;
+                    color: #333;
+                    margin-bottom: 8px;
+                    display: block;
+                }
+                .field span {
+                    display: block;
+                    color: #555;
+                    margin-top: 5px;
+                    word-wrap: break-word;
+                }
+                .button {
+                    display: block;
+                    width: 150px;
+                    margin: 30px auto 0;
+                    padding: 10px;
+                    text-align: center;
+                    background-color: #103483;
+                    color: #ffffff !important; /* Blanco puro */
+                    text-decoration: none;
+                    border-radius: 5px;
+                    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+                }
+                .button:hover {
+                    background-color: #0056b3;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+                }
+                .button-reject {
+                    background-color: #d9534f;
+                    color: #ffffff !important; /* Blanco puro */
+                }
+                .button-reject:hover {
+                    background-color: #c9302c;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+                }
+                @media (max-width: 600px) {
+                    .field-group {
+                        grid-template-columns: 1fr;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>Resumen de (${tipo}) de solicitud</h1>
+                <div class="field-group">
+                    ${createField("Descripción", solicitud.descripcion)}
+                    ${createField("Estado de Solicitud", solicitud.estadoSolicitud)}
+                    ${createField("Fecha de Realización", solicitud.fechaRealizacion)}
+                    ${createField("Fecha de Cierre", solicitud.fechaCierre)}
+                    ${createField("Solicitante", solicitud.solicitanteNombre)}
+                    ${createField("Ejecutor", solicitud.ejecutorNombre)}
+                    ${createField("Aprobador", solicitud.aprobadorNombre)}
+                    ${createField("Subárea", solicitud.subareaDescripcion)}
+                    ${createField("Disciplina", solicitud.disciplinaDescripcion)}
+                    ${createField("Turno", solicitud.turnoDescripcion)}
+                    ${createField("Motivo de Rechazo", solicitud.motivoRechazoDescripcion)}
+                    ${createField("Tipo de Forzado", solicitud.tipoForzadoDescripcion)}
+                    ${createField("Tag Centro", solicitud.tagCentroDescripcion)}
+                    ${createField("Responsable", solicitud.responsableNombre)}
+                    ${createField("Riesgo", solicitud.riesgoDescripcion)}
+                </div>
+            </div>
+        </body>
+		</html>
+	`;
 };
