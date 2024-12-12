@@ -588,7 +588,7 @@ const Page: React.FC = () => {
 													{column.key === "estado" ? (
 														formatStatus(row[column.key] as string)
 													) : column.key === "tipo" ? (
-														<span className={row.tipo === "alta" ? "text-green-500" : "text-red-500"}>{row.tipo === "alta" ? <FaArrowUp /> : <FaArrowDown />}</span>
+														<span className={row.tipo === "alta" ? "text-red-500" : "text-green-500"}>{row.tipo === "alta" ? <FaArrowUp /> : <FaArrowDown />}</span>
 													) : (
 														row[column.key]
 													)}
