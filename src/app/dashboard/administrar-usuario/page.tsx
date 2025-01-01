@@ -88,39 +88,6 @@ const Page = () => {
 		setSelectedUser(null); // Restablecer selectedUser después de enviar
 	};
 
-	const handleDeleteUser = async (id: number) => {
-		if (confirm("¿Estás seguro de que deseas eliminar este usuario?")) {
-			const response = await fetch(`/api/usuarios`, {
-				method: "DELETE",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ usuarioId: id, usuario: user?.id }),
-			});
-			const result = await response.json();
-			if (response.ok) {
-				// Refrescar los datos de la tabla
-				const fetchData = async () => {
-					const response = await fetch("/api/usuarios");
-					const result = await response.json();
-					if (result.success) {
-						setUserData(result.values);
-						setPopoverMessage("Se ha eliminado el registro");
-						setPopoverType("success");
-						setShowPopover(true);
-						setTimeout(() => setShowPopover(false), 3000);
-					}
-				};
-				fetchData();
-			} else {
-				setPopoverMessage(result.message || "Error en la operación");
-				setPopoverType("error");
-				setShowPopover(true);
-				setTimeout(() => setShowPopover(false), 3000);
-			}
-		}
-	};
-
 	return (
 		<div className="space-y-8">
 			<div className="space-y-4">
@@ -147,7 +114,7 @@ const Page = () => {
 					columns={[
 						{ key: "id", label: "Código" },
 						{ key: "nombreCompleto", label: "Nombre Completo" },
-						{ key: "rolDescripcion", label: "Rol" },
+						{ key: "puestoDescripcion", label: "Puesto" },
 						{ key: "areaDescripcion", label: "Area" },
 						{ key: "estado", label: "Estado" },
 					]}
@@ -162,8 +129,8 @@ const Page = () => {
 						setIsEditing(true);
 						setIsModalOpen(true);
 					}}
-					onDelete={handleDeleteUser}
-					actions={["edit", "delete"]}
+					// Eliminar la acción de eliminar
+					actions={["edit"]}
 				/>
 			</div>
 			<ModalCreacionUsuario

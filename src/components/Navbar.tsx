@@ -25,10 +25,12 @@ const Navbar: React.FC = () => {
 	return (
 		<nav className="bg-[#ededed] border-b border-gray-300">
 			<div className="max-h-[80px] min-h-[80px] flex items-center justify-between px-4 mx-auto">
-				<button className={`text-3xl text-gray-400 focus:outline-none transition-transform duration-300 ${open ? "rotate-0" : "rotate-180"}`} onClick={toggleSidebar} aria-label="Toggle Sidebar">
-					<FiChevronsLeft />
-				</button>
-
+				<div className="flex items-center space-x-4">
+					<button className={`text-3xl text-gray-400 focus:outline-none transition-transform duration-300 ${open ? "rotate-0" : "rotate-180"}`} onClick={toggleSidebar} aria-label="Toggle Sidebar">
+						<FiChevronsLeft />
+					</button>
+					<p className="text-lg font-bold ">Sistema de Gestión de Forzados</p>
+				</div>
 				<div className="flex items-center space-x-4 relative">
 					<button type="button" className="flex items-center focus:outline-none space-x-2" onClick={toggleDropdown} aria-haspopup="true" aria-expanded={dropdownOpen}>
 						<div className="text-left">

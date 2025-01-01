@@ -277,7 +277,7 @@ const ModalCreacionUsuario: React.FC<ModalCreacionUsuarioProps> = ({ isOpen, onC
 								placeholder="Correo"
 								className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 border-gray-300 mb-4"
 							/>
-							<label className="block text-sm font-medium text-gray-700">Rol</label>
+							{/* <label className="block text-sm font-medium text-gray-700">Rol</label>
 							<select name="rolId" value={formData.rolId} onChange={handleChange} className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 border-gray-300 mb-4">
 								<option value="">Seleccione un rol</option>
 								{roles.map((rol) => (
@@ -285,9 +285,9 @@ const ModalCreacionUsuario: React.FC<ModalCreacionUsuarioProps> = ({ isOpen, onC
 										{rol.descripcion}
 									</option>
 								))}
-							</select>
+							</select> */}
 							<label className="block text-sm font-medium text-gray-700">Estado</label>
-							<select name="estado" value={formData.estado} onChange={handleChange} className="w-full px-3 py-2 border border-gray-400 rounded focus:outline-none focus:ring-2 bg-gray-100 mb-4" disabled>
+							<select name="estado" value={formData.estado} onChange={handleChange} className="w-full px-3 py-2 border border-gray-400 rounded focus:outline-none focus:ring-2 mb-4">
 								<option value="activo">Activo</option>
 								<option value="inactivo">Inactivo</option>
 							</select>

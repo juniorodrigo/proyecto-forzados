@@ -26,8 +26,6 @@ const handler = NextAuth({
 				const registeredHash = result.recordset[0].PASSWORD;
 
 				if (await bcrypt.compare(password ?? "", registeredHash)) {
-					console.log("Password match");
-					console.log(result.recordset[0]);
 					return {
 						id: result.recordset[0].ID,
 						name: result.recordset[0].NOMBRE,

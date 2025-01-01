@@ -5,6 +5,7 @@ import { signIn } from "next-auth/react";
 import { FaUser, FaLock, FaSignInAlt } from "react-icons/fa";
 import Popover from "@/components/Popover";
 import useUserSession from "@/hooks/useSession";
+import Image from "next/image";
 
 const Login = () => {
 	const router = useRouter();
@@ -90,19 +91,24 @@ const Login = () => {
 	};
 
 	return (
-		<div className="flex h-screen w-full bg-gray-100">
-			{/* Sección de Imagen */}
-			<div className="hidden md:flex md:w-1/2 bg-cover bg-center" style={{ backgroundImage: 'url("/images/login.png")' }}></div>
+		<div className="flex h-screen w-full bg-gray-100 relative">
+			{/* Imagen de fondo */}
+			<div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: 'url("/images/login.jpg")', filter: "brightness(0.5)" }}></div>
 
 			{/* Sección del Formulario */}
-			<div className="flex w-full md:w-1/2 items-center justify-center p-6 bg-white">
-				<div className="w-full max-w-md space-y-6 relative">
+			<div className="relative z-10 flex w-full items-center justify-center p-6">
+				<div className="w-full max-w-md space-y-6 bg-white p-8 rounded-lg shadow-lg">
+					{/* Logo */}
+					<div className="flex justify-center">
+						<Image src="/images/logo.png" alt="Logo" width={150} height={85} />
+					</div>
+
 					<h2 className="text-2xl font-semibold text-center text-gray-800">
 						Bienvenido al <br />
-						<span className="text-sky-800 text-4xl">Sistema de control de Forzados</span>
+						<span className="text-[#001D39] text-3xl">Sistema de gestión de forzados</span>
 					</h2>
 
-					<div className="space-y-6">
+					<form className="space-y-6" onSubmit={handleLogin}>
 						{/* Campo de Usuario */}
 						<div className="relative">
 							<FaUser className="absolute left-4 top-5 text-gray-400" />
@@ -135,11 +141,11 @@ const Login = () => {
 						<Popover message="Inicio de sesión exitoso. Redirigiendo..." type="success" show={showPopover} />
 
 						{/* Botón de Iniciar Sesión */}
-						<button onClick={handleLogin} className="w-full flex items-center justify-center px-4 py-4 text-white bg-sky-950 hover:bg-sky-800 rounded-lg transition duration-200 focus:outline-none">
+						<button type="submit" className="w-full flex items-center justify-center px-4 py-4 text-white bg-sky-950 hover:bg-sky-800 rounded-lg transition duration-200 focus:outline-none">
 							<FaSignInAlt className="mr-2" />
 							Iniciar sesión
 						</button>
-					</div>
+					</form>
 				</div>
 			</div>
 		</div>

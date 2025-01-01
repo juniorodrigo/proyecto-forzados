@@ -6,6 +6,7 @@ interface UserSession {
 	area: string;
 	roleName: string;
 	role: number;
+	roles: { [key: number]: string };
 	jwt: string;
 }
 

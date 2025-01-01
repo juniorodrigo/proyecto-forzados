@@ -7,23 +7,30 @@ export async function GET() {
 	try {
 		const pool = await poolPromise;
 		const { recordset } = await pool.request().query(`SELECT UX.USUARIO_ID,
-		UX.NOMBRE,
-		UX.APEPATERNO,
-		UX.APEMATERNO,
-		UX.AREA_ID,
-		AR.DESCRIPCION AS AREA_DESCRIPCION,
-		UX.ROL_ID,
-		ROL.DESCRIPCION AS ROL_DESCRIPCION,
-		UX.ESTADO,
-		UX.DNI,
-		UX.PUESTO_ID,
-		PX.DESCRIPCION AS PUESTO_DESCRIPCION,
-		UX.CORREO,
-		UX.USUARIO
-	FROM MAE_USUARIO UX
+			UX.NOMBRE,
+			UX.APEPATERNO,
+			UX.APEMATERNO,
+			UX.AREA_ID,
+			AR.DESCRIPCION AS AREA_DESCRIPCION,
+			UX.ROL_ID,
+			ROL.DESCRIPCION AS ROL_DESCRIPCION,
+			UX.ESTADO,
+			UX.DNI,
+			UX.PUESTO_ID,
+			PX.DESCRIPCION AS PUESTO_DESCRIPCION,
+			UX.CORREO,
+			UX.USUARIO,
+			(
+				SELECT STRING_AGG('"' + CAST(ROL.ROL_ID AS NVARCHAR) + '": "' + ROL.DESCRIPCION + '"', ',')
+				FROM MAE_PUESTO_ROL PR
+				INNER JOIN MAE_ROL ROL ON PR.ROL_ID = ROL.ROL_ID
+				WHERE PR.PUESTO_ID = UX.PUESTO_ID
+			) AS ROLES_JSON
+		FROM MAE_USUARIO UX
 		LEFT JOIN MAE_AREA AR ON UX.AREA_ID = AR.AREA_ID
 		LEFT JOIN MAE_ROL ROL ON UX.ROL_ID = ROL.ROL_ID
-		LEFT JOIN MAE_PUESTO PX ON UX.PUESTO_ID = PX.PUESTO_ID`);
+		LEFT JOIN MAE_PUESTO PX ON UX.PUESTO_ID = PX.PUESTO_ID;
+		`);
 
 		const turnos = recordset.map((singleValue) => {
 			return {
@@ -35,6 +42,7 @@ export async function GET() {
 				areaDescripcion: singleValue.AREA_DESCRIPCION,
 				rolId: singleValue.ROL_ID,
 				rolDescripcion: singleValue.ROL_DESCRIPCION,
+				roles: singleValue.ROLES_JSON != undefined ? JSON.parse(`{${singleValue.ROLES_JSON}}`) : {},
 				estado: singleValue.ESTADO,
 				dni: singleValue.DNI,
 				puestoId: singleValue.PUESTO_ID,
@@ -43,6 +51,7 @@ export async function GET() {
 				usuario: singleValue.USUARIO,
 			};
 		});
+
 		return NextResponse.json({ success: true, values: turnos });
 	} catch (error) {
 		console.error("Error processing GET:", error);

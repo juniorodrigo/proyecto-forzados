@@ -21,16 +21,14 @@ const Sidebar: React.FC = () => {
 	const [activeToggle, setActiveToggle] = useState<string | null>(null);
 	const pathname = usePathname();
 
-	//TODO: añadir los roles verdaderos
-
 	useEffect(() => {
 		setActiveToggle(pathname.split("/")[2] || null);
 	}, [pathname]);
 
-	const solicitantes = useMemo(() => [2, 5], []);
-	const aprobadores = useMemo(() => [3, 6], []);
-	const ejecutores = useMemo(() => [4, 7], []);
-	const administradores = useMemo(() => [8], []);
+	const solicitantes = useMemo(() => [1], []);
+	const aprobadores = useMemo(() => [2, 4], []);
+	const ejecutores = useMemo(() => [3], []);
+	const administradores = useMemo(() => [5], []);
 
 	const menuItems = useMemo(
 		() => [
@@ -63,6 +61,13 @@ const Sidebar: React.FC = () => {
 				roles: [...administradores],
 			},
 			{
+				id: "administrar-puestos",
+				label: "Administrar Puestos",
+				icon: <RiProductHuntLine className="text-xl mr-3" />,
+				href: "/dashboard/administrar-puestos",
+				roles: [...administradores],
+			},
+			{
 				id: "estadisticas",
 				label: "Estadísticas",
 				icon: <RiBarChartFill className="text-xl mr-3" />,
@@ -73,28 +78,31 @@ const Sidebar: React.FC = () => {
 		[administradores, aprobadores, ejecutores, solicitantes]
 	);
 
+	const itemRolesIncludesUserRoles = (itemRoles: number[], userRoles: number[]) => {
+		return itemRoles.some((itemRole) => userRoles.includes(itemRole));
+	};
+
 	console.log(user);
 
 	return (
 		<div
-			className={`bg-[#ededed] border-r border-gray-300 flex flex-col transform transition-transform duration-300 ease-in-out ${open ? "translate-x-0 w-64 block" : "-translate-x-full w-64 hidden"}`}
+			className={`bg-[#001d39] border-r border-gray-300 flex flex-col transform transition-transform duration-300 ease-in-out ${open ? "translate-x-0 w-64 block" : "-translate-x-full w-64 hidden"}`}
 			style={{ maxWidth: "16rem", minWidth: "16rem" }}
 		>
-			<div className="p-6 text-center border-b border-gray-300">
+			<div className="p-1 text-center bg-white ">
 				<div className="text-2xl font-bold flex items-center justify-center space-x-2">
-					<Image src={"/images/icon.png"} height={24} width={24} alt="Icono" />
-					<span>Gest. Forzados</span>
+					<Image src={"/images/logo2.png"} height={120} width={180} alt="Logo" style={{ height: "auto" }} />
 				</div>
 			</div>
 			<nav className="flex-1">
 				<ul>
 					{menuItems
-						.filter((item) => user && item.roles.includes(user.role)) // Filtrar por rol
+						.filter((item) => user && itemRolesIncludesUserRoles(item.roles, Object.keys(user.roles).map(Number))) // Filtrar por rol
 						.map((item) => (
 							<li key={item.id} className="relative group">
 								<Link href={item.href}>
-									<div className={`flex items-center p-4 cursor-pointer text-gray-600 ${activeToggle === item.id ? "bg-gray-300 text-gray-400" : "hover:bg-gray-200"}`}>
-										{item.icon}
+									<div className={`flex items-center p-4 cursor-pointer text-white ${activeToggle === item.id ? "bg-[#133e6a] text-gray-400" : "hover:bg-[#00264d]"}`}>
+										<span className="text-[#c8a064]">{item.icon}</span>
 										{item.label}
 									</div>
 								</Link>

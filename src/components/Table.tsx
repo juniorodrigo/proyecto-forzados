@@ -12,7 +12,7 @@ interface TableColumn {
 }
 
 interface TableRow {
-	[key: string]: string | number | Status;
+	[key: string]: string | number | Status | JSX.Element;
 }
 
 type Action = "view" | "edit" | "delete";
@@ -85,7 +85,7 @@ const Table: React.FC<TableProps> = ({ columns, rows, onView, onEdit, onDelete, 
 		}
 	};
 
-	const getStatusClass = (status: Status) => {
+	const getStatusClass = (status: Status | string) => {
 		switch (status) {
 			case "rechazado":
 				return "bg-red-100 text-red-700";
@@ -195,7 +195,7 @@ const Table: React.FC<TableProps> = ({ columns, rows, onView, onEdit, onDelete, 
 				<tbody>
 					{rows.length > 0 ? (
 						rows.map((row) => (
-							<tr key={row.id} className="border-b border-gray-200 hover:bg-gray-100">
+							<tr key={String(row.id)} className="border-b border-gray-200 hover:bg-gray-100">
 								{columns.map((column) => (
 									<td key={column.key} className="p-3 text-sm">
 										{column.key === "estado" ? <span className={`inline-block px-6 py-2 font-semibold rounded-full ${getStatusClass(row[column.key] as Status)}`}>{row[column.key]}</span> : row[column.key]}
