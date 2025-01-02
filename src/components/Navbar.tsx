@@ -24,7 +24,6 @@ const Navbar: FC = () => {
     setOpen(!open);
   };
 
- 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -60,21 +59,19 @@ const Navbar: FC = () => {
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           className="flex h-8 items-center gap-2 rounded-md px-2 text-gray-700 transition-colors hover:bg-gray-200"
         >
-          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#001d39] text-xs text-white">
-            {user?.name?.charAt(0) || "A"}
-          </div>
           <span className="text-sm font-medium">
             {user?.name || "ADMIN"}
             <span className="ml-1 text-xs text-gray-500">
               {user?.roleName || "ADMINISTRADOR"}
             </span>
           </span>
+          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#001d39] text-xs text-white">
+            {user?.name?.charAt(0) || "A"}
+          </div>
         </button>
 
         {isDropdownOpen && (
           <div className="absolute right-0 mt-2 w-48 rounded-md border border-gray-200 bg-white py-1 shadow-lg">
-            
-            
             <button 
               onClick={handleLogout}
               className="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
@@ -90,4 +87,3 @@ const Navbar: FC = () => {
 };
 
 export default Navbar;
-
