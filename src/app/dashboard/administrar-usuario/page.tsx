@@ -91,7 +91,7 @@ const Page = () => {
 	return (
 		<div className="space-y-8">
 			<div className="space-y-4">
-				<label className="block text-sm font-medium text-gray-700">Filtrar por Usuario</label>
+				
 				<div className="relative flex justify-between items-center">
 					<input
 						type="text"
