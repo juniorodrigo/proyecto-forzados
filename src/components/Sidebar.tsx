@@ -7,6 +7,7 @@ import { UiContext } from "@/context/SidebarContext";
 import { UiContextType } from "@/types/SidebarOpen";
 import Image from "next/image";
 import useUserSession from "@/hooks/useSession";
+import { solicitantes, aprobadores, ejecutores, administradores } from "@/hooks/rolesPermitidos";
 
 const Sidebar: React.FC = () => {
 	const context = useContext(UiContext) as UiContextType;
@@ -24,11 +25,6 @@ const Sidebar: React.FC = () => {
 	useEffect(() => {
 		setActiveToggle(pathname.split("/")[2] || null);
 	}, [pathname]);
-
-	const solicitantes = useMemo(() => [1], []);
-	const aprobadores = useMemo(() => [2, 4], []);
-	const ejecutores = useMemo(() => [3], []);
-	const administradores = useMemo(() => [5], []);
 
 	const menuItems = useMemo(
 		() => [

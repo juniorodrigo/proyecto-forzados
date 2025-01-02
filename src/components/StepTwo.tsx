@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { solicitantes } from "@/hooks/rolesPermitidos";
 
 interface StepTwoProps {
 	interlockSeguridad: string;
@@ -43,7 +44,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
 	const [riesgos, setRiesgos] = useState<Option[]>([]);
 	const [probabilidades, setProbabilidades] = useState<Option[]>([]);
 	const [impactos, setImpactos] = useState<Option[]>([]);
-	const [usuarios, setUsuarios] = useState<{ id: string; nombre: string; apePaterno: string; apeMaterno: string }[]>([]);
+	const [usuarios, setUsuarios] = useState<{ id: string; nombre: string; apePaterno: string; apeMaterno: string; roles: Record<string, any> }[]>([]);
 
 	useEffect(() => {
 		const fetchData = async (url: string, setState: React.Dispatch<React.SetStateAction<Option[]>>) => {
@@ -80,7 +81,11 @@ const StepTwo: React.FC<StepTwoProps> = ({
 			try {
 				const response = await fetch("/api/usuarios");
 				const data = await response.json();
-				setUsuarios(data.values);
+
+				// Filtrar usuarios según rolesPermitidos.solicitantes
+				const filteredUsuarios = data.values.filter((usuario: any) => solicitantes.some((roleId) => Object.keys(usuario.roles).includes(roleId.toString())));
+
+				setUsuarios(filteredUsuarios);
 			} catch (error) {
 				console.error("Error al obtener usuarios:", error);
 			}
@@ -157,7 +162,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
 
 			{/* Riesgo */}
 			<div>
-				<label className="block text-sm font-medium text-gray-600 mb-2">Riesgo</label>
+				<label className="block text-sm font-medium text-gray-600 mb-2">Riesgo a</label>
 				<select value={riesgo} onChange={(e) => setRiesgo(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
 					<option value="">Seleccione Riesgo al que puede afectar el Forzado</option>
 					{riesgos.map((option) => (

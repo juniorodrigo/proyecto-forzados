@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { aprobadores, ejecutores } from "@/hooks/rolesPermitidos";
 
 interface StepThreeProps {
 	aprobador: string;
@@ -16,8 +17,9 @@ interface TipoForzado {
 
 const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor, setEjecutor, tipoForzado, setTipoForzado }) => {
 	const [tiposForzado, setTiposForzado] = useState<TipoForzado[]>([]);
-	const [usuarios, setUsuarios] = useState<{ id: string; nombre: string; apePaterno: string; apeMaterno: string }[]>([]);
-	const [aprobadores, setAprobadores] = useState<{ id: string; nombre: string; apePaterno: string; apeMaterno: string }[]>([]);
+	const [usuarios, setUsuarios] = useState<{ id: string; nombre: string; apePaterno: string; apeMaterno: string; roles: Record<string, any> }[]>([]);
+	const [aprobadoresList, setAprobadoresList] = useState<{ id: string; nombre: string; apePaterno: string; apeMaterno: string }[]>([]);
+	const [ejecutoresList, setEjecutoresList] = useState<{ id: string; nombre: string; apePaterno: string; apeMaterno: string }[]>([]);
 
 	useEffect(() => {
 		const fetchTiposForzado = async () => {
@@ -38,21 +40,15 @@ const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor
 			try {
 				const response = await fetch("/api/usuarios");
 				const data = await response.json();
-				setUsuarios(data.values);
-			} catch (error) {
-				console.error("Error al obtener usuarios:", error);
-			}
-		};
-		fetchUsuarios();
-	}, []);
 
-	useEffect(() => {
-		const fetchUsuarios = async () => {
-			try {
-				const response = await fetch("/api/usuarios/aprobadores");
-				const data = await response.json();
-				console.log(data, "APROBADORES))))))))))))))))");
-				setAprobadores(data.values);
+				// Filtrar aprobadores
+				const filteredAprobadores = data.values.filter((usuario: any) => aprobadores.some((roleId) => Object.keys(usuario.roles).includes(roleId.toString())));
+
+				// Filtrar ejecutores
+				const filteredEjecutores = data.values.filter((usuario: any) => ejecutores.some((roleId) => Object.keys(usuario.roles).includes(roleId.toString())));
+
+				setAprobadoresList(filteredAprobadores);
+				setEjecutoresList(filteredEjecutores);
 			} catch (error) {
 				console.error("Error al obtener usuarios:", error);
 			}
@@ -68,8 +64,6 @@ const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor
 				try {
 					const response = await fetch(`/api/solicitudes/alta/${id}`);
 					const result = await response.json();
-
-					console.log(result, "REGISTRO))))))))))))))))");
 
 					if (result.success && result.data.length > 0) {
 						const solicitud = result.data[0];
@@ -101,9 +95,9 @@ const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor
 					required
 				>
 					<option value="">Seleccione Aprobador del Forzado</option>
-					{aprobadores.map((aprobador) => (
+					{aprobadoresList.map((aprobador) => (
 						<option key={aprobador.id} value={aprobador.id}>
-							{aprobador.nombre}
+							{aprobador.nombre + " " + aprobador.apePaterno + " " + aprobador.apeMaterno}
 						</option>
 					))}
 				</select>
@@ -114,7 +108,7 @@ const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor
 				<label className="block text-sm font-medium text-gray-600 mb-2">Ejecutor</label>
 				<select value={ejecutor} onChange={(e) => setEjecutor(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
 					<option value="">Seleccione Ejecutor</option>
-					{usuarios.map((usuario) => (
+					{ejecutoresList.map((usuario) => (
 						<option key={usuario.id} value={usuario.id}>
 							{usuario.nombre + " " + usuario.apePaterno + " " + usuario.apeMaterno}
 						</option>

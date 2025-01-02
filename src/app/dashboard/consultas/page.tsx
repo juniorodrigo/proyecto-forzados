@@ -12,6 +12,7 @@ import { FaEye, FaEdit, FaPlay, FaMinus, FaCheck, FaArrowUp, FaArrowDown } from 
 import useUserSession from "@/hooks/useSession";
 import Modals from "@/components/Modals";
 import ModalAprobacionRechazo from "@/components/ModalAprobacionRechazo";
+import { solicitantes, aprobadores, ejecutores, administradores } from "@/hooks/rolesPermitidos";
 
 type Status = "RECHAZADO-ALTA" | "PENDIENTE-ALTA" | "APROBADO-ALTA" | "EJECUTADO-ALTA" | "RECHAZADO" | "PENDIENTE-BAJA" | "APROBADO-BAJA" | "EJECUTADO-BAJA" | "FINALIZADO";
 
@@ -64,10 +65,10 @@ const Page: React.FC = () => {
 	const router = useRouter();
 	const { user } = useUserSession();
 
-	const usuariosEjecutores = [4, 7];
-	const usuariosSolicitantes = [2, 5];
-	const usuariosAprobadores = [3, 6];
-	const usuariosAdministradores = [8];
+	const usuariosEjecutores = ejecutores;
+	const usuariosSolicitantes = solicitantes;
+	const usuariosAprobadores = aprobadores;
+	const usuariosAdministradores = administradores;
 
 	const uniqueAreas = Array.from(new Set(rows.map((row) => row.area)));
 	const uniqueSolicitantes = Array.from(new Set(rows.map((row) => row.solicitante)));
