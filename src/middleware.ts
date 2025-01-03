@@ -13,17 +13,13 @@ export default withAuth({
 export async function middleware(req: NextRequest) {
 	const response = NextResponse.next();
 	response.headers.append("Access-Control-Allow-Credentials", "true");
-	response.headers.append("Access-Control-Allow-Origin", ""); // Cambia "" por "http://localhost:<puerto>" en producción
+	response.headers.append("Access-Control-Allow-Origin", "");
 	response.headers.append("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
 	response.headers.append("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, Accept, Origin");
-	response.headers.set("Access-Control-Allow-Origin", "*"); // Permitir todos los orígenes
-	response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS"); // Métodos permitidos
-	response.headers.set(
-		"Access-Control-Allow-Headers",
-		"Content-Type, Authorization, X-Requested-With" // Cabeceras personalizadas permitidas
-	);
-	response.headers.set("Access-Control-Allow-Credentials", "true"); // Si necesitas credenciales compartidas
-	// Si es una solicitud OPTIONS (preflight), responde directamente
+	response.headers.set("Access-Control-Allow-Origin", "*");
+	response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+	response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
+	response.headers.set("Access-Control-Allow-Credentials", "true");
 	if (req.method === "OPTIONS") {
 		return new NextResponse(null, { headers: response.headers });
 	}
