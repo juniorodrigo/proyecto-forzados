@@ -9,7 +9,7 @@ export async function GET() {
 
 		const turnos = recordset.map((singleValue) => {
 			return {
-				id: singleValue.MAE_PROYECTO_ID,
+				id: singleValue.PROYECTO_ID,
 				descripcion: singleValue.DESCRIPCION,
 			};
 		});
@@ -54,7 +54,7 @@ export async function DELETE(request: Request) {
 			.input("id", id)
 			.input("usuario", usuario)
 			.input("fecha", new Date())
-			.query("UPDATE MAE_PROYECTO SET ESTADO = 0, USUARIO_MODIFICACION = @usuario, FECHA_MODIFICACION = @fecha WHERE MAE_PROYECTO_ID = @id");
+			.query("UPDATE MAE_PROYECTO SET ESTADO = 0, USUARIO_MODIFICACION = @usuario, FECHA_MODIFICACION = @fecha WHERE PROYECTO_ID = @id");
 
 		if (result.rowsAffected[0] > 0) {
 			return NextResponse.json({ success: true, message: "Record updated successfully" });
@@ -78,7 +78,7 @@ export async function PUT(request: Request) {
 			.input("descripcion", descripcion)
 			.input("usuario", usuario)
 			.input("fecha", new Date())
-			.query("UPDATE MAE_PROYECTO SET DESCRIPCION = @descripcion, USUARIO_MODIFICACION = @usuario, FECHA_MODIFICACION = @fecha WHERE MAE_PROYECTO_ID = @id");
+			.query("UPDATE MAE_PROYECTO SET DESCRIPCION = @descripcion, USUARIO_MODIFICACION = @usuario, FECHA_MODIFICACION = @fecha WHERE PROYECTO_ID = @id");
 
 		if (result.rowsAffected[0] > 0) {
 			return NextResponse.json({ success: true, message: "Record updated successfully" });

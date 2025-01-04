@@ -47,7 +47,10 @@ export async function POST(request: Request) {
 		const pool = await poolPromise;
 		const { descripcion, estado, roles, usuarioCreacion } = await request.json();
 
-		console.log({ descripcion, estado, roles, usuarioCreacion });
+		// Convertir roles de objeto a array
+		const rolesArray: { id: number }[] = Object.values(roles);
+
+		console.log({ descripcion, estado, roles: rolesArray, usuarioCreacion });
 
 		const result = await pool.request().input("descripcion", descripcion).input("estado", estado).input("usuarioCreacion", usuarioCreacion)
 			.query(`INSERT INTO MAE_PUESTO (DESCRIPCION, ESTADO, USUARIO_CREACION, FECHA_CREACION, USUARIO_MODIFICACION, FECHA_MODIFICACION)
@@ -56,7 +59,6 @@ export async function POST(request: Request) {
 
 		if (result.rowsAffected[0] > 0) {
 			const puestoId = result.recordset[0].PUESTO_ID;
-			const rolesArray = roles;
 
 			for (const rol of rolesArray) {
 				await pool.request().input("puestoId", puestoId).input("rolId", rol.id).input("usuarioCreacion", usuarioCreacion)
@@ -77,7 +79,10 @@ export async function POST(request: Request) {
 export async function PUT(request: Request) {
 	try {
 		const pool = await poolPromise;
-		const { id, descripcion, estado, roles, usuarioModificacion } = await request.json();
+		const { id, descripcion, estado, roles, usuarioModificacion }: { id: number; descripcion: string; estado: string; roles: { id: number }[]; usuarioModificacion: string } = await request.json();
+
+		// Convertir roles de objeto a array
+		const rolesArray = Object.values(roles);
 
 		await pool.request().input("id", id).input("descripcion", descripcion).input("estado", estado).input("usuarioModificacion", usuarioModificacion).query(`
 				UPDATE MAE_PUESTO
@@ -90,7 +95,7 @@ export async function PUT(request: Request) {
 
 		await pool.request().input("id", id).query(`DELETE FROM MAE_PUESTO_ROL WHERE PUESTO_ID = @id`);
 
-		for (const rol of roles) {
+		for (const rol of rolesArray) {
 			await pool.request().input("puestoId", id).input("rolId", rol.id).input("usuarioModificacion", usuarioModificacion).query(`
 					INSERT INTO MAE_PUESTO_ROL
 						(PUESTO_ID, ROL_ID, USUARIO_CREACION, FECHA_CREACION, USUARIO_MODIFICACION, FECHA_MODIFICACION)
