@@ -27,7 +27,7 @@ type ModalCreacionUsuarioProps = {
 const ModalCreacionUsuario: React.FC<ModalCreacionUsuarioProps> = ({ isOpen, onClose, isEditing, userData, onSubmit }) => {
 	const [areas, setAreas] = useState<{ id: string; descripcion: string }[]>([]);
 	const [puestos, setPuestos] = useState<{ id: string; descripcion: string }[]>([]);
-	const [roles, setRoles] = useState<{ id: string; descripcion: string }[]>([]);
+	const [, setRoles] = useState<{ id: string; descripcion: string }[]>([]);
 	const { user } = useUserSession();
 
 	const [formData, setFormData] = useState<{

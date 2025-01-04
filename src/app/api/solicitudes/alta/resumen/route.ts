@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { poolPromise } from "@sql/lib/db";
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
-		const { id } = params; // Extraer el valor de "id" desde los parámetros de la URL
+		const { id } = await params; // Extraer el valor de "id" desde los parámetros de la URL
 
 		const solicitud = await getSingleSolicitud(id);
 		return NextResponse.json({ success: true, message: "Records fetched successfully", data: solicitud });

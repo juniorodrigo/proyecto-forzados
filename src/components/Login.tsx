@@ -87,7 +87,7 @@ const Login = () => {
 		setTimeout(() => {
 			setShowPopover(false);
 			router.push("/dashboard/consultas");
-		}, 2000);
+		}, 100);
 	};
 
 	return (

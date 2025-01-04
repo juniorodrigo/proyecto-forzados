@@ -1,4 +1,4 @@
-import NextAuth from "next-auth";
+import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { poolPromise } from "@sql/lib/db";
 import bcrypt from "bcrypt";

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { DateRange } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { useRouter } from "next/navigation";
@@ -79,7 +79,7 @@ const Page: React.FC = () => {
 
 	const columns = [
 		{ key: "id", label: "ID" },
-		{ key: "tipo", label: "Tipo", filterable: true, options: ["alta", "baja"] },
+		{ key: "tipo", label: "Etapa", filterable: true, options: ["alta", "baja"] },
 		{ key: "estado", label: "Estado", filterable: true, options: uniqueEstados },
 		{ key: "nombre", label: "Descripción" },
 		{ key: "area", label: "Área", filterable: true, options: uniqueAreas },
@@ -93,7 +93,7 @@ const Page: React.FC = () => {
 		return format(new Date(dateString), "dd/MM/yy HH:mm", { locale: es });
 	};
 
-	const fetchData = async () => {
+	const fetchData = useCallback(async () => {
 		setIsLoading(true);
 		setError(null);
 		try {
@@ -115,11 +115,11 @@ const Page: React.FC = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	};
+	}, []);
 
 	useEffect(() => {
 		fetchData();
-	}, []);
+	}, [fetchData]);
 
 	const [rejectReasons, setRejectReasons] = useState<{ id: number; descripcion: string; tipo: string }[]>([]);
 
@@ -153,7 +153,7 @@ const Page: React.FC = () => {
 				setSelectedEjecutor(user.name);
 			}
 		}
-	}, [user]);
+	}, [user, usuariosSolicitantes, usuariosAprobadores, usuariosEjecutores]);
 
 	const filteredRows = useMemo(() => {
 		return rows.filter((row) => {
@@ -566,7 +566,7 @@ const Page: React.FC = () => {
 														{column.key === "estado" ? (
 															formatStatus(row[column.key] as string)
 														) : column.key === "tipo" ? (
-															<span className={row.estadoSolicitud == "FINALIZADO" ? "text-blue-400" : row.tipo === "alta" ? "text-red-500" : "text-green-500"}>
+															<span className={row.estadoSolicitud == "FINALIZADO" ? "text-green-600" : row.tipo === "alta" ? "text-red-500" : "text-green-500"}>
 																{row.estadoSolicitud == "FINALIZADO" ? <FaCircle /> : row.tipo === "alta" ? <FaArrowUp /> : <FaArrowDown />}
 															</span>
 														) : (

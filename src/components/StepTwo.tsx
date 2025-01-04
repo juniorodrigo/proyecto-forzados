@@ -176,15 +176,21 @@ const StepTwo: React.FC<StepTwoProps> = ({
 					},
 				};
 
-				const riesgoLabel = mappings[impactoDesc]?.[probabilidadDesc] || "DESCONOCIDO";
+				const riesgoLabel = mappings[impactoDesc]?.[probabilidadDesc] || nivelRiesgo || "DESCONOCIDO";
 				setNivelRiesgo(riesgoLabel);
 			} else {
-				setNivelRiesgo("DESCONOCIDO");
+				// Solo establecer "DESCONOCIDO" si nivelRiesgo está vacío
+				if (!nivelRiesgo) {
+					setNivelRiesgo("DESCONOCIDO");
+				}
 			}
 		} else {
-			setNivelRiesgo("");
+			// Solo establecer "" si nivelRiesgo está vacío
+			if (!nivelRiesgo) {
+				setNivelRiesgo("");
+			}
 		}
-	}, [probabilidad, impacto]);
+	}, [probabilidad, impacto, impactos, probabilidades, nivelRiesgo, setNivelRiesgo]);
 
 	return (
 		<form className="space-y-6">

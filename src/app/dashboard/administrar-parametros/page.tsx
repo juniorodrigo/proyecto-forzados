@@ -9,6 +9,8 @@ const Page = () => {
 		{ label: "Sub Área (Tag Prefijo)", value: "subarea", needsCode: true },
 		{ label: "Activo (Tag Centro)", value: "activo", needsCode: true },
 		{ label: "Disciplina", value: "disciplina", needsCode: false },
+		{ label: "Proyecto", value: "proyecto", needsCode: false },
+
 		{ label: "Turno", value: "turno", needsCode: false },
 		{ label: "Responsable", value: "responsable", needsCode: false },
 		{ label: "Elemento de Riesgo", value: "riesgo-a", needsCode: false },

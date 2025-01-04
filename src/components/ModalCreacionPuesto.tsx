@@ -17,7 +17,7 @@ const ModalCreacionPuesto: React.FC<ModalCreacionPuestoProps> = ({ isOpen, onClo
 		id: 0,
 		descripcion: "",
 		estado: 1,
-		roles: [],
+		roles: {} as { [key: string]: { id: number; descripcion: string } }, // Cambiar el tipo de roles
 	});
 	const [popoverMessage, setPopoverMessage] = useState("");
 	const [popoverType, setPopoverType] = useState<"success" | "error">("success");
@@ -29,7 +29,7 @@ const ModalCreacionPuesto: React.FC<ModalCreacionPuestoProps> = ({ isOpen, onClo
 			id: 0,
 			descripcion: "",
 			estado: 1,
-			roles: [],
+			roles: {},
 		});
 	};
 
@@ -39,16 +39,7 @@ const ModalCreacionPuesto: React.FC<ModalCreacionPuestoProps> = ({ isOpen, onClo
 	};
 
 	const hasRole = (roleId: number) => {
-		const roleIds = formData.roles.map((role) => role.id);
-
-		return roleIds.includes(roleId);
-	};
-
-	const deleteRole = (roleId: number) => {
-		setFormData((prevFormData) => ({
-			...prevFormData,
-			roles: prevFormData.roles.filter((rol) => rol.id !== roleId),
-		}));
+		return formData.roles.hasOwnProperty(roleId);
 	};
 
 	useEffect(() => {
@@ -67,7 +58,7 @@ const ModalCreacionPuesto: React.FC<ModalCreacionPuestoProps> = ({ isOpen, onClo
 				id: puestoData.id || 0,
 				descripcion: puestoData.descripcion || "",
 				estado: puestoData.estado || 1,
-				roles: puestoData.roles || [],
+				roles: puestoData.roles || {},
 			});
 		} else {
 			resetForm();
@@ -81,16 +72,13 @@ const ModalCreacionPuesto: React.FC<ModalCreacionPuestoProps> = ({ isOpen, onClo
 
 	const handleRoleChange = (roleId: number) => {
 		setFormData((prevFormData) => {
-			const updatedRoles = [...prevFormData.roles];
+			const updatedRoles = { ...prevFormData.roles };
 			if (hasRole(roleId)) {
-				return {
-					...prevFormData,
-					roles: updatedRoles.filter((rol) => rol.id !== roleId),
-				};
+				delete updatedRoles[roleId];
 			} else {
-				updatedRoles.push({ id: roleId, descripcion: roles.find((rol) => rol.id === roleId)?.descripcion || "" });
-				return { ...prevFormData, roles: updatedRoles };
+				updatedRoles[roleId] = roles.find((rol) => rol.id === roleId) || { id: roleId, descripcion: "" };
 			}
+			return { ...prevFormData, roles: updatedRoles };
 		});
 	};
 

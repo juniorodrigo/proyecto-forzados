@@ -11,13 +11,13 @@ const Page = () => {
 		nombre: string;
 		apePaterno: string;
 		apeMaterno: string;
-		areaId: number;
+		areaId: string; // Cambiar a string
 		areaDescripcion: string;
-		rolId: number;
+		rolId: string; // Cambiar a string
 		rolDescripcion: string;
 		estado: number;
 		dni: string;
-		puestoId: number;
+		puestoId: string; // Cambiar a string
 		puestoDescripcion: string;
 		correo: string;
 		usuario: string;
@@ -91,7 +91,6 @@ const Page = () => {
 	return (
 		<div className="space-y-8">
 			<div className="space-y-4">
-				
 				<div className="relative flex justify-between items-center">
 					<input
 						type="text"

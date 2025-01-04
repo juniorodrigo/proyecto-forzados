@@ -20,7 +20,6 @@ interface TipoForzado {
 
 const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor, setEjecutor, tipoForzado, setTipoForzado, interlockSeguridad, nivelRiesgo }) => {
 	const [tiposForzado, setTiposForzado] = useState<TipoForzado[]>([]);
-	const [usuarios, setUsuarios] = useState<{ id: string; nombre: string; apePaterno: string; apeMaterno: string; roles: Record<string, any> }[]>([]);
 	const [aprobadoresList, setAprobadoresList] = useState<{ id: string; nombre: string; apePaterno: string; apeMaterno: string }[]>([]);
 	const [ejecutoresList, setEjecutoresList] = useState<{ id: string; nombre: string; apePaterno: string; apeMaterno: string }[]>([]);
 
@@ -51,18 +50,17 @@ const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor
 
 				if (interlockSeguridad === "SÍ" && filteredAprobadores.length > 0) {
 					filteredAprobadores = filteredAprobadores.filter((aprobador: { puestoDescripcion?: string }) => aprobador.puestoDescripcion?.toLowerCase().includes("gerente"));
-				}
-
-				// Añadir usuario actual si nivelRiesgo es BAJO o MODERADO
-				if (nivelRiesgo === "BAJO" || nivelRiesgo === "MODERADO") {
-					const currentUser = user;
-					if (currentUser) {
-						filteredAprobadores.push({
-							id: currentUser.id,
-							nombre: currentUser.nombre,
-							apePaterno: currentUser.apePaterno,
-							apeMaterno: currentUser.apeMaterno,
-						});
+				} else {
+					if (nivelRiesgo === "BAJO" || nivelRiesgo === "MODERADO") {
+						const currentUser = user;
+						if (currentUser) {
+							filteredAprobadores.push({
+								id: currentUser.id,
+								nombre: currentUser.name,
+								apePaterno: "",
+								apeMaterno: "",
+							});
+						}
 					}
 				}
 
