@@ -14,6 +14,8 @@ interface StepTwoProps {
 	setImpacto: React.Dispatch<React.SetStateAction<string>>;
 	solicitante: string;
 	setSolicitante: React.Dispatch<React.SetStateAction<string>>;
+	nivelRiesgo: string;
+	setNivelRiesgo: React.Dispatch<React.SetStateAction<string>>;
 }
 
 interface Option {
@@ -39,6 +41,8 @@ const StepTwo: React.FC<StepTwoProps> = ({
 	setImpacto,
 	solicitante,
 	setSolicitante,
+	nivelRiesgo,
+	setNivelRiesgo,
 }) => {
 	const [responsables, setResponsables] = useState<responsablesOptions[]>([]);
 	const [riesgos, setRiesgos] = useState<Option[]>([]);
@@ -124,12 +128,70 @@ const StepTwo: React.FC<StepTwoProps> = ({
 		fetchSolicitudData();
 	}, [setInterlockSeguridad, setResponsable, setRiesgo, setProbabilidad, setImpacto, setSolicitante]);
 
+	useEffect(() => {
+		// Cálculo de nivel de riesgo basado en impacto y probabilidad
+		if (probabilidad && impacto) {
+			// Obtener descripciones basadas en los IDs
+			const impactoDesc = impactos.find((item) => item.id == impacto)?.descripcion;
+			const probabilidadDesc = probabilidades.find((item) => item.id == probabilidad)?.descripcion;
+
+			console.log(impactos, probabilidades, "DESCRIPCIONES");
+
+			if (impactoDesc && probabilidadDesc) {
+				const mappings: { [key: string]: { [key: string]: string } } = {
+					INSIGNIFICANTE: {
+						"CASI SEGURO": "MODERADO",
+						PROBABLE: "BAJO",
+						POSIBLE: "BAJO",
+						IMPROBABLE: "BAJO",
+						RARO: "BAJO",
+					},
+					MENOR: {
+						"CASI SEGURO": "MODERADO",
+						PROBABLE: "MODERADO",
+						POSIBLE: "MODERADO",
+						IMPROBABLE: "MODERADO",
+						RARO: "BAJO",
+					},
+					MODERADO: {
+						"CASI SEGURO": "ALTO",
+						PROBABLE: "MODERADO",
+						POSIBLE: "MODERADO",
+						IMPROBABLE: "MODERADO",
+						RARO: "BAJO",
+					},
+					MAYOR: {
+						"CASI SEGURO": "ALTO",
+						PROBABLE: "ALTO",
+						POSIBLE: "MODERADO",
+						IMPROBABLE: "MODERADO",
+						RARO: "MODERADO",
+					},
+					EXTREMO: {
+						"CASI SEGURO": "ALTO",
+						PROBABLE: "ALTO",
+						POSIBLE: "ALTO",
+						IMPROBABLE: "ALTO",
+						RARO: "ALTO",
+					},
+				};
+
+				const riesgoLabel = mappings[impactoDesc]?.[probabilidadDesc] || "DESCONOCIDO";
+				setNivelRiesgo(riesgoLabel);
+			} else {
+				setNivelRiesgo("DESCONOCIDO");
+			}
+		} else {
+			setNivelRiesgo("");
+		}
+	}, [probabilidad, impacto]);
+
 	return (
 		<form className="space-y-6">
 			{/* Interlock Seguridad */}
 			<div>
 				<h2 className="text-center font-semibold text-2xl mb-2">Responsable y Riesgo</h2>
-				<label className="block text-sm font-medium text-gray-600 mb-2">Interlock Seguridad</label>
+				<label className="block text-sm font-medium text-gray-600 mb-2">¿Requiere Interlock de Seguridad?</label>
 				<select
 					value={interlockSeguridad}
 					onChange={(e) => setInterlockSeguridad(e.target.value)}
@@ -203,6 +265,14 @@ const StepTwo: React.FC<StepTwoProps> = ({
 					))}
 				</select>
 			</div>
+
+			{/* Nivel de Riesgo */}
+			{nivelRiesgo && (
+				<div>
+					<label className="block text-sm font-medium text-gray-600 mb-2">Nivel de Riesgo</label>
+					<p>{nivelRiesgo}</p>
+				</div>
+			)}
 
 			{/* Solicitante (AN) */}
 			<div>

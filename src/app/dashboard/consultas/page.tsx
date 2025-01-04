@@ -33,6 +33,7 @@ export interface Row {
 	solicitanteBId: number;
 	aprobadorBId: number;
 	ejecutorBId: number;
+	interlock: number;
 	[key: string]: string | number;
 }
 

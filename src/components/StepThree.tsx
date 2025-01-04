@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { aprobadores, ejecutores } from "@/hooks/rolesPermitidos";
+import useUserSession from "@/hooks/useSession";
 
 interface StepThreeProps {
 	aprobador: string;
@@ -8,6 +9,8 @@ interface StepThreeProps {
 	setEjecutor: React.Dispatch<React.SetStateAction<string>>;
 	tipoForzado: string;
 	setTipoForzado: React.Dispatch<React.SetStateAction<string>>;
+	interlockSeguridad: string; // Nuevo prop
+	nivelRiesgo: string;
 }
 
 interface TipoForzado {
@@ -15,11 +18,13 @@ interface TipoForzado {
 	descripcion: string;
 }
 
-const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor, setEjecutor, tipoForzado, setTipoForzado }) => {
+const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor, setEjecutor, tipoForzado, setTipoForzado, interlockSeguridad, nivelRiesgo }) => {
 	const [tiposForzado, setTiposForzado] = useState<TipoForzado[]>([]);
 	const [usuarios, setUsuarios] = useState<{ id: string; nombre: string; apePaterno: string; apeMaterno: string; roles: Record<string, any> }[]>([]);
 	const [aprobadoresList, setAprobadoresList] = useState<{ id: string; nombre: string; apePaterno: string; apeMaterno: string }[]>([]);
 	const [ejecutoresList, setEjecutoresList] = useState<{ id: string; nombre: string; apePaterno: string; apeMaterno: string }[]>([]);
+
+	const { user } = useUserSession();
 
 	useEffect(() => {
 		const fetchTiposForzado = async () => {
@@ -42,7 +47,24 @@ const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor
 				const data = await response.json();
 
 				// Filtrar aprobadores
-				const filteredAprobadores = data.values.filter((usuario: any) => aprobadores.some((roleId) => Object.keys(usuario.roles).includes(roleId.toString())));
+				let filteredAprobadores = data.values.filter((usuario: any) => aprobadores.some((roleId) => Object.keys(usuario.roles).includes(roleId.toString())));
+
+				if (interlockSeguridad === "SÍ" && filteredAprobadores.length > 0) {
+					filteredAprobadores = filteredAprobadores.filter((aprobador: { puestoDescripcion?: string }) => aprobador.puestoDescripcion?.toLowerCase().includes("gerente"));
+				}
+
+				// Añadir usuario actual si nivelRiesgo es BAJO o MODERADO
+				if (nivelRiesgo === "BAJO" || nivelRiesgo === "MODERADO") {
+					const currentUser = user;
+					if (currentUser) {
+						filteredAprobadores.push({
+							id: currentUser.id,
+							nombre: currentUser.nombre,
+							apePaterno: currentUser.apePaterno,
+							apeMaterno: currentUser.apeMaterno,
+						});
+					}
+				}
 
 				// Filtrar ejecutores
 				const filteredEjecutores = data.values.filter((usuario: any) => ejecutores.some((roleId) => Object.keys(usuario.roles).includes(roleId.toString())));
@@ -54,7 +76,7 @@ const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor
 			}
 		};
 		fetchUsuarios();
-	}, []);
+	}, [interlockSeguridad, nivelRiesgo, user]);
 
 	useEffect(() => {
 		const fetchSolicitudData = async () => {

@@ -25,6 +25,7 @@ const ForcedRegistration: React.FC = () => {
 	const [probabilidad, setProbabilidad] = useState("");
 	const [impacto, setImpacto] = useState("");
 	const [solicitante, setSolicitante] = useState("");
+	const [nivelRiesgo, setNivelRiesgo] = useState("");
 
 	const [aprobador, setAprobador] = useState("");
 	const [ejecutor, setEjecutor] = useState("");
@@ -36,6 +37,7 @@ const ForcedRegistration: React.FC = () => {
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const { user } = useUserSession();
+
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const id = searchParams.get("id");
@@ -159,10 +161,23 @@ const ForcedRegistration: React.FC = () => {
 						setImpacto={setImpacto}
 						solicitante={solicitante}
 						setSolicitante={setSolicitante}
+						nivelRiesgo={nivelRiesgo}
+						setNivelRiesgo={setNivelRiesgo}
 					/>
 				);
 			case 3:
-				return <StepThree aprobador={aprobador} setAprobador={setAprobador} ejecutor={ejecutor} setEjecutor={setEjecutor} tipoForzado={tipoForzado} setTipoForzado={setTipoForzado} />;
+				return (
+					<StepThree
+						aprobador={aprobador}
+						setAprobador={setAprobador}
+						ejecutor={ejecutor}
+						setEjecutor={setEjecutor}
+						tipoForzado={tipoForzado}
+						setTipoForzado={setTipoForzado}
+						interlockSeguridad={interlockSeguridad} // Nuevo prop añadido
+						nivelRiesgo={nivelRiesgo}
+					/>
+				);
 			default:
 				return null;
 		}
