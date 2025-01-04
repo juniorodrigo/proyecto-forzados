@@ -18,6 +18,7 @@ const getSingleSolicitud = async (id: string) => {
 	const result = await pool.query(`
         SELECT 
             SOLICITUD_ID,
+			PROYECTO_ID,
             SUBAREA_ID,
             DISCIPLINA_ID,
             TURNO_ID,
@@ -49,6 +50,7 @@ const getSingleSolicitud = async (id: string) => {
     `);
 	return result.recordset.map((record) => ({
 		id: record.SOLICITUD_ID,
+		proyecto: record.PROYECTO_ID,
 		tagPrefijo: record.SUBAREA_ID,
 		tagCentro: record.TAGCENTRO_ID,
 		tagSubfijo: record.TAGSUFIJO,

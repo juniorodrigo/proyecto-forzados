@@ -18,6 +18,7 @@ const ForcedRegistration: React.FC = () => {
 	const [descripcion, setDescripcion] = useState("");
 	const [disciplina, setDisciplina] = useState("");
 	const [turno, setTurno] = useState("");
+	const [proyecto, setProyecto] = useState("");
 
 	const [interlockSeguridad, setInterlockSeguridad] = useState("");
 	const [responsable, setResponsable] = useState("");
@@ -54,8 +55,6 @@ const ForcedRegistration: React.FC = () => {
 				try {
 					const response = await fetch(`/api/solicitudes/alta/${id}`);
 					const result = await response.json();
-
-					console.log(result, "SOLICITUD DATA");
 
 					if (result.success && result.data.length > 0) {
 						const solicitud = result.data[0];
@@ -101,6 +100,7 @@ const ForcedRegistration: React.FC = () => {
 					aprobador: string;
 					ejecutor: string;
 					tipoForzado: string;
+					proyecto: string;
 					id?: string | null;
 				} = {
 					usuario: user?.id ?? 0,
@@ -119,6 +119,7 @@ const ForcedRegistration: React.FC = () => {
 					aprobador,
 					ejecutor,
 					tipoForzado,
+					proyecto,
 					id,
 				};
 				fetch("/api/solicitudes/alta", {
@@ -174,6 +175,8 @@ const ForcedRegistration: React.FC = () => {
 						setDisciplina={setDisciplina}
 						turno={turno}
 						setTurno={setTurno}
+						proyecto={proyecto}
+						setProyecto={setProyecto}
 					/>
 				);
 			case 2:
@@ -216,7 +219,7 @@ const ForcedRegistration: React.FC = () => {
 	const isStepValid = (step: number) => {
 		switch (step) {
 			case 1:
-				return tagPrefijo && tagCentro && tagSubfijo && descripcion && disciplina && turno;
+				return tagPrefijo && tagCentro && tagSubfijo && descripcion && disciplina && turno && proyecto;
 			case 2:
 				return interlockSeguridad && responsable && riesgo && probabilidad && impacto && solicitante;
 			case 3:

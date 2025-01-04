@@ -13,6 +13,8 @@ interface StepOneProps {
 	setDisciplina: React.Dispatch<React.SetStateAction<string>>;
 	turno: string;
 	setTurno: React.Dispatch<React.SetStateAction<string>>;
+	proyecto: string;
+	setProyecto: React.Dispatch<React.SetStateAction<string>>;
 }
 
 interface Option {
@@ -33,11 +35,16 @@ const StepOne: React.FC<StepOneProps> = ({
 	setDisciplina,
 	turno,
 	setTurno,
+	proyecto,
+	setProyecto,
 }) => {
 	const [tagPrefijos, setTagPrefijos] = useState<Option[]>([]);
 	const [tagCentros, setTagCentros] = useState<Option[]>([]);
 	const [disciplinas, setDisciplinas] = useState<Option[]>([]);
 	const [turnos, setTurnos] = useState<Option[]>([]);
+	const [proyectosList, setProyectosList] = useState<Option[]>([]);
+
+	console.log(tagPrefijo, tagCentro, tagSubfijo, descripcion, disciplina, turno, proyecto, "))))))))))))))))))))))))))))))))))))))))))))>______________________________________DATOSPREVIOS");
 
 	useEffect(() => {
 		const fetchData = async (url: string, setState: React.Dispatch<React.SetStateAction<Option[]>>) => {
@@ -56,6 +63,7 @@ const StepOne: React.FC<StepOneProps> = ({
 		fetchData("/api/maestras/activo", setTagCentros);
 		fetchData("/api/maestras/disciplina", setDisciplinas);
 		fetchData("/api/maestras/turno", setTurnos);
+		fetchData("/api/maestras/proyecto", setProyectosList);
 	}, [setDescripcion, setDisciplina, setTagCentro, setTagPrefijo, setTagSubfijo, setTurno]);
 
 	useEffect(() => {
@@ -75,6 +83,7 @@ const StepOne: React.FC<StepOneProps> = ({
 						setTagSubfijo(solicitud.tagSubfijo || ""); // Asegurarse de que no sea null/undefined
 						setDescripcion(solicitud.descripcion || "");
 						setDisciplina(String(solicitud.disciplina));
+						setProyecto(String(solicitud.proyecto));
 						setTurno(String(solicitud.turno));
 					} else {
 						console.error("No se encontraron datos para la solicitud.");
@@ -85,13 +94,26 @@ const StepOne: React.FC<StepOneProps> = ({
 			}
 		};
 		fetchSolicitudData();
-	}, [setTagPrefijo, setTagCentro, setTagSubfijo, setDescripcion, setDisciplina, setTurno]);
+	}, [setTagPrefijo, setTagCentro, setTagSubfijo, setDescripcion, setDisciplina, setTurno, setProyecto]);
 
 	return (
 		<form className="space-y-6">
-			{/* Tag (Prefijo) */}
+			{/* Proyecto */}
 			<div>
 				<h2 className="text-center font-semibold text-2xl mb-2">Datos generales</h2>
+				<label className="block text-sm font-medium text-gray-600 mb-2">Proyecto</label>
+				<select value={proyecto} onChange={(e) => setProyecto(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+					<option value="">Nombre del proyecto asociado</option>
+					{proyectosList.map((option) => (
+						<option key={option.id} value={option.id}>
+							{option.descripcion}
+						</option>
+					))}
+				</select>
+			</div>
+
+			{/* Tag (Prefijo) */}
+			<div>
 				<label className="block text-sm font-medium text-gray-600 mb-2">Tag (Prefijo)</label>
 				<select
 					value={tagPrefijo}
