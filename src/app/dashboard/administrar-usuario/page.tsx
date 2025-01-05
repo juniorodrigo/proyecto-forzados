@@ -89,7 +89,7 @@ const Page = () => {
 	};
 
 	return (
-		<div className="space-y-8">
+		<div className="space-y-8 p-4">
 			<div className="space-y-4">
 				<div className="relative flex justify-between items-center">
 					<input

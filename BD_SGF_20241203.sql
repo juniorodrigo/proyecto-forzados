@@ -429,6 +429,7 @@ go
 create table MAE_PUESTO (
    PUESTO_ID            int                  identity,
    DESCRIPCION          varchar(50)          null,
+   NIVEL_RIESGO_APROBACION varchar(50)       null,
    ESTADO               int                  null,
    USUARIO_CREACION    varchar(20)          null,
    FECHA_CREACION       datetime             null,

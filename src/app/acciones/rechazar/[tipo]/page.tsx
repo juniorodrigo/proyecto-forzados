@@ -56,7 +56,7 @@ const AprobarPage = () => {
 				const response = await fetch("/api/maestras/motivo-rechazo");
 				const result = await response.json();
 				if (result.success) {
-					console.log(result.values);
+					// console.log(result.values);
 
 					setRejectReasons(result.values);
 				} else {

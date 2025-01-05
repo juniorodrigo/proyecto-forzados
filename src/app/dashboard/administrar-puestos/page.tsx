@@ -13,6 +13,7 @@ export interface Puesto {
 	descripcion: string;
 	estado: number;
 	roles: { [key: string]: Role };
+	aprobadorNivel: string;
 }
 
 const Page = () => {
@@ -53,9 +54,8 @@ const Page = () => {
 	};
 
 	return (
-		<div className="space-y-8">
+		<div className="space-y-8 p-4">
 			<div className="space-y-4">
-				
 				<div className="relative flex justify-between items-center">
 					<input
 						type="text"
@@ -81,6 +81,7 @@ const Page = () => {
 						{ key: "descripcion", label: "Descripción" },
 						{ key: "roles", label: "Roles" },
 						{ key: "estado", label: "Estado" },
+						{ key: "aprobadorNivel", label: "Nivel de Aprobador" },
 					]}
 					rows={filteredPuestos.map((puesto) => ({
 						...puesto,

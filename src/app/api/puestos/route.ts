@@ -22,7 +22,8 @@ export async function GET() {
                 WHERE
                     PR.PUESTO_ID = P.PUESTO_ID
                 FOR JSON PATH
-            ) AS ROLES_JSON
+            ) AS ROLES_JSON,
+			P.NIVEL_RIESGO_APROBACION
         FROM
             MAE_PUESTO P;
         `);
@@ -33,6 +34,7 @@ export async function GET() {
 				descripcion: singleValue.DESCRIPCION,
 				estado: singleValue.ESTADO,
 				roles: singleValue.ROLES_JSON,
+				aprobadorNivel: singleValue.NIVEL_RIESGO_APROBACION,
 			};
 		});
 		return NextResponse.json({ success: true, values: turnos });
@@ -45,17 +47,17 @@ export async function GET() {
 export async function POST(request: Request) {
 	try {
 		const pool = await poolPromise;
-		const { descripcion, estado, roles, usuarioCreacion } = await request.json();
+		const { descripcion, estado, roles, usuarioCreacion, aprobadorNivel } = await request.json();
 
 		// Convertir roles de objeto a array
 		const rolesArray: { id: number }[] = Object.values(roles);
 
 		console.log({ descripcion, estado, roles: rolesArray, usuarioCreacion });
 
-		const result = await pool.request().input("descripcion", descripcion).input("estado", estado).input("usuarioCreacion", usuarioCreacion)
-			.query(`INSERT INTO MAE_PUESTO (DESCRIPCION, ESTADO, USUARIO_CREACION, FECHA_CREACION, USUARIO_MODIFICACION, FECHA_MODIFICACION)
+		const result = await pool.request().input("descripcion", descripcion).input("estado", estado).input("usuarioCreacion", usuarioCreacion).input("aprobadorNivel", aprobadorNivel)
+			.query(`INSERT INTO MAE_PUESTO (DESCRIPCION, ESTADO, USUARIO_CREACION, FECHA_CREACION, USUARIO_MODIFICACION, FECHA_MODIFICACION, NIVEL_RIESGO_APROBACION)
                     OUTPUT INSERTED.PUESTO_ID
-                    VALUES (@descripcion, @estado, @usuarioCreacion, GETDATE(), @usuarioCreacion, GETDATE())`);
+                    VALUES (@descripcion, @estado, @usuarioCreacion, GETDATE(), @usuarioCreacion, GETDATE(), @aprobadorNivel)`);
 
 		if (result.rowsAffected[0] > 0) {
 			const puestoId = result.recordset[0].PUESTO_ID;
@@ -79,17 +81,25 @@ export async function POST(request: Request) {
 export async function PUT(request: Request) {
 	try {
 		const pool = await poolPromise;
-		const { id, descripcion, estado, roles, usuarioModificacion }: { id: number; descripcion: string; estado: string; roles: { id: number }[]; usuarioModificacion: string } = await request.json();
+		const {
+			id,
+			descripcion,
+			estado,
+			roles,
+			usuarioModificacion,
+			aprobadorNivel,
+		}: { id: number; descripcion: string; estado: string; roles: { id: number }[]; usuarioModificacion: string; aprobadorNivel: string } = await request.json();
 
 		// Convertir roles de objeto a array
 		const rolesArray = Object.values(roles);
 
-		await pool.request().input("id", id).input("descripcion", descripcion).input("estado", estado).input("usuarioModificacion", usuarioModificacion).query(`
+		await pool.request().input("id", id).input("descripcion", descripcion).input("estado", estado).input("aprobadorNivel", aprobadorNivel).input("usuarioModificacion", usuarioModificacion).query(`
 				UPDATE MAE_PUESTO
 				SET DESCRIPCION = @descripcion,
 					ESTADO = @estado,
 					USUARIO_MODIFICACION = @usuarioModificacion,
-					FECHA_MODIFICACION = GETDATE()
+					FECHA_MODIFICACION = GETDATE(),
+					NIVEL_RIESGO_APROBACION = @aprobadorNivel
 				WHERE PUESTO_ID = @id
 			`);
 

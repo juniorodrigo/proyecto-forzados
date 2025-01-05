@@ -53,7 +53,7 @@ const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor
 				} else {
 					if (nivelRiesgo === "BAJO" || nivelRiesgo === "MODERADO") {
 						const currentUser = user;
-						if (currentUser) {
+						if (currentUser && !filteredAprobadores.some((aprobador) => aprobador.id === currentUser.id)) {
 							filteredAprobadores.push({
 								id: currentUser.id,
 								nombre: currentUser.name,

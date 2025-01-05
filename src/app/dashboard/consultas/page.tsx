@@ -119,7 +119,10 @@ const Page: React.FC = () => {
 
 	useEffect(() => {
 		fetchData();
-	}, [fetchData]);
+		if (user) {
+			setSelectedSolicitante(user.name);
+		}
+	}, [fetchData, user]);
 
 	const [rejectReasons, setRejectReasons] = useState<{ id: number; descripcion: string; tipo: string }[]>([]);
 
@@ -169,8 +172,6 @@ const Page: React.FC = () => {
 			return isWithinDateRange && matchesSolicitante && matchesEstado && matchesArea && matchesTipo && matchesAprobador && matchesEjecutor;
 		});
 	}, [rows, selectedRange, selectedSolicitante, selectedEstado, selectedArea, selectedTipo, selectedAprobador, selectedEjecutor]);
-
-	console.log(filteredRows, ")))))))))))))))))))))))))))))))))))))FIKTEREDROWS");
 
 	const handleView = (id: number) => {
 		const row = rows.find((row) => row.id === id);
@@ -420,7 +421,7 @@ const Page: React.FC = () => {
 	};
 
 	return (
-		<div className="p-8 bg-gray-50 min-h-screen">
+		<div className="p-4 min-h-screen">
 			<h1 className="text-3xl font-bold mb-8 text-gray-800">Consultas</h1>
 
 			{/* Contenedor de filtros y botón */}

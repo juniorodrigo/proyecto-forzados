@@ -44,8 +44,6 @@ const StepOne: React.FC<StepOneProps> = ({
 	const [turnos, setTurnos] = useState<Option[]>([]);
 	const [proyectosList, setProyectosList] = useState<Option[]>([]);
 
-	console.log(tagPrefijo, tagCentro, tagSubfijo, descripcion, disciplina, turno, proyecto, "))))))))))))))))))))))))))))))))))))))))))))>______________________________________DATOSPREVIOS");
-
 	useEffect(() => {
 		const fetchData = async (url: string, setState: React.Dispatch<React.SetStateAction<Option[]>>) => {
 			try {

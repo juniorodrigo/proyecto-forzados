@@ -18,11 +18,13 @@ const ModalCreacionPuesto: React.FC<ModalCreacionPuestoProps> = ({ isOpen, onClo
 		descripcion: "",
 		estado: 1,
 		roles: {} as { [key: string]: { id: number; descripcion: string } }, // Cambiar el tipo de roles
+		aprobadorNivel: "",
 	});
 	const [popoverMessage, setPopoverMessage] = useState("");
 	const [popoverType, setPopoverType] = useState<"success" | "error">("success");
 	const [showPopover, setShowPopover] = useState(false);
 	const { user } = useUserSession();
+	const [aprobadorNivel, setAprobadorNivel] = useState<string>("");
 
 	const resetForm = () => {
 		setFormData({
@@ -30,16 +32,13 @@ const ModalCreacionPuesto: React.FC<ModalCreacionPuestoProps> = ({ isOpen, onClo
 			descripcion: "",
 			estado: 1,
 			roles: {},
+			aprobadorNivel: "",
 		});
 	};
 
 	const handleClose = () => {
 		resetForm();
 		onClose();
-	};
-
-	const hasRole = (roleId: number) => {
-		return formData.roles.hasOwnProperty(roleId);
 	};
 
 	useEffect(() => {
@@ -59,7 +58,9 @@ const ModalCreacionPuesto: React.FC<ModalCreacionPuestoProps> = ({ isOpen, onClo
 				descripcion: puestoData.descripcion || "",
 				estado: puestoData.estado || 1,
 				roles: puestoData.roles || {},
+				aprobadorNivel: puestoData.aprobadorNivel || "",
 			});
+			setAprobadorNivel(puestoData.aprobadorNivel || "");
 		} else {
 			resetForm();
 		}
@@ -70,13 +71,44 @@ const ModalCreacionPuesto: React.FC<ModalCreacionPuestoProps> = ({ isOpen, onClo
 		setFormData({ ...formData, [name]: value });
 	};
 
+	const getRoleById = (roleId: number) => {
+		return roles.find((role) => role.id === roleId) || null;
+	};
+
+	const addRole = (updatedRoles, newRole) => {
+		const nextIndex = Object.keys(updatedRoles).length; // Determina el próximo índice disponible
+		updatedRoles[nextIndex] = newRole; // Asigna el nuevo rol al índice
+		return updatedRoles;
+	};
+
+	const removeRole = (updatedRoles, roleId: number) => {
+		//@ts-expect-error Filtrar roles por
+		const updatedRolesArray = Object.entries(updatedRoles).filter(([, role]) => role.id !== roleId);
+		const newRoles = Object.fromEntries(updatedRolesArray);
+		console.log("REMOVING ROLE:" + roleId, newRoles);
+		return newRoles;
+	};
+
+	const hasRole = (roleId: number) => {
+		return Object.values(formData.roles).some((role) => role.id === roleId);
+	};
+
 	const handleRoleChange = (roleId: number) => {
 		setFormData((prevFormData) => {
-			const updatedRoles = { ...prevFormData.roles };
+			let updatedRoles = { ...prevFormData.roles };
 			if (hasRole(roleId)) {
-				delete updatedRoles[roleId];
+				// console.log("TIENE EL ROL Y SE ESTÁ QUITANDO", updatedRoles);
+				if (roleId === 2) {
+					setAprobadorNivel("");
+				}
+				//@ts-expect-error Eliminar un rol del objeto
+				updatedRoles = removeRole(updatedRoles, roleId);
 			} else {
-				updatedRoles[roleId] = roles.find((rol) => rol.id === roleId) || { id: roleId, descripcion: "" };
+				// console.log("NO TIENE EL ROL Y SE ESTÁ AGREGANDO", updatedRoles);
+				const newRole = getRoleById(roleId);
+				if (newRole) {
+					updatedRoles = addRole(updatedRoles, newRole);
+				}
 			}
 			return { ...prevFormData, roles: updatedRoles };
 		});
@@ -93,9 +125,9 @@ const ModalCreacionPuesto: React.FC<ModalCreacionPuestoProps> = ({ isOpen, onClo
 			usuarioId: formData.id,
 			usuarioCreacion: user?.id,
 			usuarioModificacion: user?.id,
+			aprobadorNivel: aprobadorNivel,
 		};
 
-		console.log(dataToSend, "____________________SENDDDDDDDDDDINGGGGGGG");
 		const response = await fetch(url, {
 			method,
 			headers: {
@@ -126,7 +158,7 @@ const ModalCreacionPuesto: React.FC<ModalCreacionPuestoProps> = ({ isOpen, onClo
 	return (
 		<>
 			{/* Mostrar Popover si showPopover es true */}
-			<div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={handleClose}></div>
+			<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4" onClick={handleClose}></div>
 			<div className="fixed inset-0 flex items-center justify-center z-50 p-4">
 				<div className="bg-white rounded-lg shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
 					<div className="p-8 relative">
@@ -168,6 +200,22 @@ const ModalCreacionPuesto: React.FC<ModalCreacionPuestoProps> = ({ isOpen, onClo
 									</div>
 								))}
 							</div>
+							{hasRole(2) && ( // Suponiendo que el rol de aprobador tiene id 1
+								<div className="mb-4">
+									<label className="block text-sm font-medium text-gray-700">Nivel de Riesgo de Aprobador</label>
+									<select
+										name="aprobadorNivel"
+										value={aprobadorNivel}
+										onChange={(e) => setAprobadorNivel(e.target.value)}
+										className="w-full px-3 py-2 border border-gray-400 rounded focus:outline-none focus:ring-2 mb-4"
+									>
+										<option value="">Seleccione un nivel</option>
+										<option value="BAJO">Bajo</option>
+										<option value="MEDIO">Medio</option>
+										<option value="ALTO">Alto</option>
+									</select>
+								</div>
+							)}
 							<div className="flex justify-between mt-4">
 								<button type="submit" className={`px-4 py-2 rounded-md focus:outline-none focus:ring-2 ${isFormValid ? "bg-blue-500" : "bg-gray-500"} text-white`} disabled={!isFormValid}>
 									Guardar

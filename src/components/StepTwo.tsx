@@ -135,8 +135,6 @@ const StepTwo: React.FC<StepTwoProps> = ({
 			const impactoDesc = impactos.find((item) => item.id == impacto)?.descripcion;
 			const probabilidadDesc = probabilidades.find((item) => item.id == probabilidad)?.descripcion;
 
-			console.log(impactos, probabilidades, "DESCRIPCIONES");
-
 			if (impactoDesc && probabilidadDesc) {
 				const mappings: { [key: string]: { [key: string]: string } } = {
 					INSIGNIFICANTE: {
