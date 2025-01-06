@@ -575,8 +575,10 @@ const createSolicitudHTML = (solicitud: ResumenSolicitud, actionToken: string, i
             ${createField("Responsable", solicitud.responsableNombre)}
             ${createField("Riesgo", solicitud.riesgoDescripcion)}
         </div>
-        <a href="http://localhost:3000/acciones/aprobar/alta?token=${actionToken}&id=${insertedId}&bxs=${usuario}" class="button">Aprobar</a>
-        <a href="http://localhost:3000/acciones/rechazar/alta?token=${actionToken}&id=${insertedId}&bxs=${usuario}" class="button button-reject">Rechazar</a>
+        <a href="http${process.env.NODE_ENV == "production" ? "s" : ""}://${process.env.HOSTNAME}/acciones/aprobar/alta?token=${actionToken}&id=${insertedId}&bxs=${usuario}" class="button">Aprobar</a>
+        <a href="http${process.env.NODE_ENV == "production" ? "s" : ""}://${
+		process.env.HOSTNAME
+	}/acciones/rechazar/alta?token=${actionToken}&id=${insertedId}&bxs=${usuario}" class="button button-reject">Rechazar</a>
     </div>
 </body>
 </html>

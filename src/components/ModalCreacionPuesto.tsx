@@ -118,6 +118,14 @@ const ModalCreacionPuesto: React.FC<ModalCreacionPuestoProps> = ({ isOpen, onClo
 		});
 	};
 
+	const handleAprobadorNivelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setAprobadorNivel(e.target.value);
+		setFormData((prevFormData) => ({
+			...prevFormData,
+			aprobadorNivel: e.target.value,
+		}));
+	};
+
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		const method = isEditing ? "PUT" : "POST";
@@ -211,17 +219,20 @@ const ModalCreacionPuesto: React.FC<ModalCreacionPuestoProps> = ({ isOpen, onClo
 							{hasRole(2) && ( // Suponiendo que el rol de aprobador tiene id 1
 								<div className="mb-4">
 									<label className="block text-sm font-medium text-gray-700">Nivel de Riesgo de Aprobador</label>
-									<select
-										name="aprobadorNivel"
-										value={aprobadorNivel}
-										onChange={(e) => setAprobadorNivel(e.target.value)}
-										className="w-full px-3 py-2 border border-gray-400 rounded focus:outline-none focus:ring-2 mb-4"
-									>
-										<option value="">Seleccione un nivel</option>
-										<option value="BAJO">Bajo</option>
-										<option value="MEDIO">Medio</option>
-										<option value="ALTO">Alto</option>
-									</select>
+									<div className="flex flex-col">
+										<label className="inline-flex items-center">
+											<input type="radio" name="aprobadorNivel" value="BAJO" checked={aprobadorNivel === "BAJO"} onChange={handleAprobadorNivelChange} className="form-radio" />
+											<span className="ml-2">Bajo</span>
+										</label>
+										<label className="inline-flex items-center">
+											<input type="radio" name="aprobadorNivel" value="MEDIO" checked={aprobadorNivel === "MEDIO"} onChange={handleAprobadorNivelChange} className="form-radio" />
+											<span className="ml-2">Medio</span>
+										</label>
+										<label className="inline-flex items-center">
+											<input type="radio" name="aprobadorNivel" value="ALTO" checked={aprobadorNivel === "ALTO"} onChange={handleAprobadorNivelChange} className="form-radio" />
+											<span className="ml-2">Alto</span>
+										</label>
+									</div>
 								</div>
 							)}
 							<div className="flex justify-between mt-4">

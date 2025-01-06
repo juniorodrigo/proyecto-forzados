@@ -278,7 +278,7 @@ const ForcedRegistration: React.FC = () => {
 						)}
 					</button>
 				</div>
-				<Popover message={popoverMessage} type={popoverType} show={showPopover} />
+				<Popover message={popoverMessage} type={popoverType} show={showPopover} className="z-50" />
 			</div>
 		</Suspense>
 	);

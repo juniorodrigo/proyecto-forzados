@@ -647,7 +647,7 @@ create table MAE_DATO_ADJUNTO (
    DATOADJUNTO_ID       int                  identity,
    SOLICITUD_ID         int                  null,
    NOMBRE_ARCHIVO       varchar(100)         null,
-   ARCHIVO              varchar(max)         null,
+   ARCHIVO              VARBINARY(max)         null,
    ESTADO               int                  null,
    USUARIO_CREACION     varchar(20)          null,
    FECHA_CREACION       datetime             null,

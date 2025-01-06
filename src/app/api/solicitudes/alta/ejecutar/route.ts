@@ -79,17 +79,34 @@ const createExecutionHTML = (solicitud: Solicitud, id: string) => {
 
 export async function POST(request: Request) {
 	try {
-		const pool = await poolPromise;
+		const formData = await request.formData();
+		const id = formData.get("id") as string;
+		const usuario = formData.get("usuario");
+		const fechaEjecucion = formData.get("fechaEjecucion");
 
-		const { id, usuario, fechaEjecucion } = await request.json();
+		const files = [];
+		for (let i = 0; i < 3; i++) {
+			const file = formData.get(`file${i + 1}`);
+			if (file) {
+				const arrayBuffer = await (file as Blob).arrayBuffer();
+				const buffer = Buffer.from(arrayBuffer);
+				files.push({ name: (file as File).name, data: buffer });
+			}
+		}
+
+		console.log("Archivos recibidos:");
+		files.forEach((file, index) => {
+			console.log(`Archivo ${index + 1}:`, file.name);
+		});
 
 		// Convertir fechaEjecucion a un objeto Date
-		const fechaEjecucionDate = new Date(fechaEjecucion);
+		const fechaEjecucionDate = new Date(fechaEjecucion as string);
 
 		if (isNaN(fechaEjecucionDate.getTime())) {
 			return NextResponse.json({ success: false, message: "Invalid date format" }, { status: 400 });
 		}
 
+		const pool = await poolPromise;
 		const result = await pool.request().input("id", id).input("usuario", usuario).input("fechaEjecucion", fechaEjecucionDate).query(`
 				UPDATE TRS_Solicitud_forzado 
 				SET 
@@ -103,11 +120,18 @@ export async function POST(request: Request) {
 		if (result.rowsAffected[0] > 0) {
 			const [solicitud] = await getSingleSolicitud(id);
 
+			for (const file of files) {
+				await pool.request().input("nombreArchivo", file.name).input("usuario", usuario).input("archivo", file.data).input("id", id).query(`
+			            INSERT INTO MAE_DATO_ADJUNTO (SOLICITUD_ID, NOMBRE_ARCHIVO, ARCHIVO, ESTADO, USUARIO_CREACION, USUARIO_MODIFICACION, FECHA_CREACION, FECHA_MODIFICACION)
+			            VALUES (@id, @nombreArchivo, @archivo, 1, @usuario, @usuario, GETDATE(), GETDATE())
+			        `);
+			}
+
 			const mailOptions: MailOptions = {
 				from: "test@prot.one",
 				to: `${solicitud.solicitanteACorreo}, ${solicitud.aprobadorACorreo}, ${solicitud.ejecutorACorreo}`,
 				subject: "[FORZADOS] Solicitud de alta ejecutada correctamente",
-				html: createExecutionHTML(solicitud, id),
+				html: createExecutionHTML(solicitud, id as string),
 			};
 
 			mailer.sendMail(mailOptions).catch((error) => console.error("Error sending email:", error));

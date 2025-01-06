@@ -15,9 +15,10 @@ interface ModalsProps {
 	executeDate: string;
 	setExecuteDate: (date: string) => void;
 	handleDrag: (e: React.DragEvent<HTMLDivElement>) => void;
-	handleDrop: (e: React.DragEvent<HTMLDivElement>) => void;
-	handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-	executeFile: File | null;
+	handleDrop: (e: React.DragEvent<HTMLDivElement>, index: number) => void;
+	handleFileChange: (e: React.ChangeEvent<HTMLInputElement>, index: number) => void;
+	executeFiles: File[];
+	setExecuteFiles: (files: File[]) => void;
 	closeExecuteModal: () => void;
 	handleExecuteConfirm: (tipo: string) => void;
 	isRejectModalOpen: boolean;
@@ -42,7 +43,7 @@ const Modals: React.FC<ModalsProps> = ({
 	handleDrag,
 	handleDrop,
 	handleFileChange,
-	executeFile,
+	executeFiles,
 	closeExecuteModal,
 	handleExecuteConfirm,
 	isRejectModalOpen,
@@ -186,28 +187,31 @@ const Modals: React.FC<ModalsProps> = ({
 								<label className="block text-sm font-medium text-gray-700 mb-1">Fecha de Ejecución</label>
 								<input type="datetime-local" value={executeDate} onChange={(e) => setExecuteDate(e.target.value)} className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 border-gray-300" />
 							</div>
-							<div className="mb-4">
-								<label htmlFor="executeFile" className="block text-sm font-medium text-gray-700 mb-1">
-									Datos Adjuntos
-								</label>
-								<div
-									className={`flex items-center justify-center border-2 ${
-										dragActive ? "border-blue-500" : "border-gray-300"
-									} border-dashed rounded-md p-4 cursor-pointer hover:bg-gray-100 focus-within:ring-2 focus-within:ring-blue-500`}
-									onDragOver={handleDrag}
-									onDragEnter={handleDrag}
-									onDragLeave={handleDrag}
-									onDrop={handleDrop}
-									onClick={() => document.getElementById("executeFile")?.click()}
-								>
-									<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 16v-3a4 4 0 10-8 0v3M8 16v2a4 4 0 004 4h0a4 4 0 004-4v-2m4-4a8 8 0 10-16 0v3m4-8a4 4 0 118 0" />
-									</svg>
-									<span className="text-sm text-gray-500">{executeFile ? executeFile.name : "Arrastre y suelte archivos o haga clic aquí"}</span>
-								</div>
-								<input id="executeFile" name="executeFile" type="file" className="hidden" onChange={handleFileChange} />
+							<div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+								{[0, 1, 2].map((index) => (
+									<div key={index}>
+										<label htmlFor={`executeFile${index}`} className="block text-sm font-medium text-gray-700 mb-1">
+											Datos Adjuntos {index + 1}
+										</label>
+										<div
+											className={`flex items-center justify-center border-2 ${
+												dragActive ? "border-blue-500" : "border-gray-300"
+											} border-dashed rounded-md p-4 cursor-pointer hover:bg-gray-100 focus-within:ring-2 focus-within:ring-blue-500`}
+											onDragOver={handleDrag}
+											onDragEnter={handleDrag}
+											onDragLeave={handleDrag}
+											onDrop={(e) => handleDrop(e, index)}
+											onClick={() => document.getElementById(`executeFile${index}`)?.click()}
+										>
+											<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 16v-3a4 4 0 10-8 0v3M8 16v2a4 4 0 004 4h0a4 4 0 004-4v-2m4-4a8 8 0 10-16 0v3m4-8a4 4 0 118 0" />
+											</svg>
+											<span className="text-sm text-gray-500">{executeFiles[index] ? executeFiles[index].name : "Arrastre y suelte archivos o haga clic aquí"}</span>
+										</div>
+										<input id={`executeFile${index}`} name={`executeFile${index}`} type="file" className="hidden" onChange={(e) => handleFileChange(e, index)} />
+									</div>
+								))}
 							</div>
-
 							<div className="flex justify-end gap-4">
 								<button onClick={closeExecuteModal} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
 									Cancelar

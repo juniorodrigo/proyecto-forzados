@@ -58,7 +58,7 @@ const Page: React.FC = () => {
 	const [isExecuteModalOpen, setIsExecuteModalOpen] = useState(false);
 	const [executeDate, setExecuteDate] = useState("");
 	const [selectedExecuteRow, setSelectedExecuteRow] = useState<Row | null>(null);
-	const [executeFile, setExecuteFile] = useState<File | null>(null);
+	const [executeFiles, setExecuteFiles] = useState<File[]>([null, null, null]);
 	const [, setDragActive] = useState(false);
 	const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
 	const [rejectReason, setRejectReason] = useState("");
@@ -69,7 +69,7 @@ const Page: React.FC = () => {
 	const router = useRouter();
 	const { user } = useUserSession();
 
-	console.log(user, "________________________DATOS______________________________");
+	// console.log(user, "________________________DATOS______________________________");
 
 	const usuariosEjecutores = ejecutores;
 	const usuariosSolicitantes = solicitantes;
@@ -125,7 +125,7 @@ const Page: React.FC = () => {
 	useEffect(() => {
 		fetchData();
 		if (user) {
-			setSelectedSolicitante(user.name);
+			// setSelectedSolicitante(user.name);
 		}
 	}, [fetchData, user]);
 
@@ -306,18 +306,26 @@ const Page: React.FC = () => {
 		}
 		if (confirm("¿Está seguro de ejecutar?")) {
 			try {
+				const formData = new FormData();
+				formData.append("id", selectedExecuteRow?.id.toString() || "");
+				formData.append("fechaEjecucion", executeDate);
+				formData.append("usuario", user?.id.toString() || "");
+				executeFiles.forEach((file, index) => {
+					if (file) {
+						formData.append(`file${index + 1}`, file);
+					}
+				});
+
 				const response = await fetch(`/api/solicitudes/${tipo.toLowerCase()}/ejecutar`, {
 					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({ id: selectedExecuteRow?.id, fechaEjecucion: executeDate, usuario: user?.id }),
+					body: formData,
 				});
 				if (response.ok) {
 					setPopoverMessage("Ejecución exitosa");
 					setPopoverType("success");
 					fetchData();
 					closeExecuteModal();
+					setExecuteFiles([null, null, null]); // Limpiar archivos después de cerrar el modal
 				} else {
 					setPopoverMessage("Error al ejecutar");
 					setPopoverType("error");
@@ -411,18 +419,34 @@ const Page: React.FC = () => {
 		setDragActive(e.type === "dragover");
 	};
 
-	const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+	const handleDrop = (e: React.DragEvent<HTMLDivElement>, index: number) => {
 		e.preventDefault();
 		e.stopPropagation();
 		setDragActive(false);
-		if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-			setExecuteFile(e.dataTransfer.files[0]);
+		const files = [...executeFiles];
+		const file = e.dataTransfer.files && e.dataTransfer.files[0];
+		if (file) {
+			const allowedTypes = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "image/jpeg", "image/png"];
+			if (allowedTypes.includes(file.type)) {
+				files[index] = file;
+				setExecuteFiles(files);
+			} else {
+				alert("Solo se permiten archivos PDF, DOCX, JPG o PNG.");
+			}
 		}
 	};
 
-	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		if (e.target.files && e.target.files[0]) {
-			setExecuteFile(e.target.files[0]);
+	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+		const files = [...executeFiles];
+		const file = e.target.files && e.target.files[0];
+		if (file) {
+			const allowedTypes = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "image/jpeg", "image/png"];
+			if (allowedTypes.includes(file.type)) {
+				files[index] = file;
+				setExecuteFiles(files);
+			} else {
+				alert("Solo se permiten archivos PDF, DOCX, JPG o PNG.");
+			}
 		}
 	};
 
@@ -661,7 +685,8 @@ const Page: React.FC = () => {
 				handleDrag={handleDrag}
 				handleDrop={handleDrop}
 				handleFileChange={handleFileChange}
-				executeFile={executeFile}
+				executeFiles={executeFiles}
+				setExecuteFiles={setExecuteFiles}
 				closeExecuteModal={closeExecuteModal}
 				handleExecuteConfirm={handleExecuteConfirm}
 				isRejectModalOpen={isRejectModalOpen}
