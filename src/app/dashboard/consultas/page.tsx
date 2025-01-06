@@ -149,15 +149,22 @@ const Page: React.FC = () => {
 		fetchRejectReasons();
 	}, []);
 
+	const validateRol = (array: number[]) => {
+		return Object.keys(user.roles).some((element) => array.includes(Number(element)));
+	};
+
 	useEffect(() => {
+		const validateRol = (array: number[]) => {
+			return Object.keys(user.roles).some((element) => array.includes(Number(element)));
+		};
 		if (user) {
-			if (usuariosSolicitantes.includes(user.role)) {
+			if (validateRol(usuariosSolicitantes)) {
 				setSelectedSolicitante(user.name);
 			}
-			if (usuariosAprobadores.includes(user.role)) {
+			if (validateRol(usuariosAprobadores)) {
 				setSelectedAprobador(user.name);
 			}
-			if (usuariosEjecutores.includes(user.role)) {
+			if (validateRol(usuariosEjecutores)) {
 				setSelectedEjecutor(user.name);
 			}
 		}
@@ -280,7 +287,7 @@ const Page: React.FC = () => {
 
 	const handleExecute = async (id: number) => {
 		const row = rows.find((row) => row.id === id);
-		if (row && user && (usuariosEjecutores.includes(user?.role) || usuariosAdministradores.includes(user?.role || -1))) {
+		if (row && user && (validateRol(usuariosEjecutores) || validateRol(usuariosAdministradores))) {
 			openExecuteModal(row);
 		}
 	};
@@ -448,10 +455,6 @@ const Page: React.FC = () => {
 				alert("Solo se permiten archivos PDF, DOCX, JPG o PNG.");
 			}
 		}
-	};
-
-	const validateRol = (array: number[]) => {
-		return Object.keys(user.roles).some((element) => array.includes(Number(element)));
 	};
 
 	const handleOpenApprovalModal = (row: Row) => {
