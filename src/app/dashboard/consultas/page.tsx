@@ -69,7 +69,7 @@ const Page: React.FC = () => {
 	const router = useRouter();
 	const { user } = useUserSession();
 
-	// console.log(user, "________________________DATOS______________________________");
+	console.log(user, "________________________DATOS______________________________");
 
 	const usuariosEjecutores = ejecutores;
 	const usuariosSolicitantes = solicitantes;
@@ -450,6 +450,10 @@ const Page: React.FC = () => {
 		}
 	};
 
+	const validateRol = (array: number[]) => {
+		return Object.keys(user.roles).some((element) => array.includes(Number(element)));
+	};
+
 	const handleOpenApprovalModal = (row: Row) => {
 		setSelectedApprovalRow(row);
 		setIsApprovalModalOpen(true);
@@ -623,13 +627,13 @@ const Page: React.FC = () => {
 												<button onClick={() => handleView(row.id)} className="text-[#c8a064] hover:text-indigo-900 mr-2" title="Ver detalles">
 													<FaEye />
 												</button>
-												{row.estado.startsWith("PENDIENTE") && user && (usuariosAprobadores.includes(user.role) || usuariosAdministradores.includes(user.role)) && (
+												{row.estado.startsWith("PENDIENTE") && user && (validateRol(usuariosAprobadores) || validateRol(usuariosAdministradores)) && (
 													<button onClick={() => handleOpenApprovalModal(row)} className="text-green-600 hover:text-green-900 mr-2" title="Aprobar/Rechazar">
 														<FaCheck />
 													</button>
 												)}
 												{row.estado !== "FINALIZADO" &&
-													(usuariosSolicitantes.includes(user?.role || -1) || usuariosAdministradores.includes(user?.role || -1)) &&
+													(validateRol(usuariosSolicitantes) || validateRol(usuariosAdministradores)) &&
 													row.estado !== "APROBADO-ALTA" &&
 													!row.estado.includes("APROBADO") &&
 													!row.estado.includes("RECHAZADO") &&
@@ -638,7 +642,7 @@ const Page: React.FC = () => {
 															<FaEdit />
 														</button>
 													)}
-												{row.estado !== "FINALIZADO" && row.estado === "EJECUTADO-ALTA" && user && (usuariosSolicitantes.includes(user.role) || usuariosAdministradores.includes(user?.role || -1)) && (
+												{row.estado !== "FINALIZADO" && row.estado === "EJECUTADO-ALTA" && user && (validateRol(usuariosSolicitantes) || validateRol(usuariosAdministradores)) && (
 													<button onClick={() => handleDelete(row.id)} className="text-green-600 hover:text-green-900 mr-2" title="Eliminar">
 														<FaArrowDown />
 													</button>
@@ -648,7 +652,7 @@ const Page: React.FC = () => {
 													!row.estado.includes("RECHAZADO") &&
 													row.estado.includes("APROBADO") &&
 													user &&
-													(usuariosEjecutores.includes(user?.role) || usuariosAdministradores.includes(user?.role || -1)) && (
+													(validateRol(usuariosEjecutores) || validateRol(usuariosAdministradores)) && (
 														<button onClick={() => handleExecute(row.id)} className="text-[#c8a064] hover:text-blue-900" title="Ejecutar">
 															<FaPlay />
 														</button>
