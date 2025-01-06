@@ -8,6 +8,7 @@ interface UserSession {
 	role: number;
 	roles: { [key: number]: string };
 	jwt: string;
+	flagNuevoIngreso: string;
 }
 
 export default function useUserSession() {
@@ -50,5 +51,9 @@ export default function useUserSession() {
 		}
 	};
 
-	return { user, saveUser, clearUser, fetchUserFromServer };
+	const disableFlagNuevoIngreso = async () => {
+		user.flagNuevoIngreso = "0";
+	};
+
+	return { user, saveUser, clearUser, fetchUserFromServer, disableFlagNuevoIngreso };
 }

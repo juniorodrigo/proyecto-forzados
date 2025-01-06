@@ -66,7 +66,7 @@ const Page = () => {
 		});
 		const result = await response.json();
 		if (response.ok) {
-			setPopoverMessage("Operación exitosa");
+			setPopoverMessage("Usuario guardado correctamente");
 			setPopoverType("success");
 			setShowPopover(true);
 			// Refrescar los datos de la tabla
@@ -78,13 +78,13 @@ const Page = () => {
 				}
 			};
 			fetchData();
+			setIsModalOpen(false);
 		} else {
 			setPopoverMessage(result.message || "Error en la operación");
 			setPopoverType("error");
 			setShowPopover(true);
 		}
 		setTimeout(() => setShowPopover(false), 3000);
-		setIsModalOpen(false);
 		setSelectedUser(null); // Restablecer selectedUser después de enviar
 	};
 

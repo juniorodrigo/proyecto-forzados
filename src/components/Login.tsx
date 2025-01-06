@@ -3,7 +3,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { FaUser, FaLock, FaSignInAlt } from "react-icons/fa";
-import Popover from "@/components/Popover";
 import useUserSession from "@/hooks/useSession";
 import Image from "next/image";
 
@@ -12,17 +11,17 @@ const Login = () => {
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	const [errors, setErrors] = useState({ username: "", password: "" });
-	const [showPopover, setShowPopover] = useState(false);
-	const { fetchUserFromServer } = useUserSession(); // Obtener la función del hook
+	const { fetchUserFromServer } = useUserSession();
 
 	// Validaciones
 	const validateUsername = (username: string) => {
-		const usernameRegex = /^[A-ZÑ]{10,15}$/;
+		const usernameRegex = /^[A-ZÑ]{5,20}$/;
 		return usernameRegex.test(username);
 	};
 	const validatePassword = (password: string) => {
-		const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-		return passwordRegex.test(password);
+		const errors = [];
+		if (!/.{8,}/.test(password)) errors.push("al menos 8 caracteres");
+		return errors;
 	};
 
 	const handleLogin = async (e: React.FormEvent) => {
@@ -35,14 +34,15 @@ const Login = () => {
 		if (!upperUsername) {
 			newErrors.username = "El usuario es obligatorio";
 		} else if (!validateUsername(upperUsername)) {
-			newErrors.username = "El usuario debe tener entre 10 y 15 letras mayúsculas";
+			newErrors.username = "El usuario debe tener entre 5 y 20 letras mayúsculas";
 		}
 
 		// Validación de contraseña
+		const passwordErrors = validatePassword(password);
 		if (!password) {
 			newErrors.password = "La contraseña es obligatoria";
-		} else if (!validatePassword(password)) {
-			newErrors.password = "La contraseña debe tener al menos 8 caracteres alfanuméricos";
+		} else if (passwordErrors.length > 0) {
+			newErrors.password = `La contraseña debe tener ${passwordErrors.join(", ")}`;
 		}
 
 		if (newErrors.username || newErrors.password) {
@@ -82,12 +82,10 @@ const Login = () => {
 
 		// Si la autenticación fue exitosa
 		setErrors({ username: "", password: "" });
-		setShowPopover(true);
 
 		setTimeout(() => {
-			setShowPopover(false);
 			router.push("/dashboard/consultas");
-		}, 100);
+		}, 0);
 	};
 
 	return (
@@ -136,10 +134,6 @@ const Login = () => {
 							/>
 							{errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
 						</div>
-
-						{/* Popover de éxito */}
-						<Popover message="Inicio de sesión exitoso. Redirigiendo..." type="success" show={showPopover} />
-
 						{/* Botón de Iniciar Sesión */}
 						<button type="submit" className="w-full flex items-center justify-center px-4 py-4 text-white bg-sky-950 hover:bg-sky-800 rounded-lg transition duration-200 focus:outline-none">
 							<FaSignInAlt className="mr-2" />

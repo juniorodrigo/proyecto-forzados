@@ -20,6 +20,10 @@ const Navbar: FC = () => {
 
 	const { open, setOpen } = context;
 
+	useEffect(() => {
+		setOpen(false);
+	}, [setOpen]);
+
 	const toggleSidebar = () => {
 		setOpen(!open);
 	};

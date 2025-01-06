@@ -2,6 +2,7 @@
 import Table from "@/components/Table";
 import React, { useState, useMemo, useEffect } from "react";
 import ModalCreacionPuesto from "@/components/ModalCreacionPuesto";
+import Popover from "@/components/Popover";
 
 export interface Role {
 	id: number;
@@ -22,6 +23,9 @@ const Page = () => {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isEditing, setIsEditing] = useState(false);
 	const [selectedPuesto, setSelectedPuesto] = useState<Puesto | undefined>(undefined);
+	const [popoverMessage, setPopoverMessage] = useState("");
+	const [popoverType, setPopoverType] = useState<"success" | "error">("success");
+	const [showPopover, setShowPopover] = useState(false);
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -50,6 +54,10 @@ const Page = () => {
 
 		if (result.success) {
 			setPuestosData(result.values);
+			setPopoverMessage("Puesto guardado correctamente");
+			setPopoverType("success");
+			setShowPopover(true);
+			setTimeout(() => setShowPopover(false), 3000);
 		}
 	};
 
@@ -119,6 +127,7 @@ const Page = () => {
 				puestoData={selectedPuesto}
 				onSuccess={handleSuccess}
 			/>
+			<Popover message={popoverMessage} type={popoverType} show={showPopover} />
 		</div>
 	);
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Popover from "./Popover"; // Importar Popover
+import Popover from "./Popover";
 import { Puesto } from "../app/dashboard/administrar-puestos/page";
 import useUserSession from "@/hooks/useSession";
 
@@ -25,6 +25,7 @@ const ModalCreacionPuesto: React.FC<ModalCreacionPuestoProps> = ({ isOpen, onClo
 	const [showPopover, setShowPopover] = useState(false);
 	const { user } = useUserSession();
 	const [aprobadorNivel, setAprobadorNivel] = useState<string>("");
+	const [initialFormData, setInitialFormData] = useState<Puesto | null>(null);
 
 	const resetForm = () => {
 		setFormData({
@@ -53,16 +54,19 @@ const ModalCreacionPuesto: React.FC<ModalCreacionPuestoProps> = ({ isOpen, onClo
 
 	useEffect(() => {
 		if (isEditing && puestoData) {
-			setFormData({
+			const initialData = {
 				id: puestoData.id || 0,
 				descripcion: puestoData.descripcion || "",
 				estado: puestoData.estado || 1,
 				roles: puestoData.roles || {},
 				aprobadorNivel: puestoData.aprobadorNivel || "",
-			});
+			};
+			setFormData(initialData);
+			setInitialFormData(initialData);
 			setAprobadorNivel(puestoData.aprobadorNivel || "");
 		} else {
 			resetForm();
+			setInitialFormData(null);
 		}
 	}, [isEditing, puestoData]);
 
@@ -137,7 +141,7 @@ const ModalCreacionPuesto: React.FC<ModalCreacionPuestoProps> = ({ isOpen, onClo
 		});
 		const result = await response.json();
 		if (response.ok) {
-			setPopoverMessage("Operación exitosa");
+			setPopoverMessage("Puesto guardado correctamente");
 			setPopoverType("success");
 			setShowPopover(true);
 			onSuccess();
@@ -151,7 +155,11 @@ const ModalCreacionPuesto: React.FC<ModalCreacionPuestoProps> = ({ isOpen, onClo
 		onClose();
 	};
 
-	const isFormValid = formData.descripcion && formData.estado;
+	const isFormChanged = () => {
+		return JSON.stringify(formData) !== JSON.stringify(initialFormData);
+	};
+
+	const isFormValid = formData.descripcion && formData.estado && Object.keys(formData.roles).length > 0 && (!isEditing || isFormChanged());
 
 	if (!isOpen) return null;
 

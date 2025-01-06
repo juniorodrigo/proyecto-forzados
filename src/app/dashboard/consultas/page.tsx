@@ -12,6 +12,8 @@ import { FaEye, FaEdit, FaPlay, FaCheck, FaArrowUp, FaArrowDown, FaCircle } from
 import useUserSession from "@/hooks/useSession";
 import Modals from "@/components/Modals";
 import ModalAprobacionRechazo from "@/components/ModalAprobacionRechazo";
+import ModalCambioPassword from "@/components/ModalCambioPassword";
+
 import { solicitantes, aprobadores, ejecutores, administradores } from "@/hooks/rolesPermitidos";
 
 type Status = "RECHAZADO-ALTA" | "PENDIENTE-ALTA" | "APROBADO-ALTA" | "EJECUTADO-ALTA" | "RECHAZADO" | "PENDIENTE-BAJA" | "APROBADO-BAJA" | "EJECUTADO-BAJA" | "FINALIZADO";
@@ -63,8 +65,11 @@ const Page: React.FC = () => {
 	const [selectedEndDate, setSelectedEndDate] = useState<string | "">("");
 	const [isApprovalModalOpen, setIsApprovalModalOpen] = useState(false);
 	const [selectedApprovalRow, setSelectedApprovalRow] = useState<Row | null>(null);
+	const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 	const router = useRouter();
 	const { user } = useUserSession();
+
+	console.log(user, "________________________DATOS______________________________");
 
 	const usuariosEjecutores = ejecutores;
 	const usuariosSolicitantes = solicitantes;
@@ -157,6 +162,12 @@ const Page: React.FC = () => {
 			}
 		}
 	}, [user, usuariosSolicitantes, usuariosAprobadores, usuariosEjecutores]);
+
+	useEffect(() => {
+		if (user && user.flagNuevoIngreso) {
+			setIsPasswordModalOpen(true);
+		}
+	}, [user]);
 
 	const filteredRows = useMemo(() => {
 		return rows.filter((row) => {
@@ -420,8 +431,16 @@ const Page: React.FC = () => {
 		setIsApprovalModalOpen(true);
 	};
 
+	const handlePasswordChangeSuccess = () => {
+		setPopoverMessage("Cambio de contraseña exitoso");
+		setPopoverType("success");
+		setShowPopover(true);
+		setTimeout(() => setShowPopover(false), 3000);
+		setIsPasswordModalOpen(false);
+	};
+
 	return (
-		<div className="p-4 min-h-screen">
+		<div className="p-4 min-h-screen  ">
 			<h1 className="text-3xl font-bold mb-8 text-gray-800">Consultas</h1>
 
 			{/* Contenedor de filtros y botón */}
@@ -660,7 +679,10 @@ const Page: React.FC = () => {
 				onApprove={() => selectedApprovalRow && handleApprove(selectedApprovalRow.id, selectedApprovalRow.estado.includes("ALTA") ? "ALTA" : "BAJA")}
 				onReject={openRejectModal}
 			/>
-			<Popover message={popoverMessage} type={popoverType} show={showPopover} />
+			{/* Mostrar ModalCambioPassword si isPasswordModalOpen es true */}
+			<ModalCambioPassword isOpen={isPasswordModalOpen} onClose={() => setIsPasswordModalOpen(false)} onSuccess={handlePasswordChangeSuccess} />
+
+			<Popover message={popoverMessage} type={popoverType} show={showPopover} className="z-40" />
 		</div>
 	);
 };

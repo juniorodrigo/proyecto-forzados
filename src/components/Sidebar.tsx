@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useContext, useEffect, useState, useMemo } from "react";
-import { RiDashboardLine, RiArrowRightUpLine, RiProductHuntLine, RiArchiveDrawerLine, RiBarChartFill } from "react-icons/ri";
+import { RiArrowRightUpLine, RiProductHuntLine, RiArchiveDrawerLine, RiBarChartFill } from "react-icons/ri";
+import { FaUserFriends, FaHardHat } from "react-icons/fa";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UiContext } from "@/context/SidebarContext";
@@ -46,7 +47,7 @@ const Sidebar: React.FC = () => {
 			{
 				id: "administrar-usuario",
 				label: "Administrar Usuarios",
-				icon: <RiDashboardLine className="text-xl" />,
+				icon: <FaUserFriends className="text-xl" />,
 				href: "/dashboard/administrar-usuario",
 				roles: [...administradores],
 			},
@@ -60,7 +61,7 @@ const Sidebar: React.FC = () => {
 			{
 				id: "administrar-puestos",
 				label: "Administrar Puestos",
-				icon: <RiProductHuntLine className="text-xl" />,
+				icon: <FaHardHat className="text-xl" />,
 				href: "/dashboard/administrar-puestos",
 				roles: [...administradores],
 			},

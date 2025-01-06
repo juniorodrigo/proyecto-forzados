@@ -148,6 +148,15 @@ const ModalCreacionUsuario: React.FC<ModalCreacionUsuarioProps> = ({ isOpen, onC
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
+
+		if (formData.usuario.length < 5 || formData.usuario.length > 20) {
+			setPopoverMessage("El nombre de usuario debe tener entre 5 y 20 caracteres.");
+			setPopoverType("error");
+			setShowPopover(true);
+			setTimeout(() => setShowPopover(false), 3000);
+			return;
+		}
+
 		const response = await fetch("/api/usuarios/usuario-existe", {
 			method: "POST",
 			headers: {
@@ -187,8 +196,9 @@ const ModalCreacionUsuario: React.FC<ModalCreacionUsuarioProps> = ({ isOpen, onC
 		}
 	};
 
-	const isFormValid =
-		formData.areaId && formData.usuario && formData.nombre && formData.apePaterno && formData.apeMaterno && formData.dni && formData.correo && formData.rolId && formData.estado && formData.puestoId;
+	const isFormValid = Boolean(
+		formData.areaId && formData.usuario && formData.nombre && formData.apePaterno && formData.apeMaterno && formData.dni && formData.correo && formData.estado && formData.puestoId
+	);
 
 	if (!isOpen) return null;
 
