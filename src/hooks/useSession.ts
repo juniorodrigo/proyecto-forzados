@@ -52,7 +52,11 @@ export default function useUserSession() {
 	};
 
 	const disableFlagNuevoIngreso = async () => {
-		user.flagNuevoIngreso = "0";
+		if (user) {
+			const updatedUser = { ...user, flagNuevoIngreso: "0" };
+			setUser(updatedUser);
+			localStorage.setItem("user", JSON.stringify(updatedUser));
+		}
 	};
 
 	return { user, saveUser, clearUser, fetchUserFromServer, disableFlagNuevoIngreso };

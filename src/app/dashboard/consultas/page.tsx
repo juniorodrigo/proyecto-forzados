@@ -164,7 +164,7 @@ const Page: React.FC = () => {
 	}, [user, usuariosSolicitantes, usuariosAprobadores, usuariosEjecutores]);
 
 	useEffect(() => {
-		if (user && user.flagNuevoIngreso) {
+		if (user && user.flagNuevoIngreso == "1") {
 			setIsPasswordModalOpen(true);
 		}
 	}, [user]);
@@ -620,7 +620,7 @@ const Page: React.FC = () => {
 												</td>
 											))}
 											<td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-												<button onClick={() => handleView(row.id)} className="text-indigo-600 hover:text-indigo-900 mr-2" title="Ver detalles">
+												<button onClick={() => handleView(row.id)} className="text-[#c8a064] hover:text-indigo-900 mr-2" title="Ver detalles">
 													<FaEye />
 												</button>
 												{row.estado.startsWith("PENDIENTE") && user && (usuariosAprobadores.includes(user.role) || usuariosAdministradores.includes(user.role)) && (
@@ -634,7 +634,7 @@ const Page: React.FC = () => {
 													!row.estado.includes("APROBADO") &&
 													!row.estado.includes("RECHAZADO") &&
 													!row.estado.includes("EJECUTADO") && (
-														<button onClick={() => handleEdit(row.id, row.estado)} className="text-blue-600 hover:text-blue-900 mr-2" title="Editar">
+														<button onClick={() => handleEdit(row.id, row.estado)} className="text-[#c8a064] hover:text-blue-900 mr-2" title="Editar">
 															<FaEdit />
 														</button>
 													)}
@@ -649,7 +649,7 @@ const Page: React.FC = () => {
 													row.estado.includes("APROBADO") &&
 													user &&
 													(usuariosEjecutores.includes(user?.role) || usuariosAdministradores.includes(user?.role || -1)) && (
-														<button onClick={() => handleExecute(row.id)} className="text-blue-600 hover:text-blue-900" title="Ejecutar">
+														<button onClick={() => handleExecute(row.id)} className="text-[#c8a064] hover:text-blue-900" title="Ejecutar">
 															<FaPlay />
 														</button>
 													)}

@@ -51,7 +51,7 @@ const StepOne: React.FC<StepOneProps> = ({
 				const data = await response.json();
 
 				setState(data.values);
-				console.log(data.values, `data values from ${url}`);
+				// console.log(data.values, `data values from ${url}`);
 			} catch (error) {
 				console.error(`Error fetching data from ${url}:`, error);
 			}
