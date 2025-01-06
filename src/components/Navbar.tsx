@@ -56,7 +56,7 @@ const Navbar: FC = () => {
 				<button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className="flex h-8 items-center gap-2 rounded-md px-2 text-gray-700 transition-colors hover:bg-gray-200">
 					<span className="text-sm font-medium">
 						{user?.name || "ADMIN"}
-						<span className="ml-1 text-xs text-gray-500">{user?.roleName || "ADMINISTRADOR"}</span>
+						<span className="ml-1 text-xs text-gray-500">{user?.area || "ADMINISTRADOR"}</span>
 					</span>
 					<div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#001d39] text-xs text-white">{user?.name?.charAt(0) || "A"}</div>
 				</button>
