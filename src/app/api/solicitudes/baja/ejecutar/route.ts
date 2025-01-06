@@ -68,8 +68,26 @@ const createApprovalHTML = (solicitud: Solicitud) => {
 
 export async function POST(request: Request) {
 	try {
+		const formData = await request.formData();
+		const id = formData.get("id") as string;
+		const usuario = formData.get("usuario");
+
+		const files = [];
+		for (let i = 0; i < 3; i++) {
+			const file = formData.get(`file${i + 1}`);
+			if (file) {
+				const arrayBuffer = await (file as Blob).arrayBuffer();
+				const buffer = Buffer.from(arrayBuffer);
+				files.push({ name: (file as File).name, data: buffer });
+			}
+		}
+
+		console.log("Archivos recibidos:");
+		files.forEach((file, index) => {
+			console.log(`Archivo ${index + 1}:`, file.name);
+		});
+
 		const pool = await poolPromise;
-		const { id, usuario } = await request.json();
 		const result = await pool
 			.request()
 			.input("id", id)
@@ -93,6 +111,13 @@ export async function POST(request: Request) {
 			if (motivoResult.recordset.length > 0) {
 				const solicitud = motivoResult.recordset[0];
 				const recipients = [solicitud.SOLICITANTE_CORREO, solicitud.APROBADOR_CORREO, solicitud.EJECUTOR_CORREO];
+
+				for (const file of files) {
+					await pool.request().input("nombreArchivo", file.name).input("usuario", usuario).input("archivo", file.data).input("id", id).query(`
+			            INSERT INTO MAE_DATO_ADJUNTO (SOLICITUD_ID, NOMBRE_ARCHIVO, ARCHIVO, ESTADO, USUARIO_CREACION, USUARIO_MODIFICACION, FECHA_CREACION, FECHA_MODIFICACION)
+			            VALUES (@id, @nombreArchivo, @archivo, 1, @usuario, @usuario, GETDATE(), GETDATE())
+			        `);
+				}
 
 				for (const recipient of recipients) {
 					const mailOptions: MailOptions = {
