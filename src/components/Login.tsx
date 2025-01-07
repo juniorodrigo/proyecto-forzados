@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { FaUser, FaLock, FaSignInAlt } from "react-icons/fa";
+import { FaUser, FaLock, FaSignInAlt, FaEye, FaEyeSlash } from "react-icons/fa";
 import useUserSession from "@/hooks/useSession";
 import Image from "next/image";
 
@@ -12,6 +12,7 @@ const Login = () => {
 	const [password, setPassword] = useState("");
 	const [errors, setErrors] = useState({ username: "", password: "" });
 	const { fetchUserFromServer } = useUserSession();
+	const [showPassword, setShowPassword] = useState(false);
 
 	// Validaciones
 	const validateUsername = (username: string) => {
@@ -125,13 +126,16 @@ const Login = () => {
 						<div className="relative">
 							<FaLock className="absolute left-4 top-5 text-gray-400" />
 							<input
-								type="password"
+								type={showPassword ? "text" : "password"}
 								placeholder="Contraseña"
 								value={password}
 								onChange={(e) => setPassword(e.target.value)}
-								className="w-full pl-10 pr-6 py-4 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-gray-600"
+								className="w-full pl-10 pr-10 py-4 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-gray-600"
 								required
 							/>
+							<button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-5 text-gray-400">
+								{showPassword ? <FaEyeSlash /> : <FaEye />}
+							</button>
 							{errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
 						</div>
 						{/* Botón de Iniciar Sesión */}
