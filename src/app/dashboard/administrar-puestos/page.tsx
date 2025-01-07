@@ -61,6 +61,35 @@ const Page = () => {
 		}
 	};
 
+	const renderNivelAprobador = (nivelAprobador: string) => {
+		if (nivelAprobador === "" || !nivelAprobador) return <span></span>;
+		else {
+			const niveles = nivelAprobador.split(",");
+			return niveles.map((nivel) => {
+				let colorClass = "";
+				switch (nivel) {
+					case "BAJO":
+						colorClass = "bg-green-100 text-green-800";
+						break;
+					case "MEDIO":
+						colorClass = "bg-yellow-100 text-yellow-800";
+						break;
+					case "ALTO":
+						colorClass = "bg-orange-100 text-orange-800";
+						break;
+
+					default:
+						break;
+				}
+				return (
+					<span key={nivel} className={`px-2 py-1 rounded-full ${colorClass} mr-1`}>
+						{nivel}
+					</span>
+				);
+			});
+		}
+	};
+
 	return (
 		<div className="space-y-8 p-4">
 			<div className="space-y-4">
@@ -106,6 +135,7 @@ const Page = () => {
 						) : (
 							<span></span>
 						),
+						aprobadorNivel: <>{renderNivelAprobador(puesto.aprobadorNivel)}</>, // Renderizar nivelAprobador
 					}))}
 					onEdit={(id) => {
 						const puesto = puestosData.find((puesto) => puesto.id === id);

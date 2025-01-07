@@ -66,6 +66,7 @@ const Page = () => {
 		});
 		const result = await response.json();
 		if (response.ok) {
+			setIsModalOpen(false);
 			setPopoverMessage("Usuario guardado correctamente");
 			setPopoverType("success");
 			setShowPopover(true);
@@ -78,7 +79,6 @@ const Page = () => {
 				}
 			};
 			fetchData();
-			setIsModalOpen(false);
 		} else {
 			setPopoverMessage(result.message || "Error en la operación");
 			setPopoverType("error");
@@ -135,8 +135,8 @@ const Page = () => {
 			<ModalCreacionUsuario
 				isOpen={isModalOpen}
 				onClose={() => {
-					setIsModalOpen(false);
 					setSelectedUser(null); // Restablecer selectedUser al cerrar
+					setIsModalOpen(false);
 				}}
 				isEditing={isEditing}
 				userData={selectedUser}

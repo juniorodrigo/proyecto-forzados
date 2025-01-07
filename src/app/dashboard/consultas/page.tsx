@@ -69,12 +69,14 @@ const Page: React.FC = () => {
 	const router = useRouter();
 	const { user } = useUserSession();
 
-	console.log(user, "________________________DATOS______________________________");
+	// console.log(user, "________________________DATOS______________________________");
 
 	const usuariosEjecutores = ejecutores;
 	const usuariosSolicitantes = solicitantes;
 	const usuariosAprobadores = aprobadores;
 	const usuariosAdministradores = administradores;
+
+	console.log(rows, "THIS IS THE ROWS");
 
 	const uniqueAreas = Array.from(new Set(rows.map((row) => row.area)));
 	const uniqueSolicitantes = Array.from(new Set(rows.map((row) => row.solicitante)));

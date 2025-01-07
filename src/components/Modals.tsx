@@ -75,7 +75,7 @@ const Modals: React.FC<ModalsProps> = ({
 						<div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
 							<div className="p-6">
 								<h2 className="text-2xl font-bold mb-4">Detalles del Registro</h2>
-								<div className="bg-gray-100 p-4 rounded-lg mb-4 grid grid-cols-2 gap-4">
+								<div className="bg-gray-100 p-4 rounded-lg mb-4 grid grid-cols-2 gap-2.5">
 									{/* <p>
 									<strong>ID:</strong> {selectedRow.id}
 								</p> */}
@@ -102,16 +102,13 @@ const Modals: React.FC<ModalsProps> = ({
 										<strong>Disciplina:</strong> {selectedRow.disciplinaDescripcion}
 									</p>
 									<p>
-										<strong>Estado Solicitud:</strong> {selectedRow.estadoSolicitud}
-									</p>
-									<p>
 										<strong>Fecha Cierre:</strong> {selectedRow.fechaCierre ? formatDate(selectedRow.fechaCierre.toString()) : "N/A"}
 									</p>
 									<p>
 										<strong>Fecha Realización:</strong> {selectedRow.fechaRealizacion ? formatDate(selectedRow.fechaRealizacion.toString()) : "N/A"}
 									</p>
 									<p>
-										<strong>Motivo de Rechazo:</strong> {selectedRow.motivoRechazoDescripcion}
+										<strong>Motivo de Rechazo:</strong> {selectedRow.motivoRechazoDescripcion ?? "N/A"}
 									</p>
 									<p>
 										<strong>Gerencia Responsable:</strong> {selectedRow.responsableNombre}

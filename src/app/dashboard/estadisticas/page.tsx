@@ -128,7 +128,7 @@ const Estadisticas: React.FC = () => {
 				</div>
 			</div>
 			<div className="mt-8">
-				<h2 className="text-2xl font-bold mb-6">Solicitudes por área</h2>
+				<h2 className="text-2xl font-bold mb-6">Solicitudes por área (cualquier estado)</h2>
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 					{Object.entries(areaStats).map(([area, count]) => (
 						<div key={area} className="bg-white p-4 rounded-lg shadow flex items-center">

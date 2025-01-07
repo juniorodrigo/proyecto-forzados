@@ -20,8 +20,8 @@ type ModalCreacionUsuarioProps = {
 	isOpen: boolean;
 	onClose: () => void;
 	isEditing: boolean;
-	userData?: UserData; // Actualizar el tipo de userData
-	onSubmit: (formData: any, isEditing: boolean) => void; // Nueva prop para manejar el envío
+	userData?: UserData;
+	onSubmit: (formData: any, isEditing: boolean) => void;
 };
 
 const ModalCreacionUsuario: React.FC<ModalCreacionUsuarioProps> = ({ isOpen, onClose, isEditing, userData, onSubmit }) => {
@@ -134,7 +134,8 @@ const ModalCreacionUsuario: React.FC<ModalCreacionUsuarioProps> = ({ isOpen, onC
 		}
 	}, [isEditing, userData]);
 
-	const [, setIsModified] = useState(false);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [isModified, setIsModified] = useState(false);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
 		const { name, value } = e.target;
@@ -148,12 +149,14 @@ const ModalCreacionUsuario: React.FC<ModalCreacionUsuarioProps> = ({ isOpen, onC
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
+		setIsSubmitting(true); // Deshabilitar el botón de guardar
 
 		if (formData.usuario.length < 5 || formData.usuario.length > 20) {
 			setPopoverMessage("El nombre de usuario debe tener entre 5 y 20 caracteres.");
 			setPopoverType("error");
 			setShowPopover(true);
 			setTimeout(() => setShowPopover(false), 3000);
+			setIsSubmitting(false); // Habilitar el botón de guardar
 			return;
 		}
 
@@ -172,11 +175,13 @@ const ModalCreacionUsuario: React.FC<ModalCreacionUsuarioProps> = ({ isOpen, onC
 			setPopoverType("error");
 			setShowPopover(true);
 			setTimeout(() => setShowPopover(false), 3000);
+			setIsSubmitting(false); // Habilitar el botón de guardar
 			return;
 		}
 
 		onSubmit(formData, isEditing);
 		resetForm();
+		setIsSubmitting(false); // Habilitar el botón de guardar
 	};
 
 	const handleResetPassword = async () => {
@@ -197,7 +202,7 @@ const ModalCreacionUsuario: React.FC<ModalCreacionUsuarioProps> = ({ isOpen, onC
 	};
 
 	const isFormValid = Boolean(
-		formData.areaId && formData.usuario && formData.nombre && formData.apePaterno && formData.apeMaterno && formData.dni && formData.correo && formData.estado && formData.puestoId
+		formData.areaId && formData.usuario && formData.nombre && formData.apePaterno && formData.apeMaterno && formData.dni && formData.correo && formData.estado && formData.puestoId && isModified
 	);
 
 	if (!isOpen) return null;
@@ -311,7 +316,11 @@ const ModalCreacionUsuario: React.FC<ModalCreacionUsuarioProps> = ({ isOpen, onC
 								))}
 							</select>
 							<div className="flex justify-between mt-4">
-								<button type="submit" className={`px-4 py-2 rounded-md focus:outline-none focus:ring-2 ${isFormValid ? "bg-blue-500" : "bg-gray-500"} text-white`} disabled={!isFormValid}>
+								<button
+									type="submit"
+									className={`px-4 py-2 rounded-md focus:outline-none focus:ring-2 ${isFormValid && !isSubmitting ? "bg-blue-500" : "bg-gray-500"} text-white`}
+									disabled={!isFormValid || isSubmitting}
+								>
 									Guardar
 								</button>
 								<button type="button" onClick={handleClose} className="px-4 py-2 bg-red-500 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">

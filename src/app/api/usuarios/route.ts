@@ -109,7 +109,6 @@ export async function PUT(request: Request) {
 			.input("apePaterno", apePaterno)
 			.input("apeMaterno", apeMaterno)
 			.input("correo", correo)
-			.input("rolId", rolId)
 			.input("estado", estado)
 			.input("usuarioModificacion", usuarioModificacion).query(`UPDATE MAE_USUARIO SET 
 			        AREA_ID = @areaId, 
@@ -120,7 +119,6 @@ export async function PUT(request: Request) {
 			        APEPATERNO = @apePaterno, 
 			        APEMATERNO = @apeMaterno, 
 			        CORREO = @correo, 
-			        ROL_ID = @rolId, 
 			        ESTADO = @estado, 
 			        USUARIO_MODIFICACION = @usuarioModificacion, 
 			        FECHA_MODIFICACION = GETDATE() 
@@ -172,5 +170,4 @@ export async function DELETE(request: Request) {
 			return NextResponse.json({ success: false, message: "Error deshabilitando el usuario" }, { status: 500 });
 		}
 	}
-	return NextResponse.json({ success: false, message: "Error deleting user" }, { status: 500 });
 }

@@ -24,7 +24,7 @@ const ModalCreacionPuesto: React.FC<ModalCreacionPuestoProps> = ({ isOpen, onClo
 	const [popoverType, setPopoverType] = useState<"success" | "error">("success");
 	const [showPopover, setShowPopover] = useState(false);
 	const { user } = useUserSession();
-	const [aprobadorNivel, setAprobadorNivel] = useState<string>("");
+	const [aprobadorNivel, setAprobadorNivel] = useState<string[]>([]);
 	const [initialFormData, setInitialFormData] = useState<Puesto | null>(null);
 
 	const resetForm = () => {
@@ -35,6 +35,7 @@ const ModalCreacionPuesto: React.FC<ModalCreacionPuestoProps> = ({ isOpen, onClo
 			roles: {},
 			aprobadorNivel: "",
 		});
+		setAprobadorNivel([]);
 	};
 
 	const handleClose = () => {
@@ -63,10 +64,13 @@ const ModalCreacionPuesto: React.FC<ModalCreacionPuestoProps> = ({ isOpen, onClo
 			};
 			setFormData(initialData);
 			setInitialFormData(initialData);
-			setAprobadorNivel(puestoData.aprobadorNivel || "");
+			setAprobadorNivel(puestoData.aprobadorNivel ? puestoData.aprobadorNivel.split(",") : []);
 		} else {
 			resetForm();
 			setInitialFormData(null);
+			if (hasRole(2)) {
+				setAprobadorNivel(["BAJO"]);
+			}
 		}
 	}, [isEditing, puestoData]);
 
@@ -103,7 +107,7 @@ const ModalCreacionPuesto: React.FC<ModalCreacionPuestoProps> = ({ isOpen, onClo
 			if (hasRole(roleId)) {
 				// console.log("TIENE EL ROL Y SE ESTÁ QUITANDO", updatedRoles);
 				if (roleId === 2) {
-					setAprobadorNivel("");
+					setAprobadorNivel([]);
 				}
 				//@ts-expect-error Eliminar un rol del objeto
 				updatedRoles = removeRole(updatedRoles, roleId);
@@ -112,6 +116,9 @@ const ModalCreacionPuesto: React.FC<ModalCreacionPuestoProps> = ({ isOpen, onClo
 				const newRole = getRoleById(roleId);
 				if (newRole) {
 					updatedRoles = addRole(updatedRoles, newRole);
+					if (roleId === 2) {
+						setAprobadorNivel(["BAJO"]);
+					}
 				}
 			}
 			return { ...prevFormData, roles: updatedRoles };
@@ -119,10 +126,18 @@ const ModalCreacionPuesto: React.FC<ModalCreacionPuestoProps> = ({ isOpen, onClo
 	};
 
 	const handleAprobadorNivelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setAprobadorNivel(e.target.value);
+		const { value, checked } = e.target;
+		setAprobadorNivel((prevAprobadorNivel) => {
+			if (checked) {
+				return [...prevAprobadorNivel, value];
+			} else {
+				return prevAprobadorNivel.filter((nivel) => nivel !== value);
+			}
+		});
+
 		setFormData((prevFormData) => ({
 			...prevFormData,
-			aprobadorNivel: e.target.value,
+			aprobadorNivel: checked ? value : "",
 		}));
 	};
 
@@ -130,6 +145,7 @@ const ModalCreacionPuesto: React.FC<ModalCreacionPuestoProps> = ({ isOpen, onClo
 		e.preventDefault();
 		const method = isEditing ? "PUT" : "POST";
 		const url = "/api/puestos";
+
 		const dataToSend = {
 			...formData,
 			id: formData.id,
@@ -137,7 +153,7 @@ const ModalCreacionPuesto: React.FC<ModalCreacionPuestoProps> = ({ isOpen, onClo
 			usuarioId: formData.id,
 			usuarioCreacion: user?.id,
 			usuarioModificacion: user?.id,
-			aprobadorNivel: aprobadorNivel,
+			aprobadorNivel: aprobadorNivel.join(","),
 		};
 
 		const response = await fetch(url, {
@@ -216,20 +232,20 @@ const ModalCreacionPuesto: React.FC<ModalCreacionPuestoProps> = ({ isOpen, onClo
 									</div>
 								))}
 							</div>
-							{hasRole(2) && ( // Suponiendo que el rol de aprobador tiene id 1
+							{hasRole(2) && (
 								<div className="mb-4">
 									<label className="block text-sm font-medium text-gray-700">Nivel de Riesgo de Aprobador</label>
 									<div className="flex flex-col">
 										<label className="inline-flex items-center">
-											<input type="radio" name="aprobadorNivel" value="BAJO" checked={aprobadorNivel === "BAJO"} onChange={handleAprobadorNivelChange} className="form-radio" />
+											<input type="checkbox" name="aprobadorNivel" value="BAJO" checked={aprobadorNivel.includes("BAJO")} onChange={handleAprobadorNivelChange} className="form-checkbox" />
 											<span className="ml-2">Bajo</span>
 										</label>
 										<label className="inline-flex items-center">
-											<input type="radio" name="aprobadorNivel" value="MEDIO" checked={aprobadorNivel === "MEDIO"} onChange={handleAprobadorNivelChange} className="form-radio" />
+											<input type="checkbox" name="aprobadorNivel" value="MEDIO" checked={aprobadorNivel.includes("MEDIO")} onChange={handleAprobadorNivelChange} className="form-checkbox" />
 											<span className="ml-2">Medio</span>
 										</label>
 										<label className="inline-flex items-center">
-											<input type="radio" name="aprobadorNivel" value="ALTO" checked={aprobadorNivel === "ALTO"} onChange={handleAprobadorNivelChange} className="form-radio" />
+											<input type="checkbox" name="aprobadorNivel" value="ALTO" checked={aprobadorNivel.includes("ALTO")} onChange={handleAprobadorNivelChange} className="form-checkbox" />
 											<span className="ml-2">Alto</span>
 										</label>
 									</div>
