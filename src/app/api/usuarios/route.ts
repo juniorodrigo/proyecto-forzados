@@ -96,7 +96,7 @@ export async function POST(request: Request) {
 export async function PUT(request: Request) {
 	try {
 		const pool = await poolPromise;
-		const { usuarioId, areaId, puestoId, usuario, dni, nombre, apePaterno, apeMaterno, correo, rolId, estado, usuarioModificacion } = await request.json();
+		const { usuarioId, areaId, puestoId, usuario, dni, nombre, apePaterno, apeMaterno, correo, estado, usuarioModificacion } = await request.json();
 
 		const result = await pool
 			.request()

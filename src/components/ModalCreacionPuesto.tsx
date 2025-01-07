@@ -58,11 +58,12 @@ const ModalCreacionPuesto: React.FC<ModalCreacionPuestoProps> = ({ isOpen, onClo
 			const initialData = {
 				id: puestoData.id || 0,
 				descripcion: puestoData.descripcion || "",
-				estado: puestoData.estado || 1,
+				estado: puestoData.estado ?? 1,
 				roles: puestoData.roles || {},
 				aprobadorNivel: puestoData.aprobadorNivel || "",
 			};
 			setFormData(initialData);
+
 			setInitialFormData(initialData);
 			setAprobadorNivel(puestoData.aprobadorNivel ? puestoData.aprobadorNivel.split(",") : []);
 		} else {
@@ -212,8 +213,8 @@ const ModalCreacionPuesto: React.FC<ModalCreacionPuestoProps> = ({ isOpen, onClo
 							/>
 							<label className="block text-sm font-medium text-gray-700">Estado</label>
 							<select name="estado" value={formData.estado} onChange={handleChange} className="w-full px-3 py-2 border border-gray-400 rounded focus:outline-none focus:ring-2 mb-4">
-								<option value="activo">Activo</option>
-								<option value="inactivo">Inactivo</option>
+								<option value={1}>Activo</option>
+								<option value={0}>Inactivo</option>
 							</select>
 							<label className="block text-sm font-medium text-gray-700">Roles</label>
 							<div className="mb-4 grid grid-cols-2 gap-4">
