@@ -26,6 +26,7 @@ export interface Row {
 	estado: Status;
 	fecha: string;
 	fechaModificacion: string;
+	fechaCreacion: string;
 	tipo: string;
 	aprobador: string;
 	ejecutor: string;
@@ -76,8 +77,6 @@ const Page: React.FC = () => {
 	const usuariosAprobadores = aprobadores;
 	const usuariosAdministradores = administradores;
 
-	console.log(rows, "THIS IS THE ROWS");
-
 	const uniqueAreas = Array.from(new Set(rows.map((row) => row.area)));
 	const uniqueSolicitantes = Array.from(new Set(rows.map((row) => row.solicitante)));
 	const uniqueEstados = Array.from(new Set(rows.map((row) => row.estado)));
@@ -93,7 +92,7 @@ const Page: React.FC = () => {
 		{ key: "solicitante", label: "Solicitante", filterable: true, options: uniqueSolicitantes },
 		{ key: "aprobador", label: "Aprobador", filterable: true, options: uniqueAprobadores },
 		{ key: "ejecutor", label: "Ejecutor", filterable: true, options: uniqueEjecutores },
-		{ key: "fecha", label: "Fecha Actualización", filterable: false },
+		{ key: "fecha", label: "Fecha Creación", filterable: false },
 	];
 
 	const formatDate = (dateString: string) => {
@@ -110,7 +109,7 @@ const Page: React.FC = () => {
 			if (result.success) {
 				const formattedData = result.data.map((row: Row) => ({
 					...row,
-					fecha: formatDate(row.fechaModificacion),
+					fecha: formatDate(row.fechaCreacion),
 				}));
 
 				setRows(formattedData);
@@ -180,8 +179,8 @@ const Page: React.FC = () => {
 
 	const filteredRows = useMemo(() => {
 		return rows.filter((row) => {
-			const rowDate = new Date(row.fechaModificacion);
-			const isWithinDateRange = (!selectedRange?.from || rowDate >= selectedRange.from) && (!selectedRange?.to || rowDate <= selectedRange.to);
+			const rowDate = new Date(row.fechaCreacion);
+			const isWithinDateRange = (!selectedRange?.from || rowDate >= selectedRange.from) && (!selectedRange?.to || rowDate <= new Date(selectedRange.to.getTime() + 86400000));
 			const matchesSolicitante = selectedSolicitante ? row.solicitante.toLowerCase().includes(selectedSolicitante.toLowerCase()) : true;
 			const matchesEstado = selectedEstado ? row.estado === selectedEstado : true;
 			const matchesArea = selectedArea ? row.area === selectedArea : true;
@@ -192,6 +191,8 @@ const Page: React.FC = () => {
 			return isWithinDateRange && matchesSolicitante && matchesEstado && matchesArea && matchesTipo && matchesAprobador && matchesEjecutor;
 		});
 	}, [rows, selectedRange, selectedSolicitante, selectedEstado, selectedArea, selectedTipo, selectedAprobador, selectedEjecutor]);
+
+	console.log(filteredRows, "filteredRows");
 
 	const handleView = (id: number) => {
 		const row = rows.find((row) => row.id === id);
