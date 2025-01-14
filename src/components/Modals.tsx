@@ -29,13 +29,15 @@ interface ModalsProps {
 	handleRejectConfirm: (id: number, tipo: string) => void;
 	getStatusClass: (estado: string) => string;
 	formatDate: (dateString: string) => string;
+	setShowPopover: (show: boolean) => void;
+	setPopoverMessage: (message: string) => void;
+	setPopoverType: (type: string) => void;
 }
 
 const Modals: React.FC<ModalsProps> = ({
 	isModalOpen,
 	selectedRow,
 	closeModal,
-	closeModalBaja,
 	isExecuteModalOpen,
 	selectedExecuteRow,
 	executeDate,
@@ -54,15 +56,57 @@ const Modals: React.FC<ModalsProps> = ({
 	handleRejectConfirm,
 	getStatusClass,
 	formatDate,
+	setShowPopover,
+	setPopoverMessage,
+	setPopoverType,
 }) => {
 	const [dragActive] = React.useState(false);
 	const [isSubmitting, setIsSubmitting] = React.useState(false);
+	const [isObservationModalOpen, setIsObservationModalOpen] = React.useState(false);
+	const [isRejectExecutionModalOpen, setIsRejectExecutionModalOpen] = React.useState(false);
+
+	const [observation, setObservation] = React.useState("");
 
 	const formatStatus = (status: string) => {
 		return status
 			.split("-")
 			.map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
 			.join(" ");
+	};
+
+	const handleObservationSubmit = async () => {
+		setIsSubmitting(true);
+		try {
+			const response = await fetch("/api/solicitudes/alta/observar-ejecucion", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					id: selectedExecuteRow?.id,
+					observacion: observation,
+					usuario: selectedExecuteRow?.usuario,
+				}),
+			});
+			if (response.ok) {
+				setPopoverMessage("Observación enviada exitosamente");
+				setPopoverType("success");
+				closeExecuteModal();
+				setIsObservationModalOpen(false);
+				setObservation(""); // Limpiar el valor del input text
+				//fetchData(); // Recargar registros de la tabla
+			} else {
+				setPopoverMessage("Error al enviar la observación");
+				setPopoverType("error");
+			}
+		} catch {
+			setPopoverMessage("Error al enviar la observación");
+			setPopoverType("error");
+		} finally {
+			setShowPopover(true);
+			setTimeout(() => setShowPopover(false), 3000);
+			setIsSubmitting(false);
+		}
 	};
 
 	return (
@@ -77,7 +121,7 @@ const Modals: React.FC<ModalsProps> = ({
 								<h2 className="text-2xl font-bold mb-4">Detalles del Registro</h2>
 								<div className="bg-gray-100 p-4 rounded-lg mb-4 grid grid-cols-2 gap-2.5">
 									{/* <p>
-									<strong>ID:</strong> {selectedRow.id}
+										<strong>ID:</strong> {selectedRow.id}
 								</p> */}
 									{/* <p>
 									<strong>Descripcion:</strong> {selectedRow.nombre}
@@ -167,7 +211,7 @@ const Modals: React.FC<ModalsProps> = ({
 								</p>
 							</div>
 							<div className="flex justify-end gap-4">
-								<button onClick={closeModalBaja} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+								<button onClick={closeModal} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
 									Cerrar
 								</button>
 							</div>
@@ -179,7 +223,7 @@ const Modals: React.FC<ModalsProps> = ({
 				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
 					<div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
 						<div className="p-6">
-							<h2 className="text-2xl font-bold mb-4">{`Ejecutar ${selectedExecuteRow?.estado.includes("ALTA") ? "Alta" : "Baja"} de Forzado`}</h2>
+							<h2 className="text-2xl font-bold mb-4">{`Ejecutar ${selectedExecuteRow?.estado.includes("ALTA") ? "Forzado" : "Retiro"}`}</h2>
 							<div className="mb-4">
 								<label className="block text-sm font-medium text-gray-700 mb-1">Fecha de Ejecución</label>
 								<input type="datetime-local" value={executeDate} onChange={(e) => setExecuteDate(e.target.value)} className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 border-gray-300" />
@@ -210,9 +254,31 @@ const Modals: React.FC<ModalsProps> = ({
 								))}
 							</div>
 							<div className="flex justify-end gap-4">
-								<button onClick={closeExecuteModal} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+								<button
+									onClick={() => {
+										closeModal();
+										setExecuteDate("");
+									}}
+									className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+								>
 									Cancelar
 								</button>
+								{selectedExecuteRow.observadoEjecucion == false && (
+									<button
+										onClick={() => setIsObservationModalOpen(true)}
+										className="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
+									>
+										Observar
+									</button>
+								)}
+								{selectedExecuteRow.observadoEjecucion == true && (
+									<button
+										onClick={() => setIsRejectExecutionModalOpen(true)}
+										className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+									>
+										Rechazar
+									</button>
+								)}
 								<button
 									onClick={() => handleExecuteConfirm(selectedExecuteRow?.estado.includes("ALTA") ? "Alta" : "Baja")}
 									disabled={!executeDate}
@@ -227,6 +293,102 @@ const Modals: React.FC<ModalsProps> = ({
 					</div>
 				</div>
 			)}
+
+			{isObservationModalOpen && (
+				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+					<div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+						<div className="p-6">
+							<h2 className="text-2xl font-bold mb-4">Motivo de Observación</h2>
+							<textarea
+								value={observation}
+								onChange={(e) => setObservation(e.target.value)}
+								maxLength={2000}
+								rows={5}
+								className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 border-gray-300 mb-4"
+								placeholder="Escriba el motivo de observación aquí..."
+								disabled={isSubmitting}
+							/>
+							<div className="flex justify-end gap-4">
+								<button
+									onClick={() => {
+										setIsObservationModalOpen(false);
+										setObservation(""); // Limpiar el valor del input text
+									}}
+									className={`px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+										isSubmitting ? "bg-gray-400 text-gray-600 cursor-not-allowed" : "bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-gray-500"
+									}`}
+									disabled={isSubmitting}
+								>
+									Cancelar
+								</button>
+								<button
+									onClick={handleObservationSubmit}
+									className="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
+									disabled={isSubmitting}
+								>
+									{isSubmitting ? (
+										<svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+											<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+											<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+										</svg>
+									) : (
+										"Observar"
+									)}
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			)}
+
+			{isRejectExecutionModalOpen && selectedExecuteRow && (
+				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+					<div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+						<div className="p-6">
+							<h2 className="text-2xl font-bold mb-4">Motivo del Rechazo</h2>
+							<select value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 border-gray-300 mb-4">
+								<option value="">Seleccione un motivo</option>
+								{rejectReasons
+									.filter((reason) => reason.tipo === "A")
+									.map((reason) => (
+										<option key={reason.id} value={reason.id}>
+											{reason.descripcion}
+										</option>
+									))}
+							</select>
+							<div className="flex justify-end gap-4">
+								<button
+									onClick={() => {
+										closeModal();
+										setIsRejectExecutionModalOpen(false);
+									}}
+									disabled={isSubmitting} // Deshabilitar si está enviando
+									className={`px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 ${
+										isSubmitting ? "cursor-not-allowed" : ""
+									}`}
+								>
+									Cancelar
+								</button>
+								<button
+									onClick={() => {
+										setIsSubmitting(true);
+										if (selectedExecuteRow) handleRejectConfirm(selectedExecuteRow.id, "ALTA");
+										setIsRejectExecutionModalOpen(false);
+										closeModal();
+									}}
+									disabled={!rejectReason || isSubmitting} // Deshabilitar si no hay un motivo seleccionado o si está enviando
+									className={`px-4 py-2 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+										!rejectReason || isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-red-500 hover:bg-red-600 focus:ring-red-500"
+									}`}
+								>
+									Confirmar Rechazo
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			)}
+
 			{isRejectModalOpen && selectedRow && selectedRow.estado.includes("ALTA") && (
 				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
 					<div className="bg-white rounded-lg shadow-xl w-full max-w-md">
@@ -244,7 +406,7 @@ const Modals: React.FC<ModalsProps> = ({
 							</select>
 							<div className="flex justify-end gap-4">
 								<button
-									onClick={closeRejectModal}
+									onClick={closeModal}
 									disabled={isSubmitting} // Deshabilitar si está enviando
 									className={`px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 ${
 										isSubmitting ? "cursor-not-allowed" : ""
@@ -288,7 +450,9 @@ const Modals: React.FC<ModalsProps> = ({
 								</select>
 								<div className="flex justify-end gap-4">
 									<button
-										onClick={closeRejectModal}
+										onClick={() => {
+											closeRejectModal();
+										}}
 										disabled={isSubmitting} // Deshabilitar si está enviando
 										className={`px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 ${
 											isSubmitting ? "cursor-not-allowed" : ""

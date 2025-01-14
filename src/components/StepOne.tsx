@@ -99,9 +99,9 @@ const StepOne: React.FC<StepOneProps> = ({
 			{/* Proyecto */}
 			<div>
 				<h2 className="text-center font-semibold text-2xl mb-2">Datos generales</h2>
-				<label className="block text-sm font-medium text-gray-600 mb-2">Proyecto</label>
+				<label className="block text-sm font-medium text-gray-600 mb-2">Área de forzado</label>
 				<select value={proyecto} onChange={(e) => setProyecto(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-					<option value="">Nombre del proyecto asociado</option>
+					<option value="">Nombre del área de forzado</option>
 					{proyectosList.map((option) => (
 						<option key={option.id} value={option.id}>
 							{option.descripcion}

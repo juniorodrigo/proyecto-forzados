@@ -103,7 +103,10 @@ const getAllSolicitudes = async () => {
     SF.INTERLOCK,
 
     UXSA.AREA_ID,
-    AREAX.DESCRIPCION AS AREA_DESCRIPCION
+    AREAX.DESCRIPCION AS AREA_DESCRIPCION,
+
+    SF.OBSERVADO,
+    SF.OBSERVACION_RECHAZO
 
 FROM
     TRS_SOLICITUD_FORZADO SF
@@ -150,7 +153,7 @@ FROM
 		area: record.AREA_DESCRIPCION,
 		subarea: record.SUBAREA_DESCRIPCION,
 
-		tipo: record.SOLICITANTE_B_ID === null ? "alta" : "baja",
+		tipo: record.SOLICITANTE_B_ID == null ? "alta" : "baja",
 		solicitante:
 			record.SOLICITANTE_B_ID === null
 				? record.NOMBRE_SOLICITANTE_A + " " + record.AP_SOLICITANTE_A + " " + record.AM_SOLICITANTE_A
@@ -194,6 +197,8 @@ FROM
 		interlock: record.INTERLOCK,
 		proyectoDescripcion: record.PROYECTO_DESCRIPCION,
 		proyectoId: record.PROYECTO_ID,
+		observadoEjecucion: record.OBSERVADO,
+		desObservacionEjecucion: record.OBSERVACION_RECHAZO,
 	}));
 };
 
@@ -352,6 +357,7 @@ type InsertQueryParameters = {
 	interlockSeguridad: string;
 	responsable: string;
 	riesgo: string;
+	riesgoA: string;
 	probabilidad: string;
 	solicitante: string;
 	aprobador: string;

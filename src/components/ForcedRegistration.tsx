@@ -209,6 +209,8 @@ const ForcedRegistration: React.FC = () => {
 						setTipoForzado={setTipoForzado}
 						interlockSeguridad={interlockSeguridad} // Nuevo prop añadido
 						nivelRiesgo={nivelRiesgo}
+						solicitante={solicitante}
+						riesgo={riesgo}
 					/>
 				);
 			default:
@@ -232,7 +234,7 @@ const ForcedRegistration: React.FC = () => {
 	return (
 		<Suspense fallback={<div>Cargando...</div>}>
 			<div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-xl">
-				<h1 className="text-3xl font-bold text-center text-gray-900 mb-4">{!id ? "Alta de Forzado" : "Modificación de Alta"}</h1>
+				<h1 className="text-3xl font-bold text-center text-gray-900 mb-4">{!id ? "Creación solicitud de forzado" : "Modificación de solicitud de forzado"}</h1>
 
 				<div className="flex items-center justify-between mb-8">
 					<div className="relative flex-1 flex justify-center items-center">

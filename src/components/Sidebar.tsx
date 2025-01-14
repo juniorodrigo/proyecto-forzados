@@ -39,9 +39,9 @@ const Sidebar: React.FC = () => {
 			},
 			{
 				id: "generar-alta",
-				label: "Generar Alta",
+				label: "Solicitud de Forzado",
 				icon: <RiArrowRightUpLine className="text-xl" />,
-				href: "/dashboard/generar-alta",
+				href: "/dashboard/solicitud-forzado",
 				roles: [...solicitantes, ...administradores],
 			},
 			{

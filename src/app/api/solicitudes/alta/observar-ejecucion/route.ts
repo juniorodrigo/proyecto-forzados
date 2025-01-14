@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { poolPromise } from "@sql/lib/db";
-import bcrypt from "bcrypt";
 import { mailer, MailOptions } from "@/lib/mailer";
 import { getSingleSolicitud } from "../common";
 
@@ -94,41 +93,16 @@ export async function POST(request: Request) {
 	await transaction.begin();
 
 	try {
-		const { id, motivoRechazo, usuario, token } = await request.json();
-
-		if (token) {
-			const register = await pool.request().input("id", id).query("SELECT ACTION_TOKEN FROM TRS_SOLICITUD_FORZADO WHERE SOLICITUD_ID = @id");
-
-			if (!register.recordset.length || !register.recordset[0].ACTION_TOKEN) {
-				return NextResponse.json(
-					{
-						success: false,
-						message: "Token ha expirado",
-					},
-					{ status: 400 }
-				);
-			}
-
-			const isTokenValid = await bcrypt.compare(token, register.recordset[0].ACTION_TOKEN);
-			if (!isTokenValid) {
-				return NextResponse.json(
-					{
-						success: false,
-						message: "Token inválido",
-					},
-					{ status: 400 }
-				);
-			}
-		}
+		const { id, observacionEjecucion, usuario } = await request.json();
 
 		// Actualización combinada
-		const result = await pool.request().input("id", id).input("motivoRechazo", motivoRechazo).input("usuario", usuario).query(`
+		const result = await pool.request().input("id", id).input("observacionEjecucion", observacionEjecucion).input("usuario", usuario).query(`
                 UPDATE TRS_Solicitud_forzado 
-                SET ESTADOSOLICITUD = 'RECHAZADO-ALTA',
-                    MOTIVORECHAZO_A_ID = @motivoRechazo,
+                SET OBSERVADO = 1,
+                    OBSERVACION_RECHAZO = @observacionEjecucion,
                     FECHA_MODIFICACION = GETDATE(),
                     USUARIO_MODIFICACION = @usuario,
-                    ACTION_TOKEN = ''
+					ESTADOSOLICITUD = 'PENDIENTE-ALTA'
                 WHERE SOLICITUD_ID = @id
             `);
 
@@ -148,26 +122,26 @@ export async function POST(request: Request) {
 		const mailOptionsAprobador: MailOptions = {
 			from: "test@prot.one",
 			to: solicitud.aprobadorACorreo,
-			subject: "[FORZADOS] Solicitud de alta de forzado rechazada",
+			subject: "[FORZADOS] Solicitud de forzado observada durante ejecución",
 			html: createRejectionHTML(solicitud),
 		};
 
 		const mailOptionsEjecutor: MailOptions = {
 			from: "test@prot.one",
 			to: solicitud.ejecutorACorreo,
-			subject: "[FORZADOS] Solicitud de alta de forzado rechazada",
+			subject: "[FORZADOS] Solicitud de forzado observada durante ejecución",
 			html: createRejectionHTML(solicitud),
 		};
 
 		const mailOptionsSolicitante: MailOptions = {
 			from: "test@prot.one",
 			to: solicitud.solicitanteACorreo,
-			subject: "[FORZADOS] Solicitud de alta de forzado rechazada",
+			subject: "[FORZADOS] Solicitud de forzado observada durante ejecución",
 			html: createRejectionHTML(solicitud),
 		};
 
 		// Enviar correos de forma no bloqueante
-		Promise.all([
+		await Promise.all([
 			mailer.sendMail(mailOptionsAprobador).catch((error) => console.error("Error sending email to aprobador:", error)),
 			mailer.sendMail(mailOptionsEjecutor).catch((error) => console.error("Error sending email to ejecutor:", error)),
 			mailer.sendMail(mailOptionsSolicitante).catch((error) => console.error("Error sending email to solicitante:", error)),

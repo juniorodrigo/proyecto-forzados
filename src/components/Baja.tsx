@@ -127,7 +127,7 @@ const BajaForzado = () => {
 		<Suspense fallback={<div>Cargando...</div>}>
 			<div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-md">
 				<Popover message={popover.message} type={popover.type} show={popover.show} />
-				<h1 className="text-2xl font-bold text-gray-800 mb-6">Baja Forzado</h1>
+				<h1 className="text-2xl font-bold text-gray-800 mb-6">Solicitud de Retiro</h1>
 				<form onSubmit={handleSubmit}>
 					{/* Solicitante Retiro */}
 					<div className="mb-4">

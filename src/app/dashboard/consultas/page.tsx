@@ -37,7 +37,8 @@ export interface Row {
 	aprobadorBId: number;
 	ejecutorBId: number;
 	interlock: number;
-	[key: string]: string | number;
+	observadoEjecucion: boolean;
+	[key: string]: string | number | boolean;
 }
 
 const Page: React.FC = () => {
@@ -93,6 +94,7 @@ const Page: React.FC = () => {
 		{ key: "aprobador", label: "Aprobador", filterable: true, options: uniqueAprobadores },
 		{ key: "ejecutor", label: "Ejecutor", filterable: true, options: uniqueEjecutores },
 		{ key: "fecha", label: "Fecha Creación", filterable: false },
+		{ key: "observadoEjecucion", label: "Reiniciado" },
 	];
 
 	const formatDate = (dateString: string) => {
@@ -180,6 +182,7 @@ const Page: React.FC = () => {
 	const filteredRows = useMemo(() => {
 		return rows.filter((row) => {
 			const rowDate = new Date(row.fechaCreacion);
+			row.observadoEjecucion = row.observadoEjecucion && Number(row.observadoEjecucion) == 1 ? true : false;
 			const isWithinDateRange = (!selectedRange?.from || rowDate >= selectedRange.from) && (!selectedRange?.to || rowDate <= new Date(selectedRange.to.getTime() + 86400000));
 			const matchesSolicitante = selectedSolicitante ? row.solicitante.toLowerCase().includes(selectedSolicitante.toLowerCase()) : true;
 			const matchesEstado = selectedEstado ? row.estado === selectedEstado : true;
@@ -192,7 +195,7 @@ const Page: React.FC = () => {
 		});
 	}, [rows, selectedRange, selectedSolicitante, selectedEstado, selectedArea, selectedTipo, selectedAprobador, selectedEjecutor]);
 
-	console.log(filteredRows, "filteredRows");
+	// console.log(filteredRows, "filteredRows");
 
 	const handleView = (id: number) => {
 		const row = rows.find((row) => row.id === id);
@@ -202,14 +205,12 @@ const Page: React.FC = () => {
 		}
 	};
 
-	const closeModal = () => {
-		setIsModalOpen(false);
-		setSelectedRow(null);
-	};
-
 	const closeModalBaja = () => {
 		setIsModalOpen(false);
 		setSelectedRow(null);
+		fetchData(); // Recargar registros de la tabla
+		setShowPopover(true);
+		setTimeout(() => setShowPopover(false), 3000);
 	};
 
 	const handleEdit = (id: number, estado: Status) => {
@@ -243,10 +244,28 @@ const Page: React.FC = () => {
 	}, [selectedRange, selectedSolicitante, selectedEstado, selectedArea, selectedEndDate, selectedAprobador, selectedEjecutor]);
 
 	const formatStatus = (status: string) => {
-		return status
-			.split("-")
-			.map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-			.join(" ");
+		switch (status) {
+			case "PENDIENTE-ALTA":
+				return "Forzado Pendiente";
+			case "APROBADO-ALTA":
+				return "Forzado Aprobado";
+			case "EJECUTADO-ALTA":
+				return "Forzado Ejecutado";
+			case "RECHAZADO-ALTA":
+				return "Forzado Rechazado";
+			case "PENDIENTE-BAJA":
+				return "Retiro Pendiente";
+			case "APROBADO-BAJA":
+				return "Retiro Aprobado";
+			case "EJECUTADO-BAJA":
+				return "Retiro Ejecutado";
+			case "RECHAZADO-BAJA":
+				return "Retiro Rechazado";
+			case "FINALIZADO":
+				return "Finalizado";
+			default:
+				return status;
+		}
 	};
 
 	const getStatusClass = (estado: string) => {
@@ -300,10 +319,20 @@ const Page: React.FC = () => {
 		setIsExecuteModalOpen(true);
 	};
 
+	const closeModal = () => {
+		setIsModalOpen(false);
+		setIsExecuteModalOpen(false);
+
+		setSelectedRow(null);
+	};
+
 	const closeExecuteModal = () => {
 		setIsExecuteModalOpen(false);
 		setSelectedExecuteRow(null);
 		setExecuteDate("");
+		fetchData(); // Recargar registros de la tabla
+		setShowPopover(true);
+		setTimeout(() => setShowPopover(false), 3000);
 	};
 
 	const handleExecuteConfirm = async (tipo: string) => {
@@ -361,6 +390,9 @@ const Page: React.FC = () => {
 	const closeRejectModal = () => {
 		setIsRejectModalOpen(false);
 		setRejectReason("");
+		fetchData(); // Recargar registros de la tabla
+		setShowPopover(true);
+		setTimeout(() => setShowPopover(false), 3000);
 	};
 
 	const handleRejectConfirm = async (id: number, tipo: string) => {
@@ -383,9 +415,9 @@ const Page: React.FC = () => {
 				if (response.ok) {
 					setPopoverMessage("Rechazo exitoso");
 					setPopoverType("success");
-					fetchData();
 					closeRejectModal();
 					closeModal();
+					fetchData();
 				} else {
 					setPopoverMessage("Error al rechazar");
 					setPopoverType("error");
@@ -472,6 +504,8 @@ const Page: React.FC = () => {
 		setTimeout(() => setShowPopover(false), 3000);
 		setIsPasswordModalOpen(false);
 	};
+
+	console.log(filteredRows, "_______________________XXXXXXXXXXX");
 
 	return (
 		<div className="p-4 min-h-screen  ">
@@ -623,6 +657,12 @@ const Page: React.FC = () => {
 															<span className={row.estadoSolicitud == "FINALIZADO" ? "text-green-600" : row.tipo === "alta" ? "text-red-500" : "text-green-500"}>
 																{row.estadoSolicitud == "FINALIZADO" ? <FaCircle /> : row.tipo === "alta" ? <FaArrowUp /> : <FaArrowDown />}
 															</span>
+														) : column.key === "observadoEjecucion" ? (
+															row.observadoEjecucion ? (
+																"SÍ"
+															) : (
+																"NO"
+															)
 														) : (
 															row[column.key]
 														)}
@@ -707,6 +747,9 @@ const Page: React.FC = () => {
 				handleRejectConfirm={handleRejectConfirm}
 				getStatusClass={getStatusClass}
 				formatDate={formatDate}
+				setShowPopover={setShowPopover}
+				setPopoverMessage={setPopoverMessage}
+				setPopoverType={(type: "error" | "success") => setPopoverType(type)}
 			/>
 			<ModalAprobacionRechazo
 				isOpen={isApprovalModalOpen}

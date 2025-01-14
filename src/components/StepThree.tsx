@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { aprobadores, ejecutores } from "@/hooks/rolesPermitidos";
 import useUserSession from "@/hooks/useSession";
+import { nivelRiesgoDePersonasId, rolAprobadorInterlockId } from "@/hooks/variablesHardcodeadas";
 
 interface StepThreeProps {
 	aprobador: string;
@@ -11,6 +12,8 @@ interface StepThreeProps {
 	setTipoForzado: React.Dispatch<React.SetStateAction<string>>;
 	interlockSeguridad: string; // Nuevo prop
 	nivelRiesgo: string;
+	solicitante: string;
+	riesgo: string;
 }
 
 interface TipoForzado {
@@ -18,7 +21,7 @@ interface TipoForzado {
 	descripcion: string;
 }
 
-const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor, setEjecutor, tipoForzado, setTipoForzado, interlockSeguridad, nivelRiesgo }) => {
+const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor, setEjecutor, tipoForzado, setTipoForzado, interlockSeguridad, nivelRiesgo, solicitante, riesgo }) => {
 	const [tiposForzado, setTiposForzado] = useState<TipoForzado[]>([]);
 	const [aprobadoresList, setAprobadoresList] = useState<{ id: string; nombre: string; apePaterno: string; apeMaterno: string }[]>([]);
 	const [ejecutoresList, setEjecutoresList] = useState<{ id: string; nombre: string; apePaterno: string; apeMaterno: string }[]>([]);
@@ -45,22 +48,34 @@ const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor
 				const response = await fetch("/api/usuarios");
 				const data = await response.json();
 
+				const findUserById = (id: number) => {
+					return data.values.find((usuario: any) => usuario.id === id);
+				};
+
 				// Filtrar aprobadores
 				let filteredAprobadores = data.values.filter((usuario: any) => aprobadores.some((roleId) => Object.keys(usuario.roles).includes(roleId.toString())));
 
-				if (interlockSeguridad === "SÍ" && filteredAprobadores.length > 0) {
-					filteredAprobadores = filteredAprobadores.filter((aprobador: { puestoDescripcion?: string }) => aprobador.puestoDescripcion?.toLowerCase().includes("gerente"));
-				} else {
-					if (nivelRiesgo === "BAJO" || nivelRiesgo === "MODERADO") {
-						const currentUser = user;
-						if (currentUser && !filteredAprobadores.some((aprobador) => aprobador.id === currentUser.id)) {
-							filteredAprobadores.push({
-								id: currentUser.id,
-								nombre: currentUser.name,
-								apePaterno: "",
-								apeMaterno: "",
-							});
+				//TODO: mover a variables hardcodeadas
+				if ((interlockSeguridad === "SÍ" || Number(riesgo) == nivelRiesgoDePersonasId) && filteredAprobadores.length > 0) {
+					const newFilteredAprobadores = [];
+					for (const aprobador of filteredAprobadores) {
+						console.log(aprobador.roles);
+						if (aprobador.roles[rolAprobadorInterlockId]) {
+							newFilteredAprobadores.push(aprobador);
 						}
+					}
+					filteredAprobadores = newFilteredAprobadores;
+				} else {
+					// TODO: cambiar esto a variables hardcodeadas
+					if (nivelRiesgo === "BAJO" || nivelRiesgo === "MODERADO") {
+						const solicitantex = findUserById(Number(solicitante));
+
+						filteredAprobadores.push({
+							id: solicitantex.id,
+							nombre: solicitantex.nombre,
+							apePaterno: solicitantex.apePaterno,
+							apeMaterno: solicitantex.apeMaterno,
+						});
 					}
 				}
 
@@ -74,7 +89,7 @@ const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor
 			}
 		};
 		fetchUsuarios();
-	}, [interlockSeguridad, nivelRiesgo, user]);
+	}, [interlockSeguridad, nivelRiesgo, user, riesgo, solicitante]);
 
 	useEffect(() => {
 		const fetchSolicitudData = async () => {
