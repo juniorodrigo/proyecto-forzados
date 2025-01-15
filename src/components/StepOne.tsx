@@ -15,8 +15,6 @@ interface StepOneProps {
 	setTurno: React.Dispatch<React.SetStateAction<string>>;
 	proyecto: string;
 	setProyecto: React.Dispatch<React.SetStateAction<string>>;
-	setProbabilidadPrefijoId: React.Dispatch<React.SetStateAction<string>>;
-	setImpactoPrefijoId: React.Dispatch<React.SetStateAction<string>>;
 }
 
 interface Option {
@@ -41,8 +39,6 @@ const StepOne: React.FC<StepOneProps> = ({
 	setTurno,
 	proyecto,
 	setProyecto,
-	setProbabilidadPrefijoId,
-	setImpactoPrefijoId,
 }) => {
 	const [tagPrefijos, setTagPrefijos] = useState<Option[]>([]);
 	const [tagCentros, setTagCentros] = useState<Option[]>([]);
@@ -125,15 +121,7 @@ const StepOne: React.FC<StepOneProps> = ({
 				<label className="block text-sm font-medium text-gray-600 mb-2">Sub Área (Tag Prefijo)</label>
 				<select
 					value={tagPrefijo}
-					onChange={(e) => {
-						setTagPrefijo(e.target.value);
-
-						const selectedOption = tagPrefijos.find((option) => Number(option.id) === Number(e.target.value));
-						if (selectedOption) {
-							setProbabilidadPrefijoId(selectedOption.probabilidad);
-							setImpactoPrefijoId(selectedOption.impacto);
-						}
-					}}
+					onChange={(e) => setTagPrefijo(e.target.value)}
 					className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
 					required
 				>

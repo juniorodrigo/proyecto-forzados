@@ -26,11 +26,10 @@ const Page = () => {
 	const [matrizData, setMatrizData] = useState<Row[]>([]);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isEditing, setIsEditing] = useState(false);
-	const [selectedRow, setSelectedRow] = useState<Row | undefined>(undefined);
+	const [, setSelectedRow] = useState<Row | undefined>(undefined);
 	const [popoverMessage, setPopoverMessage] = useState("");
 	const [popoverType, setPopoverType] = useState<"success" | "error">("success");
 	const [showPopover, setShowPopover] = useState(false);
-	const [modalType, setModalType] = useState<"create" | "edit">("create");
 	const [newRecord, setNewRecord] = useState<Row>();
 
 	const [tagPrefijos, setTagPrefijos] = useState<Option[]>([]);
@@ -54,14 +53,6 @@ const Page = () => {
 			const result = await response.json();
 
 			setMatrizData(result.values);
-
-			// for (const singleRow of result.values) {
-			// 	singleRow.values[singleRow.id] = JSON.parse(result.values[i].roles);
-			// }
-
-			// if (result.success) {
-			// 	setMatrizData(result.values);
-			// }
 		};
 		fetchData();
 

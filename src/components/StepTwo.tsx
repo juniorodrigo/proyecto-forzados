@@ -16,8 +16,10 @@ interface StepTwoProps {
 	setSolicitante: React.Dispatch<React.SetStateAction<string>>;
 	nivelRiesgo: string;
 	setNivelRiesgo: React.Dispatch<React.SetStateAction<string>>;
-	probabilidadPrefijoId: string;
-	impactoPrefijoId: string;
+
+	tagPrefijo: string;
+	tagCentro: string;
+	tagSufijo: string;
 }
 
 interface Option {
@@ -28,6 +30,15 @@ interface Option {
 interface responsablesOptions {
 	id: string;
 	nombre: string;
+}
+
+interface RowMatrizRiesgo {
+	id: number;
+	prefijoId: number;
+	centroId: number;
+	sufijo: string;
+	probabilidadId: number;
+	impactoId: number;
 }
 
 const StepTwo: React.FC<StepTwoProps> = ({
@@ -45,17 +56,16 @@ const StepTwo: React.FC<StepTwoProps> = ({
 	setSolicitante,
 	nivelRiesgo,
 	setNivelRiesgo,
-	probabilidadPrefijoId,
-	impactoPrefijoId,
+	tagPrefijo,
+	tagCentro,
+	tagSufijo,
 }) => {
 	const [responsables, setResponsables] = useState<responsablesOptions[]>([]);
 	const [riesgos, setRiesgos] = useState<Option[]>([]);
 	const [probabilidades, setProbabilidades] = useState<Option[]>([]);
 	const [impactos, setImpactos] = useState<Option[]>([]);
 	const [usuarios, setUsuarios] = useState<{ id: string; nombre: string; apePaterno: string; apeMaterno: string; roles: Record<string, any> }[]>([]);
-
-	// console.log(probabilidad, "probabilidad", impacto, "impacto");
-	// console.log(probabilidadPrefijoId, "probabilidadPrefijoId", impactoPrefijoId, "impactoPrefijoId");
+	const [matrizData, setMatrizData] = useState<RowMatrizRiesgo[]>([]);
 
 	useEffect(() => {
 		const fetchData = async (url: string, setState: React.Dispatch<React.SetStateAction<Option[]>>) => {
@@ -81,11 +91,28 @@ const StepTwo: React.FC<StepTwoProps> = ({
 			}
 		};
 
+		const fetchMatrizRiesgoData = async () => {
+			const response = await fetch("/api/maestras/tags-matriz-riesgo");
+			const result = await response.json();
+
+			setMatrizData(result.values);
+
+			// Recorrer matrizData y buscar registros que cumplan con los parámetros
+			result.values.forEach((row: RowMatrizRiesgo) => {
+				if (row.prefijoId === parseInt(tagPrefijo) && row.centroId === parseInt(tagCentro) && row.sufijo === tagSufijo) {
+					console.log("Encontrada una regla de matriz que coincide. Aplicando probabilidad e impacto...");
+					setProbabilidad(String(row.probabilidadId));
+					setImpacto(String(row.impactoId));
+				} else console.log(`No se encontraron reglas de matriz de riesgos para los valores de tagPrefijo : ${tagPrefijo}, tagCentro: ${tagCentro}, tagSufijo: ${tagSufijo}`);
+			});
+		};
+
 		fetchResponsableData("/api/maestras/responsable", setResponsables);
 		fetchData("/api/maestras/riesgo-a", setRiesgos);
 		fetchData("/api/maestras/probabilidad", setProbabilidades);
 		fetchData("/api/maestras/impacto", setImpactos);
-	}, [setInterlockSeguridad, setResponsable, setRiesgo, setProbabilidad, setImpacto, setSolicitante]);
+		fetchMatrizRiesgoData();
+	}, [setInterlockSeguridad, setResponsable, setRiesgo, setProbabilidad, setImpacto, setSolicitante, tagPrefijo, tagCentro, tagSufijo]);
 
 	useEffect(() => {
 		const fetchUsuarios = async () => {
@@ -134,16 +161,6 @@ const StepTwo: React.FC<StepTwoProps> = ({
 		};
 		fetchSolicitudData();
 	}, [setInterlockSeguridad, setResponsable, setRiesgo, setProbabilidad, setImpacto, setSolicitante]);
-
-	useEffect(() => {
-		// Si existen probabilidadPrefijoId e impactoPrefijoId, setearlos como probabilidad e impacto
-		if (probabilidadPrefijoId) {
-			setProbabilidad(probabilidadPrefijoId);
-		}
-		if (impactoPrefijoId) {
-			setImpacto(impactoPrefijoId);
-		}
-	}, [probabilidadPrefijoId, impactoPrefijoId, setProbabilidad, setImpacto]);
 
 	useEffect(() => {
 		// Cálculo de nivel de riesgo basado en impacto y probabilidad
@@ -264,7 +281,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
 					onChange={(e) => setProbabilidad(e.target.value)}
 					className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
 					required
-					disabled={!!probabilidadPrefijoId} // Deshabilitar si existe probabilidadPrefijoId
+					disabled={false}
 				>
 					<option value="">Seleccione la probabilidad de ocurrencia</option>
 					{probabilidades.map((option) => (
@@ -283,7 +300,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
 					onChange={(e) => setImpacto(e.target.value)}
 					className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
 					required
-					disabled={!!impactoPrefijoId} // Deshabilitar si existe impactoPrefijoId
+					disabled={false}
 				>
 					<option value="">Seleccione Impacto de la Consecuencia</option>
 					{impactos.map((option) => (

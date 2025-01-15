@@ -19,8 +19,6 @@ const ForcedRegistration: React.FC = () => {
 	const [disciplina, setDisciplina] = useState("");
 	const [turno, setTurno] = useState("");
 	const [proyecto, setProyecto] = useState("");
-	const [probabilidadPrefijoId, setProbabilidadPrefijoId] = useState("");
-	const [impactoPrefijoId, setImpactoPrefijoId] = useState("");
 
 	const [interlockSeguridad, setInterlockSeguridad] = useState("");
 	const [responsable, setResponsable] = useState("");
@@ -179,8 +177,6 @@ const ForcedRegistration: React.FC = () => {
 						setTurno={setTurno}
 						proyecto={proyecto}
 						setProyecto={setProyecto}
-						setProbabilidadPrefijoId={setProbabilidadPrefijoId}
-						setImpactoPrefijoId={setImpactoPrefijoId}
 					/>
 				);
 			case 2:
@@ -190,8 +186,6 @@ const ForcedRegistration: React.FC = () => {
 						setInterlockSeguridad={setInterlockSeguridad}
 						responsable={responsable}
 						setResponsable={setResponsable}
-						probabilidadPrefijoId={probabilidadPrefijoId}
-						impactoPrefijoId={impactoPrefijoId}
 						riesgo={riesgo}
 						setRiesgo={setRiesgo}
 						probabilidad={probabilidad}
@@ -202,6 +196,9 @@ const ForcedRegistration: React.FC = () => {
 						setSolicitante={setSolicitante}
 						nivelRiesgo={nivelRiesgo}
 						setNivelRiesgo={setNivelRiesgo}
+						tagPrefijo={tagPrefijo}
+						tagCentro={tagCentro}
+						tagSufijo={tagSubfijo}
 					/>
 				);
 			case 3:
