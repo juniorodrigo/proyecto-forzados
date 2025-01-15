@@ -578,6 +578,10 @@ create table MAE_TAGS_MATRIZ_RIESGO (
    PROBABILIDAD_ID               int            null,
    IMPACTO_ID               int            null,
    ESTADO                  int            null,
+   USUARIO_CREACION    varchar(20)          null,
+   FECHA_CREACION       datetime             null,
+   USUARIO_MODIFICACION varchar(20)          null,
+   FECHA_MODIFICACION   datetime             null,
    constraint PK_TAGS_MATRIZ_RIESGO primary key (ID),
 
    constraint FK_MAE_TAGS_MATRIZ_RIESGO_SUB_AREA foreign key (SUB_AREA_ID)
