@@ -65,7 +65,6 @@ const StepTwo: React.FC<StepTwoProps> = ({
 	const [probabilidades, setProbabilidades] = useState<Option[]>([]);
 	const [impactos, setImpactos] = useState<Option[]>([]);
 	const [usuarios, setUsuarios] = useState<{ id: string; nombre: string; apePaterno: string; apeMaterno: string; roles: Record<string, any> }[]>([]);
-	const [matrizData, setMatrizData] = useState<RowMatrizRiesgo[]>([]);
 	const [camposBloqueados, setCamposBloqueados] = useState(false);
 
 	useEffect(() => {
@@ -95,9 +94,6 @@ const StepTwo: React.FC<StepTwoProps> = ({
 		const fetchMatrizRiesgoData = async () => {
 			const response = await fetch("/api/maestras/tags-matriz-riesgo");
 			const result = await response.json();
-
-			setMatrizData(result.values);
-			console.log("Matriz de riesgos cargada:", result.values);
 
 			// Recorrer matrizData y buscar registros que cumplan con los parámetros
 			for (const row of result.values) {
