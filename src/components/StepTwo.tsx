@@ -66,6 +66,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
 	const [impactos, setImpactos] = useState<Option[]>([]);
 	const [usuarios, setUsuarios] = useState<{ id: string; nombre: string; apePaterno: string; apeMaterno: string; roles: Record<string, any> }[]>([]);
 	const [matrizData, setMatrizData] = useState<RowMatrizRiesgo[]>([]);
+	const [camposBloqueados, setCamposBloqueados] = useState(false);
 
 	useEffect(() => {
 		const fetchData = async (url: string, setState: React.Dispatch<React.SetStateAction<Option[]>>) => {
@@ -96,15 +97,22 @@ const StepTwo: React.FC<StepTwoProps> = ({
 			const result = await response.json();
 
 			setMatrizData(result.values);
+			console.log("Matriz de riesgos cargada:", result.values);
 
 			// Recorrer matrizData y buscar registros que cumplan con los parámetros
-			result.values.forEach((row: RowMatrizRiesgo) => {
+			for (const row of result.values) {
 				if (row.prefijoId === parseInt(tagPrefijo) && row.centroId === parseInt(tagCentro) && row.sufijo === tagSufijo) {
 					console.log("Encontrada una regla de matriz que coincide. Aplicando probabilidad e impacto...");
 					setProbabilidad(String(row.probabilidadId));
 					setImpacto(String(row.impactoId));
-				} else console.log(`No se encontraron reglas de matriz de riesgos para los valores de tagPrefijo : ${tagPrefijo}, tagCentro: ${tagCentro}, tagSufijo: ${tagSufijo}`);
-			});
+					setCamposBloqueados(true);
+					break;
+				} else {
+					console.log(`No se encontraron reglas de matriz de riesgos para los valores de tagPrefijo : ${tagPrefijo}, tagCentro: ${tagCentro}, tagSufijo: ${tagSufijo}`);
+					setCamposBloqueados(false); // Desbloquear campos
+				}
+			}
+			return;
 		};
 
 		fetchResponsableData("/api/maestras/responsable", setResponsables);
@@ -279,9 +287,9 @@ const StepTwo: React.FC<StepTwoProps> = ({
 				<select
 					value={probabilidad}
 					onChange={(e) => setProbabilidad(e.target.value)}
-					className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+					className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${camposBloqueados ? "bg-gray-200" : ""}`}
 					required
-					disabled={false}
+					disabled={camposBloqueados}
 				>
 					<option value="">Seleccione la probabilidad de ocurrencia</option>
 					{probabilidades.map((option) => (
@@ -298,9 +306,9 @@ const StepTwo: React.FC<StepTwoProps> = ({
 				<select
 					value={impacto}
 					onChange={(e) => setImpacto(e.target.value)}
-					className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+					className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${camposBloqueados ? "bg-gray-200" : ""}`}
 					required
-					disabled={false}
+					disabled={camposBloqueados}
 				>
 					<option value="">Seleccione Impacto de la Consecuencia</option>
 					{impactos.map((option) => (
