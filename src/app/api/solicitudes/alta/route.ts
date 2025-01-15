@@ -105,8 +105,8 @@ const getAllSolicitudes = async () => {
     UXSA.AREA_ID,
     AREAX.DESCRIPCION AS AREA_DESCRIPCION,
 
-    SF.OBSERVADO,
-    SF.OBSERVACION_RECHAZO
+    SF.OBSERVADO_A,
+    SF.OBSERVACION_RECHAZO_A
 
 FROM
     TRS_SOLICITUD_FORZADO SF
@@ -197,7 +197,7 @@ FROM
 		interlock: record.INTERLOCK,
 		proyectoDescripcion: record.PROYECTO_DESCRIPCION,
 		proyectoId: record.PROYECTO_ID,
-		observadoEjecucion: record.OBSERVADO,
+		observadoEjecucion: record.OBSERVADO_A,
 		desObservacionEjecucion: record.OBSERVACION_RECHAZO,
 	}));
 };

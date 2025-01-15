@@ -1,5 +1,5 @@
 import React from "react";
-import { Row } from "@/app/dashboard/consultas/page";
+import { Row, formatStatus } from "@/app/dashboard/consultas/page";
 
 interface ModalsProps {
 	isModalOpen: boolean;
@@ -67,17 +67,12 @@ const Modals: React.FC<ModalsProps> = ({
 
 	const [observation, setObservation] = React.useState("");
 
-	const formatStatus = (status: string) => {
-		return status
-			.split("-")
-			.map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-			.join(" ");
-	};
-
 	const handleObservationSubmit = async () => {
 		setIsSubmitting(true);
 		try {
-			const response = await fetch("/api/solicitudes/alta/observar-ejecucion", {
+			const apiEndpoint = selectedExecuteRow?.estado.includes("ALTA") ? "/api/solicitudes/alta/observar-ejecucion" : "/api/solicitudes/baja/observar-ejecucion";
+
+			const response = await fetch(apiEndpoint, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -115,10 +110,10 @@ const Modals: React.FC<ModalsProps> = ({
 				!selectedRow.estado.includes("BAJA") &&
 				selectedRow &&
 				(selectedRow.estado.includes("ALTA") || selectedRow.estado.includes("RECHAZADO") || selectedRow.estado.includes("finalizado")) && (
-					<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+					<div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center p-4">
 						<div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
 							<div className="p-6">
-								<h2 className="text-2xl font-bold mb-4">Detalles del Registro</h2>
+								<h2 className="text-2xl font-bold mb-4">Detalles de la solicitud de forzado</h2>
 								<div className="bg-gray-100 p-4 rounded-lg mb-4 grid grid-cols-2 gap-2.5">
 									{/* <p>
 										<strong>ID:</strong> {selectedRow.id}
@@ -174,7 +169,7 @@ const Modals: React.FC<ModalsProps> = ({
 									</p>
 								</div>
 								<div className="flex justify-end gap-4">
-									<button onClick={closeModal} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+									<button onClick={closeModal} className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
 										Cerrar
 									</button>
 								</div>
@@ -186,7 +181,7 @@ const Modals: React.FC<ModalsProps> = ({
 				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
 					<div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
 						<div className="p-6">
-							<h2 className="text-2xl font-bold mb-4">Detalles del Registro de Baja</h2>
+							<h2 className="text-2xl font-bold mb-4">Detalles de la solicitud de retiro</h2>
 							<div className="bg-gray-100 p-4 rounded-lg mb-4 grid grid-cols-2 gap-4">
 								{/* <p>
 									<strong>ID:</strong> {selectedRow.id}
@@ -211,7 +206,7 @@ const Modals: React.FC<ModalsProps> = ({
 								</p>
 							</div>
 							<div className="flex justify-end gap-4">
-								<button onClick={closeModal} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+								<button onClick={closeModal} className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
 									Cerrar
 								</button>
 							</div>
@@ -259,7 +254,7 @@ const Modals: React.FC<ModalsProps> = ({
 										closeModal();
 										setExecuteDate("");
 									}}
-									className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+									className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
 								>
 									Cancelar
 								</button>

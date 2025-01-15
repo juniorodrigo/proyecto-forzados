@@ -253,11 +253,11 @@ const ModalCreacionPuesto: React.FC<ModalCreacionPuestoProps> = ({ isOpen, onClo
 								</div>
 							)}
 							<div className="flex justify-between mt-4">
+								<button type="button" onClick={handleClose} className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:bg-gray-400">
+									Cancelar
+								</button>
 								<button type="submit" className={`px-4 py-2 rounded-md focus:outline-none focus:ring-2 ${isFormValid ? "bg-blue-500" : "bg-gray-500"} text-white`} disabled={!isFormValid}>
 									Guardar
-								</button>
-								<button type="button" onClick={handleClose} className="px-4 py-2 bg-red-500 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
-									Cerrar
 								</button>
 							</div>
 						</form>

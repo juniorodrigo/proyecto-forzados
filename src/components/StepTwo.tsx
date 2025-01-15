@@ -32,15 +32,6 @@ interface responsablesOptions {
 	nombre: string;
 }
 
-interface RowMatrizRiesgo {
-	id: number;
-	prefijoId: number;
-	centroId: number;
-	sufijo: string;
-	probabilidadId: number;
-	impactoId: number;
-}
-
 const StepTwo: React.FC<StepTwoProps> = ({
 	interlockSeguridad,
 	setInterlockSeguridad,

@@ -15,12 +15,12 @@ const BajaForzado = () => {
 	});
 
 	const [errors, setErrors] = useState<Record<string, boolean>>({});
-	// const [dragActive, setDragActive] = useState(false);
 	const [popover, setPopover] = useState({ show: false, message: "", type: "success" as "success" | "error" });
 	const [aprobadoresList, setAprobadoresList] = useState<{ id: string; nombre: string; apePaterno: string; apeMaterno: string }[]>([]);
 	const [solicitantesList, setSolicitantesList] = useState<{ id: string; nombre: string; apePaterno: string; apeMaterno: string }[]>([]);
 	const [ejecutoresList, setEjecutoresList] = useState<{ id: string; nombre: string; apePaterno: string; apeMaterno: string }[]>([]);
 	const { user } = useUserSession();
+	const [isModified, setIsModified] = useState(false);
 
 	const searchParams = useSearchParams();
 	const id = searchParams.get("id");
@@ -68,6 +68,7 @@ const BajaForzado = () => {
 					console.error("Error al obtener la solicitud:", error);
 				}
 			}
+			setIsModified(false);
 		};
 		fetchSolicitud();
 	}, [id]);
@@ -82,17 +83,22 @@ const BajaForzado = () => {
 			...errors,
 			[name]: false,
 		});
+		setIsModified(true);
 	};
 
 	const validateForm = () => {
 		const newErrors: Record<string, boolean> = {};
 		Object.keys(formData).forEach((key) => {
-			if (!formData[key as keyof typeof formData]) {
+			if (key !== "observaciones" && !formData[key as keyof typeof formData]) {
 				newErrors[key] = true;
 			}
 		});
 		setErrors(newErrors);
 		return Object.keys(newErrors).length === 0;
+	};
+
+	const isFormValid = () => {
+		return Object.keys(formData).every((key) => key === "observaciones" || formData[key as keyof typeof formData]) && isModified;
 	};
 
 	const handleSubmit = async (e: React.FormEvent) => {
@@ -109,7 +115,7 @@ const BajaForzado = () => {
 						body: JSON.stringify({ ...formData, id, usuario: user?.id }),
 					});
 					if (response.ok) {
-						setPopover({ show: true, message: "Baja solicitada exitosamente.", type: "success" });
+						setPopover({ show: true, message: "Retiro solicitado exitosamente.", type: "success" });
 						setTimeout(() => {
 							window.location.href = "/dashboard/consultas";
 						}, 3000);
@@ -201,7 +207,12 @@ const BajaForzado = () => {
 					</div>
 
 					{/* Botón de Enviar */}
-					<button type="submit" className="w-full px-4 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600">
+					<button
+						type="submit"
+						className={`w-full px-4 py-2 font-semibold rounded ${isFormValid() ? "bg-blue-500 text-white hover:bg-blue-600" : "bg-gray-500 text-white cursor-not-allowed"}`}
+						disabled={!isFormValid()}
+					>
+						{!isFormValid() && <span className="mr-2"></span>}
 						Enviar
 					</button>
 				</form>

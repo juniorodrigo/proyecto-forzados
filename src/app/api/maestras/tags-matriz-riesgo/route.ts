@@ -29,6 +29,19 @@ export async function POST(request: Request) {
 	try {
 		const pool = await poolPromise;
 		const { prefijoId, centroId, sufijo, probabilidadId, impactoId, usuario } = await request.json();
+
+		// Validar si ya existe un registro con los mismos prefijoId, centroId y sufijo
+		const { recordset: existingRecords } = await pool
+			.request()
+			.input("prefijoId", prefijoId)
+			.input("centroId", centroId)
+			.input("sufijo", sufijo)
+			.query("SELECT * FROM MAE_TAGS_MATRIZ_RIESGO WHERE SUB_AREA_ID = @prefijoId AND TAG_CENTRO_ID = @centroId AND SUFIJO = @sufijo AND ESTADO = 1");
+
+		if (existingRecords.length > 0) {
+			return NextResponse.json({ success: false, message: "Ya existe un registro con dicho pefijo, centro y sufijo" }, { status: 400 });
+		}
+
 		const result = await pool
 			.request()
 			.input("prefijoId", prefijoId)
@@ -79,6 +92,19 @@ export async function PUT(request: Request) {
 	try {
 		const pool = await poolPromise;
 		const { id, prefijoId, centroId, sufijo, probabilidadId, impactoId, usuario } = await request.json();
+
+		// Validar si ya existe un registro con los mismos prefijoId, centroId y sufijo
+		const { recordset: existingRecords } = await pool
+			.request()
+			.input("prefijoId", prefijoId)
+			.input("centroId", centroId)
+			.input("sufijo", sufijo)
+			.query("SELECT * FROM MAE_TAGS_MATRIZ_RIESGO WHERE SUB_AREA_ID = @prefijoId AND TAG_CENTRO_ID = @centroId AND SUFIJO = @sufijo AND ESTADO = 1 AND ID != @id");
+
+		if (existingRecords.length > 0) {
+			return NextResponse.json({ success: false, message: "Record with the same prefijoId, centroId, and sufijo already exists" }, { status: 400 });
+		}
+
 		const result = await pool
 			.request()
 			.input("id", id)

@@ -41,6 +41,31 @@ export interface Row {
 	[key: string]: string | number | boolean;
 }
 
+export const formatStatus = (status: string) => {
+	switch (status) {
+		case "PENDIENTE-ALTA":
+			return "Forzado Pendiente";
+		case "APROBADO-ALTA":
+			return "Forzado Aprobado";
+		case "EJECUTADO-ALTA":
+			return "Forzado Ejecutado";
+		case "RECHAZADO-ALTA":
+			return "Forzado Rechazado";
+		case "PENDIENTE-BAJA":
+			return "Retiro Pendiente";
+		case "APROBADO-BAJA":
+			return "Retiro Aprobado";
+		case "EJECUTADO-BAJA":
+			return "Retiro Ejecutado";
+		case "RECHAZADO-BAJA":
+			return "Retiro Rechazado";
+		case "FINALIZADO":
+			return "Finalizado";
+		default:
+			return status;
+	}
+};
+
 const Page: React.FC = () => {
 	const [selectedRange, setSelectedRange] = useState<DateRange | undefined>();
 	const [selectedSolicitante, setSelectedSolicitante] = useState("");
@@ -215,14 +240,14 @@ const Page: React.FC = () => {
 
 	const handleEdit = (id: number, estado: Status) => {
 		if (estado === "PENDIENTE-BAJA") {
-			router.push(`/dashboard/generar-baja?id=${id}`);
+			router.push(`/dashboard/solicitud-retiro?id=${id}`);
 		} else {
 			router.push(`/dashboard/solicitud-forzado?id=${id}`);
 		}
 	};
 
 	const handleDelete = (id: number) => {
-		router.push(`/dashboard/generar-baja?id=${id}`);
+		router.push(`/dashboard/solicitud-retiro?id=${id}`);
 	};
 
 	const handleClearFilters = () => {
@@ -242,31 +267,6 @@ const Page: React.FC = () => {
 	const areFiltersApplied = useMemo(() => {
 		return selectedRange || selectedSolicitante || selectedEstado || selectedArea || selectedEndDate || selectedAprobador || selectedEjecutor;
 	}, [selectedRange, selectedSolicitante, selectedEstado, selectedArea, selectedEndDate, selectedAprobador, selectedEjecutor]);
-
-	const formatStatus = (status: string) => {
-		switch (status) {
-			case "PENDIENTE-ALTA":
-				return "Forzado Pendiente";
-			case "APROBADO-ALTA":
-				return "Forzado Aprobado";
-			case "EJECUTADO-ALTA":
-				return "Forzado Ejecutado";
-			case "RECHAZADO-ALTA":
-				return "Forzado Rechazado";
-			case "PENDIENTE-BAJA":
-				return "Retiro Pendiente";
-			case "APROBADO-BAJA":
-				return "Retiro Aprobado";
-			case "EJECUTADO-BAJA":
-				return "Retiro Ejecutado";
-			case "RECHAZADO-BAJA":
-				return "Retiro Rechazado";
-			case "FINALIZADO":
-				return "Finalizado";
-			default:
-				return status;
-		}
-	};
 
 	const getStatusClass = (estado: string) => {
 		if (estado.includes("PENDIENTE")) {

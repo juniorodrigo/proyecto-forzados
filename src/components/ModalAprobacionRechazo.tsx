@@ -18,7 +18,7 @@ const ModalAprobacionRechazo: React.FC<ModalAprobacionRechazoProps> = ({ isOpen,
 				<div className="p-6">
 					<h2 className="text-2xl font-bold mb-4">¿Desea aprobar o rechazar la solicitud?</h2>
 					<div className="flex justify-end gap-4">
-						<button onClick={onClose} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+						<button onClick={onClose} className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
 							Cancelar
 						</button>
 						<button

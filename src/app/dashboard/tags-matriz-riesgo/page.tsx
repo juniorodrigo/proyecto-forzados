@@ -2,6 +2,7 @@
 import Table from "@/components/Table";
 import React, { useState, useEffect } from "react";
 import Popover from "@/components/Popover";
+import { FaSpinner } from "react-icons/fa";
 
 export interface Role {
 	id: number;
@@ -31,6 +32,7 @@ const Page = () => {
 	const [popoverType, setPopoverType] = useState<"success" | "error">("success");
 	const [showPopover, setShowPopover] = useState(false);
 	const [newRecord, setNewRecord] = useState<Row>();
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const [tagPrefijos, setTagPrefijos] = useState<Option[]>([]);
 	const [tagCentros, setTagCentros] = useState<Option[]>([]);
@@ -68,11 +70,13 @@ const Page = () => {
 	};
 
 	const handleCreateOrUpdate = async () => {
+		setIsSubmitting(true);
 		if (!newRecord.prefijoId || !newRecord.centroId || !newRecord.sufijo || !newRecord.probabilidadId || !newRecord.impactoId) {
-			setPopoverMessage("Por favor, complete todos los campos.");
-			setPopoverType("error");
-			setShowPopover(true);
-			setTimeout(() => setShowPopover(false), 3000);
+			alert("Por favor, complete todos los campos.");
+			// setPopoverType("error");
+			// setShowPopover(true);
+			// setTimeout(() => setShowPopover(false), 3000);
+			setIsSubmitting(false);
 			return;
 		}
 
@@ -97,7 +101,7 @@ const Page = () => {
 					setPopoverMessage("Registro actualizado correctamente");
 					setPopoverType("success");
 				} else {
-					setPopoverMessage("Error al actualizar el registro");
+					setPopoverMessage(result.message || "Error al actualizar el registro");
 					setPopoverType("error");
 				}
 			} catch (error) {
@@ -120,7 +124,7 @@ const Page = () => {
 					setPopoverMessage("Registro creado correctamente");
 					setPopoverType("success");
 				} else {
-					setPopoverMessage("Error al crear el registro");
+					setPopoverMessage(result.message || "Error al crear el registro");
 					setPopoverType("error");
 				}
 			} catch (error) {
@@ -131,20 +135,21 @@ const Page = () => {
 		}
 		setShowPopover(true);
 		setTimeout(() => setShowPopover(false), 3000);
+		setIsSubmitting(false);
 		setIsModalOpen(false);
 	};
 
 	return (
 		<div className="space-y-8 p-4">
 			<div className="space-y-4">
-				<div className="relative flex justify-between items-center">
+				<div className="flex justify-end">
 					<button
 						onClick={() => {
 							setIsEditing(false);
 							setIsModalOpen(true);
 							setNewRecord({ id: 0, prefijoId: 0, centroId: 0, sufijo: "", probabilidadId: 0, impactoId: 0 });
 						}}
-						className="ml-4 px-4 py-2 bg-green-500 text-white rounded-md"
+						className="px-4 py-2 bg-green-500 text-white rounded-md active:bg-green-600 hover:bg-green-600"
 					>
 						Añadir Registro
 					</button>
@@ -177,9 +182,11 @@ const Page = () => {
 					actions={["edit"]}
 				/>
 			</div>
+
 			{isModalOpen && (
-				<div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-					<div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
+				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+					<div className="absolute inset-0 bg-black bg-opacity-50"></div>
+					<div className="relative bg-white p-6 rounded-lg shadow-lg w-1/3 z-60">
 						<h2 className="text-lg font-semibold mb-4">{isEditing ? "Editar registro" : "Crear nuevo registro"}</h2>
 
 						<div>
@@ -238,10 +245,15 @@ const Page = () => {
 						</div>
 
 						<div className="flex justify-end space-x-4">
-							<button onClick={() => setIsModalOpen(false)} className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
+							<button onClick={() => setIsModalOpen(false)} className={`bg-gray-300 text-gray-800  px-4 py-2 rounded-lg ${isSubmitting ? "cursor-not-allowed" : "hover:bg-gray-400"}`} disabled={isSubmitting}>
 								Cancelar
 							</button>
-							<button onClick={handleCreateOrUpdate} className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+							<button
+								onClick={handleCreateOrUpdate}
+								className={`bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center justify-center ${isSubmitting ? "cursor-not-allowed bg-gray-500" : "hover:bg-blue-600"}`}
+								disabled={isSubmitting}
+							>
+								{isSubmitting && <FaSpinner className="animate-spin mr-2" />}
 								{isEditing ? "Guardar cambios" : "Crear"}
 							</button>
 						</div>

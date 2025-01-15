@@ -278,16 +278,18 @@ const Page = () => {
 					))}
 				</select>
 
-				<button
-					onClick={() => {
-						setModalType("create");
-						setIsModalOpen(true);
-						setNewRecord({ codigo: "", descripcion: "", categoria: selectedCategory, probabilidad: "", impacto: "" });
-					}}
-					className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
-				>
-					Crear nuevo registro
-				</button>
+				{selectedCategory && (
+					<button
+						onClick={() => {
+							setModalType("create");
+							setIsModalOpen(true);
+							setNewRecord({ codigo: "", descripcion: "", categoria: selectedCategory, probabilidad: "", impacto: "" });
+						}}
+						className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
+					>
+						Crear nuevo registro
+					</button>
+				)}
 			</div>
 
 			{selectedCategory ? (
@@ -352,21 +354,9 @@ const Page = () => {
 								</div>
 							</div>
 						)}
-						{/* {modalType === "create" && (
-							<div className="mb-4">
-								<label className="block text-sm font-medium mb-2">Categoría</label>
-								<select className="w-full p-2 border rounded-lg" value={newRecord.categoria} onChange={(e) => setNewRecord({ ...newRecord, categoria: e.target.value })}>
-									<option value="">Seleccionar categoría</option>
-									{categories.map((category) => (
-										<option key={category.value} value={category.value}>
-											{category.label}
-										</option>
-									))}
-								</select>
-							</div>
-						)} */}
+
 						<div className="flex justify-end space-x-4">
-							<button onClick={() => setIsModalOpen(false)} className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
+							<button onClick={() => setIsModalOpen(false)} className="bg-gray-300 text-gray-800  px-4 py-2 rounded-lg hover:bg-gray-400">
 								Cancelar
 							</button>
 							<button onClick={handleCreateOrUpdate} className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">

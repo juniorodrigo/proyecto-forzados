@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { poolPromise } from "@sql/lib/db";
 import { mailer, MailOptions } from "@/lib/mailer";
-import { getSingleSolicitud } from "../common";
+import { getSingleSolicitud } from "../../alta/common";
 
 interface Solicitud {
 	descripcion: string;
@@ -98,8 +98,8 @@ export async function POST(request: Request) {
 		// Actualización combinada
 		const result = await pool.request().input("id", id).input("observacionEjecucion", observacionEjecucion).input("usuario", usuario).query(`
                 UPDATE TRS_Solicitud_forzado 
-                SET OBSERVADO_A = 1,
-                    OBSERVACION_RECHAZO_A = @observacionEjecucion,
+                SET OBSERVADO_B = 1,
+                    OBSERVACION_RECHAZO_B = @observacionEjecucion,
                     FECHA_MODIFICACION = GETDATE(),
                     USUARIO_MODIFICACION = @usuario,
 					ESTADOSOLICITUD = 'PENDIENTE-ALTA'
@@ -122,21 +122,21 @@ export async function POST(request: Request) {
 		const mailOptionsAprobador: MailOptions = {
 			from: "test@prot.one",
 			to: solicitud.aprobadorACorreo,
-			subject: "[FORZADOS] Solicitud de forzado observada durante ejecución",
+			subject: "[FORZADOS] Solicitud de retiro observada durante ejecución",
 			html: createRejectionHTML(solicitud),
 		};
 
 		const mailOptionsEjecutor: MailOptions = {
 			from: "test@prot.one",
 			to: solicitud.ejecutorACorreo,
-			subject: "[FORZADOS] Solicitud de forzado observada durante ejecución",
+			subject: "[FORZADOS] Solicitud de retiro observada durante ejecución",
 			html: createRejectionHTML(solicitud),
 		};
 
 		const mailOptionsSolicitante: MailOptions = {
 			from: "test@prot.one",
 			to: solicitud.solicitanteACorreo,
-			subject: "[FORZADOS] Solicitud de forzado observada durante ejecución",
+			subject: "[FORZADOS] Solicitud de retiro observada durante ejecución",
 			html: createRejectionHTML(solicitud),
 		};
 
