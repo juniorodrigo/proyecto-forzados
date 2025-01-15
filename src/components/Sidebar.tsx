@@ -2,7 +2,7 @@
 
 import React, { useContext, useEffect, useState, useMemo } from "react";
 import { RiArrowRightUpLine, RiProductHuntLine, RiArchiveDrawerLine, RiBarChartFill } from "react-icons/ri";
-import { FaUserFriends, FaHardHat } from "react-icons/fa";
+import { FaUserFriends, FaHardHat, FaBorderAll } from "react-icons/fa";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UiContext } from "@/context/SidebarContext";
@@ -63,6 +63,13 @@ const Sidebar: React.FC = () => {
 				label: "Administrar Puestos",
 				icon: <FaHardHat className="text-xl" />,
 				href: "/dashboard/administrar-puestos",
+				roles: [...administradores],
+			},
+			{
+				id: "tags-matriz-riesgo",
+				label: "Matriz de Riesgo por Tags",
+				icon: <FaBorderAll className="text-xl" />,
+				href: "/dashboard/tags-matriz-riesgo",
 				roles: [...administradores],
 			},
 			{

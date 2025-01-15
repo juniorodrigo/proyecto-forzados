@@ -570,6 +570,29 @@ create table MAE_PARAMETROS_GLOBALES (
 )
 go
 
+create table MAE_TAGS_MATRIZ_RIESGO (
+   ID            int                  identity,
+   SUB_AREA_ID            int          null,
+   TAG_CENTRO_ID          int          null,
+   SUFIJO                VARCHAR(50)   null,
+   PROBABILIDAD_ID               int            null,
+   IMPACTO_ID               int            null,
+   ESTADO                  int            null,
+   constraint PK_TAGS_MATRIZ_RIESGO primary key (ID),
+
+   constraint FK_MAE_TAGS_MATRIZ_RIESGO_SUB_AREA foreign key (SUB_AREA_ID)
+      references SUB_AREA (SUBAREA_ID),
+   constraint FK_MAE_TAGS_MATRIZ_RIESGO_TAG_CENTRO foreign key (TAG_CENTRO_ID)
+      references TAG_CENTRO (TAGCENTRO_ID)
+
+   constraint FK_MAE_TAGS_MATRIZ_RIESGO_PROBABILIDAD foreign key (PROBABILIDAD_ID)
+      references PROBABILIDAD (PROBABILIDAD_ID)
+
+   constraint FK_MAE_TAGS_MATRIZ_RIESGO_IMPACTO foreign key (IMPACTO_ID)
+      references IMPACTO (IMPACTO_ID)
+)
+go
+
 create table SUB_AREA (
    SUBAREA_ID           int                  identity,
    CODIGO               varchar(30)         null,
@@ -579,8 +602,6 @@ create table SUB_AREA (
    FECHA_CREACION       datetime             null,
    USUARIO_MODIFICACION varchar(20)          null,
    FECHA_MODIFICACION   datetime             null,
-   PROBABILIDAD         VARCHAR(50) NULL,
-   IMPACTO              VARCHAR(50) NULL,
    constraint PK_SUB_AREA primary key (SUBAREA_ID)
 )
 go

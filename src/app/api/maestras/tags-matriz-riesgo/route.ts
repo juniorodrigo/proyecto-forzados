@@ -1,22 +1,23 @@
 import { NextResponse } from "next/server";
 import { poolPromise } from "@sql/lib/db";
 
-// TAG CENTRO_______________________________________________________________
-
 // Manejo del método GET
 export async function GET() {
 	try {
 		const pool = await poolPromise;
-		const { recordset } = await pool.request().query("SELECT * FROM SUB_AREA WHERE ESTADO = 1");
+		const { recordset } = await pool.request().query("SELECT * FROM MAE_TAGS_MATRIZ_RIESGO WHERE ESTADO = 1");
 
-		const turnos = recordset.map((singleValue) => {
+		const rows = recordset.map((singleValue) => {
 			return {
-				id: singleValue.SUBAREA_ID,
-				codigo: singleValue.CODIGO,
-				descripcion: singleValue.DESCRIPCION,
+				id: singleValue.ID,
+				prefijoId: singleValue.SUB_AREA_ID,
+				centroId: singleValue.TAG_CENTRO_ID,
+				sufijo: singleValue.SUFIJO,
+				probabilidadId: singleValue.PROBABILIDAD_ID,
+				impactoId: singleValue.IMPACTO_ID,
 			};
 		});
-		return NextResponse.json({ success: true, values: turnos });
+		return NextResponse.json({ success: true, values: rows });
 	} catch (error) {
 		console.error("Error processing GET:", error);
 		return NextResponse.json({ success: false, message: "Error retrieving data" }, { status: 500 });
@@ -27,15 +28,17 @@ export async function GET() {
 export async function POST(request: Request) {
 	try {
 		const pool = await poolPromise;
-		const { codigo, descripcion, usuario } = await request.json();
+		const { prefijoId, centroId, sufijo, probabilidadId, impactoId, usuario } = await request.json();
 		const result = await pool
 			.request()
-			.input("CODIGO", codigo)
-			.input("DESCRIPCION", descripcion)
-			.input("USUARIO_CREACION", usuario)
-			.input("USUARIO_MODIFICACION", usuario)
+			.input("prefijoId", prefijoId)
+			.input("centroId", centroId)
+			.input("sufijo", sufijo)
+			.input("probabilidadId", probabilidadId)
+			.input("impactoId", impactoId)
+			.input("usuario", usuario)
 			.query(
-				"INSERT INTO SUB_AREA (CODIGO, DESCRIPCION, USUARIO_CREACION, USUARIO_MODIFICACION, FECHA_CREACION, FECHA_MODIFICACION, ESTADO) VALUES (@CODIGO, @DESCRIPCION, @USUARIO_CREACION, @USUARIO_MODIFICACION, GETDATE(), GETDATE(), 1)"
+				"INSERT INTO MAE_TAGS_MATRIZ_RIESGO (SUB_AREA_ID, TAG_CENTRO_ID, SUFIJO, PROBABILIDAD_ID, IMPACTO_ID, USUARIO_CREACION, USUARIO_MODIFICACION, FECHA_CREACION, FECHA_MODIFICACION, ESTADO) VALUES (@prefijoId, @centroId, @sufijo, @probabilidadId, @impactoId, @usuario, @usuario, GETDATE(), GETDATE(), 1)"
 			);
 
 		if (result.rowsAffected[0] > 0) {
@@ -56,14 +59,14 @@ export async function DELETE(request: Request) {
 		const { id, usuario } = await request.json();
 		const result = await pool
 			.request()
-			.input("ID", id)
-			.input("USUARIO_MODIFICACION", usuario)
-			.query("UPDATE SUB_AREA SET ESTADO = 0, USUARIO_MODIFICACION = @USUARIO_MODIFICACION, FECHA_MODIFICACION = GETDATE() WHERE SUBAREA_ID = @ID");
+			.input("id", id)
+			.input("usuario", usuario)
+			.query("UPDATE MAE_TAGS_MATRIZ_RIESGO SET ESTADO = 0, USUARIO_MODIFICACION = @usuario, FECHA_MODIFICACION = GETDATE() WHERE ID = @id");
 
 		if (result.rowsAffected[0] > 0) {
 			return NextResponse.json({ success: true, message: "Record updated successfully" });
 		} else {
-			return NextResponse.json({ success: false, message: "No record found to update" }, { status: 404 });
+			return NextResponse.json({ success: false, message: "No record found with the given ID" }, { status: 404 });
 		}
 	} catch (error) {
 		console.error("Error processing DELETE:", error);
@@ -75,14 +78,19 @@ export async function DELETE(request: Request) {
 export async function PUT(request: Request) {
 	try {
 		const pool = await poolPromise;
-		const { id, codigo, descripcion, usuario } = await request.json();
+		const { id, prefijoId, centroId, sufijo, probabilidadId, impactoId, usuario } = await request.json();
 		const result = await pool
 			.request()
-			.input("ID", id)
-			.input("CODIGO", codigo)
-			.input("DESCRIPCION", descripcion)
-			.input("USUARIO_MODIFICACION", usuario)
-			.query("UPDATE SUB_AREA SET CODIGO = @CODIGO, DESCRIPCION = @DESCRIPCION, USUARIO_MODIFICACION = @USUARIO_MODIFICACION, FECHA_MODIFICACION = GETDATE() WHERE SUBAREA_ID = @ID");
+			.input("id", id)
+			.input("prefijoId", prefijoId)
+			.input("centroId", centroId)
+			.input("sufijo", sufijo)
+			.input("probabilidadId", probabilidadId)
+			.input("impactoId", impactoId)
+			.input("usuario", usuario)
+			.query(
+				"UPDATE MAE_TAGS_MATRIZ_RIESGO SET SUB_AREA_ID = @prefijoId, TAG_CENTRO_ID = @centroId, SUFIJO = @sufijo, PROBABILIDAD_ID = @probabilidadId, IMPACTO_ID = @impactoId, USUARIO_MODIFICACION = @usuario, FECHA_MODIFICACION = GETDATE() WHERE ID = @id"
+			);
 
 		if (result.rowsAffected[0] > 0) {
 			return NextResponse.json({ success: true, message: "Record updated successfully" });

@@ -122,7 +122,7 @@ const StepOne: React.FC<StepOneProps> = ({
 
 			{/* Tag (Prefijo) */}
 			<div>
-				<label className="block text-sm font-medium text-gray-600 mb-2">Tag (Prefijo)</label>
+				<label className="block text-sm font-medium text-gray-600 mb-2">Sub Área (Tag Prefijo)</label>
 				<select
 					value={tagPrefijo}
 					onChange={(e) => {
@@ -148,7 +148,7 @@ const StepOne: React.FC<StepOneProps> = ({
 
 			{/* Tag (Centro) */}
 			<div>
-				<label className="block text-sm font-medium text-gray-600 mb-2">Tag (Centro)</label>
+				<label className="block text-sm font-medium text-gray-600 mb-2">Activo (Tag Centro)</label>
 				<select
 					value={tagCentro}
 					onChange={(e) => setTagCentro(e.target.value)}

@@ -68,7 +68,7 @@ const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor
 					filteredAprobadores = newFilteredAprobadores;
 				} else {
 					console.log(aplicaReglaRiesgoBajo, "aplica regla nivel de reisgo");
-					if (aplicaReglaRiesgoBajo && (nivelRiesgo === "BAJO" || nivelRiesgo === "MODERADO")) {
+					if (aplicaReglaRiesgoBajo && (nivelRiesgo == "BAJO" || nivelRiesgo == "MODERADO")) {
 						const solicitantex = findUserById(Number(solicitante));
 
 						filteredAprobadores.push({
