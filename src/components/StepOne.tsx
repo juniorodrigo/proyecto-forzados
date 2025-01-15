@@ -15,11 +15,15 @@ interface StepOneProps {
 	setTurno: React.Dispatch<React.SetStateAction<string>>;
 	proyecto: string;
 	setProyecto: React.Dispatch<React.SetStateAction<string>>;
+	setProbabilidadPrefijoId: React.Dispatch<React.SetStateAction<string>>;
+	setImpactoPrefijoId: React.Dispatch<React.SetStateAction<string>>;
 }
 
 interface Option {
 	id: string;
 	descripcion: string;
+	probabilidad?: string;
+	impacto?: string;
 }
 
 const StepOne: React.FC<StepOneProps> = ({
@@ -37,6 +41,8 @@ const StepOne: React.FC<StepOneProps> = ({
 	setTurno,
 	proyecto,
 	setProyecto,
+	setProbabilidadPrefijoId,
+	setImpactoPrefijoId,
 }) => {
 	const [tagPrefijos, setTagPrefijos] = useState<Option[]>([]);
 	const [tagCentros, setTagCentros] = useState<Option[]>([]);
@@ -49,6 +55,10 @@ const StepOne: React.FC<StepOneProps> = ({
 			try {
 				const response = await fetch(url);
 				const data = await response.json();
+
+				// if (url.includes("subarea")) {
+				// 	console.log(data.values, `data values from ${url}`);
+				// }
 
 				setState(data.values);
 				// console.log(data.values, `data values from ${url}`);
@@ -115,7 +125,15 @@ const StepOne: React.FC<StepOneProps> = ({
 				<label className="block text-sm font-medium text-gray-600 mb-2">Tag (Prefijo)</label>
 				<select
 					value={tagPrefijo}
-					onChange={(e) => setTagPrefijo(e.target.value)}
+					onChange={(e) => {
+						setTagPrefijo(e.target.value);
+
+						const selectedOption = tagPrefijos.find((option) => Number(option.id) === Number(e.target.value));
+						if (selectedOption) {
+							setProbabilidadPrefijoId(selectedOption.probabilidad);
+							setImpactoPrefijoId(selectedOption.impacto);
+						}
+					}}
 					className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
 					required
 				>
@@ -177,7 +195,9 @@ const StepOne: React.FC<StepOneProps> = ({
 				<label className="block text-sm font-medium text-gray-600 mb-2">Disciplina</label>
 				<select
 					value={disciplina}
-					onChange={(e) => setDisciplina(e.target.value)}
+					onChange={(e) => {
+						setDisciplina(e.target.value);
+					}}
 					className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
 					required
 				>

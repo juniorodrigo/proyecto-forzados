@@ -16,6 +16,8 @@ interface StepTwoProps {
 	setSolicitante: React.Dispatch<React.SetStateAction<string>>;
 	nivelRiesgo: string;
 	setNivelRiesgo: React.Dispatch<React.SetStateAction<string>>;
+	probabilidadPrefijoId: string;
+	impactoPrefijoId: string;
 }
 
 interface Option {
@@ -43,12 +45,17 @@ const StepTwo: React.FC<StepTwoProps> = ({
 	setSolicitante,
 	nivelRiesgo,
 	setNivelRiesgo,
+	probabilidadPrefijoId,
+	impactoPrefijoId,
 }) => {
 	const [responsables, setResponsables] = useState<responsablesOptions[]>([]);
 	const [riesgos, setRiesgos] = useState<Option[]>([]);
 	const [probabilidades, setProbabilidades] = useState<Option[]>([]);
 	const [impactos, setImpactos] = useState<Option[]>([]);
 	const [usuarios, setUsuarios] = useState<{ id: string; nombre: string; apePaterno: string; apeMaterno: string; roles: Record<string, any> }[]>([]);
+
+	// console.log(probabilidad, "probabilidad", impacto, "impacto");
+	// console.log(probabilidadPrefijoId, "probabilidadPrefijoId", impactoPrefijoId, "impactoPrefijoId");
 
 	useEffect(() => {
 		const fetchData = async (url: string, setState: React.Dispatch<React.SetStateAction<Option[]>>) => {
@@ -106,7 +113,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
 					const response = await fetch(`/api/solicitudes/alta/${id}`);
 					const result = await response.json();
 
-					console.log(result, "SOLICITUD DATA");
+					// console.log(result, "SOLICITUD DATA");
 
 					if (result.success && result.data.length > 0) {
 						const solicitud = result.data[0];
@@ -127,6 +134,16 @@ const StepTwo: React.FC<StepTwoProps> = ({
 		};
 		fetchSolicitudData();
 	}, [setInterlockSeguridad, setResponsable, setRiesgo, setProbabilidad, setImpacto, setSolicitante]);
+
+	useEffect(() => {
+		// Si existen probabilidadPrefijoId e impactoPrefijoId, setearlos como probabilidad e impacto
+		if (probabilidadPrefijoId) {
+			setProbabilidad(probabilidadPrefijoId);
+		}
+		if (impactoPrefijoId) {
+			setImpacto(impactoPrefijoId);
+		}
+	}, [probabilidadPrefijoId, impactoPrefijoId, setProbabilidad, setImpacto]);
 
 	useEffect(() => {
 		// Cálculo de nivel de riesgo basado en impacto y probabilidad
@@ -247,6 +264,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
 					onChange={(e) => setProbabilidad(e.target.value)}
 					className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
 					required
+					disabled={!!probabilidadPrefijoId} // Deshabilitar si existe probabilidadPrefijoId
 				>
 					<option value="">Seleccione la probabilidad de ocurrencia</option>
 					{probabilidades.map((option) => (
@@ -260,7 +278,13 @@ const StepTwo: React.FC<StepTwoProps> = ({
 			{/* Impacto */}
 			<div>
 				<label className="block text-sm font-medium text-gray-600 mb-2">Impacto</label>
-				<select value={impacto} onChange={(e) => setImpacto(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+				<select
+					value={impacto}
+					onChange={(e) => setImpacto(e.target.value)}
+					className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+					required
+					disabled={!!impactoPrefijoId} // Deshabilitar si existe impactoPrefijoId
+				>
 					<option value="">Seleccione Impacto de la Consecuencia</option>
 					{impactos.map((option) => (
 						<option key={option.id} value={option.id}>

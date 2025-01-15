@@ -4,6 +4,11 @@ import Popover from "@/components/Popover";
 import React, { useState, useEffect } from "react";
 import useUserSession from "@/hooks/useSession";
 
+interface Option {
+	id: number;
+	descripcion: string;
+}
+
 const Page = () => {
 	const categories = [
 		{ label: "Sub Área (Tag Prefijo)", value: "subarea", needsCode: true },
@@ -18,7 +23,7 @@ const Page = () => {
 		{ label: "Motivo de Rechazo", value: "motivo-rechazo", needsCode: false },
 	];
 	const [selectedCategory, setSelectedCategory] = useState("");
-	const [data, setData] = useState<Record<string, { id: number; codigo: string; descripcion: string }[]>>({
+	const [data, setData] = useState<Record<string, { id: number; codigo: string; descripcion: string; probabilidad?: string; impacto?: string }[]>>({
 		disciplina: [],
 		turno: [],
 		responsable: [],
@@ -29,22 +34,26 @@ const Page = () => {
 	});
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [modalType, setModalType] = useState<"create" | "edit">("create");
-	const [newRecord, setNewRecord] = useState({ codigo: "", descripcion: "", categoria: "" });
+	const [newRecord, setNewRecord] = useState({ codigo: "", descripcion: "", categoria: "", probabilidad: "", impacto: "" });
 	const [editingRecordId, setEditingRecordId] = useState<number | null>(null);
 	const [showPopover, setShowPopover] = useState(false);
 	const [popoverMessage, setPopoverMessage] = useState("");
 	const [popoverType, setPopoverType] = useState<"success" | "error">("success");
 	const { user } = useUserSession();
+	const [probabilidades, setProbabilidades] = useState<Option[]>([]);
+	const [impactos, setImpactos] = useState<Option[]>([]);
 
 	const fetchData = async (category: string) => {
 		try {
 			const response = await fetch(`/api/maestras/${category}`);
 			const result = await response.json();
-			console.log("data fetched for", category, result.values);
-			const normalizedData = result.values.map((item: { id: number; codigo?: string; descripcion?: string; nombre?: string }) => ({
+			// console.log("data fetched for", category, result.values);
+			const normalizedData = result.values.map((item: { id: number; codigo?: string; descripcion?: string; nombre?: string; probabilidad?: string; impacto?: string }) => ({
 				id: item.id,
 				codigo: item.codigo || item.id.toString(),
 				descripcion: item.descripcion || item.nombre,
+				probabilidad: item.probabilidad || "",
+				impacto: item.impacto || "",
 			}));
 			setData((prevData) => ({
 				...prevData,
@@ -55,9 +64,30 @@ const Page = () => {
 		}
 	};
 
+	const fetchDataForProbabilities = async (url: string, setState: React.Dispatch<React.SetStateAction<Option[]>>) => {
+		try {
+			const response = await fetch(url);
+			const data = await response.json();
+
+			// console.log(data.values, `data values from ${url}`);
+
+			setState(data.values);
+		} catch (error) {
+			console.error(`Error fetching data from ${url}:`, error);
+		}
+	};
+
+	const findObjectById = (id: string, array: Option[]) => {
+		return array.find((item) => item.id === parseInt(id));
+	};
+
 	useEffect(() => {
 		if (selectedCategory) {
 			fetchData(selectedCategory);
+		}
+		if (selectedCategory === "subarea") {
+			fetchDataForProbabilities("/api/maestras/probabilidad", setProbabilidades);
+			fetchDataForProbabilities("/api/maestras/impacto", setImpactos);
 		}
 	}, [selectedCategory]);
 
@@ -88,6 +118,8 @@ const Page = () => {
 				body: JSON.stringify({
 					descripcion: newRecord.descripcion.toUpperCase(),
 					...(selectedCategoryObject?.needsCode && { codigo: newRecord.codigo.toUpperCase() }),
+					probabilidad: Number(newRecord.probabilidad),
+					impacto: Number(newRecord.impacto),
 					usuario: user?.id,
 				}),
 			})
@@ -128,6 +160,8 @@ const Page = () => {
 					id: editingRecordId,
 					descripcion: newRecord.descripcion.toUpperCase(),
 					...(selectedCategoryObject?.needsCode && { codigo: newRecord.codigo.toUpperCase() }),
+					probabilidad: newRecord.probabilidad,
+					impacto: newRecord.impacto,
 					usuario: user?.id,
 				}),
 			})
@@ -161,7 +195,7 @@ const Page = () => {
 		}
 
 		setIsModalOpen(false);
-		setNewRecord({ codigo: "", descripcion: "", categoria: "" });
+		setNewRecord({ codigo: "", descripcion: "", categoria: "", probabilidad: "", impacto: "" });
 		setEditingRecordId(null);
 	};
 
@@ -174,6 +208,8 @@ const Page = () => {
 				codigo: recordToEdit.codigo,
 				descripcion: recordToEdit.descripcion,
 				categoria: selectedCategory,
+				probabilidad: recordToEdit.probabilidad,
+				impacto: recordToEdit.impacto,
 			});
 			setEditingRecordId(id);
 		}
@@ -224,6 +260,10 @@ const Page = () => {
 	const tableRows = (data[selectedCategory] || []).map((row) => ({
 		...row,
 		codigo: selectedCategoryObject?.needsCode ? row.codigo : row.id,
+		...(selectedCategory === "subarea" && {
+			probabilidad: findObjectById(row.probabilidad, probabilidades)?.descripcion || "-",
+			impacto: findObjectById(row.impacto, impactos)?.descripcion || "-",
+		}),
 	}));
 
 	return (
@@ -242,7 +282,7 @@ const Page = () => {
 					onClick={() => {
 						setModalType("create");
 						setIsModalOpen(true);
-						setNewRecord({ codigo: "", descripcion: "", categoria: selectedCategory });
+						setNewRecord({ codigo: "", descripcion: "", categoria: selectedCategory, probabilidad: "", impacto: "" });
 					}}
 					className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
 				>
@@ -255,6 +295,12 @@ const Page = () => {
 					columns={[
 						{ key: "codigo", label: "Código" },
 						{ key: "descripcion", label: "Descripción" },
+						...(selectedCategory === "subarea"
+							? [
+									{ key: "probabilidad", label: "Probabilidad" },
+									{ key: "impacto", label: "Impacto" },
+							  ]
+							: []),
 					]}
 					rows={tableRows}
 					onEdit={handleEdit}
@@ -280,7 +326,33 @@ const Page = () => {
 							<label className="block text-sm font-medium mb-2">Descripción</label>
 							<input type="text" className="w-full p-2 border rounded-lg" value={newRecord.descripcion} onChange={(e) => setNewRecord({ ...newRecord, descripcion: e.target.value })} />
 						</div>
-						{modalType === "create" && (
+						{selectedCategory === "subarea" && (
+							<div>
+								<div className="mb-4">
+									<label className="block text-sm font-medium mb-2">Probabilidad</label>
+									<select className="w-full p-2 border rounded-lg" value={newRecord.probabilidad} onChange={(e) => setNewRecord({ ...newRecord, probabilidad: e.target.value })}>
+										<option value="">Seleccionar opción</option>
+										{probabilidades.map((option) => (
+											<option key={option.id} value={option.id}>
+												{option.descripcion}
+											</option>
+										))}
+									</select>
+								</div>
+								<div className="mb-4">
+									<label className="block text-sm font-medium mb-2">Impacto</label>
+									<select className="w-full p-2 border rounded-lg" value={newRecord.impacto} onChange={(e) => setNewRecord({ ...newRecord, impacto: e.target.value })}>
+										<option value="">Seleccionar opción</option>
+										{impactos.map((option) => (
+											<option key={option.id} value={option.id}>
+												{option.descripcion}
+											</option>
+										))}
+									</select>
+								</div>
+							</div>
+						)}
+						{/* {modalType === "create" && (
 							<div className="mb-4">
 								<label className="block text-sm font-medium mb-2">Categoría</label>
 								<select className="w-full p-2 border rounded-lg" value={newRecord.categoria} onChange={(e) => setNewRecord({ ...newRecord, categoria: e.target.value })}>
@@ -292,7 +364,7 @@ const Page = () => {
 									))}
 								</select>
 							</div>
-						)}
+						)} */}
 						<div className="flex justify-end space-x-4">
 							<button onClick={() => setIsModalOpen(false)} className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
 								Cancelar

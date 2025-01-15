@@ -569,6 +569,8 @@ create table SUB_AREA (
    FECHA_CREACION       datetime             null,
    USUARIO_MODIFICACION varchar(20)          null,
    FECHA_MODIFICACION   datetime             null,
+   PROBABILIDAD         VARCHAR(50) NULL,
+   IMPACTO              VARCHAR(50) NULL,
    constraint PK_SUB_AREA primary key (SUBAREA_ID)
 )
 go

@@ -217,7 +217,7 @@ const Page: React.FC = () => {
 		if (estado === "PENDIENTE-BAJA") {
 			router.push(`/dashboard/generar-baja?id=${id}`);
 		} else {
-			router.push(`/dashboard/generar-alta?id=${id}`);
+			router.push(`/dashboard/solicitud-forzado?id=${id}`);
 		}
 	};
 

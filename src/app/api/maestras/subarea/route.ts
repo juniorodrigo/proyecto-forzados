@@ -14,6 +14,8 @@ export async function GET() {
 				id: singleValue.SUBAREA_ID,
 				codigo: singleValue.CODIGO,
 				descripcion: singleValue.DESCRIPCION,
+				probabilidad: singleValue.PROBABILIDAD,
+				impacto: singleValue.IMPACTO,
 			};
 		});
 		return NextResponse.json({ success: true, values: turnos });
@@ -27,15 +29,18 @@ export async function GET() {
 export async function POST(request: Request) {
 	try {
 		const pool = await poolPromise;
-		const { codigo, descripcion, usuario } = await request.json();
+		const { codigo, descripcion, probabilidad, impacto, usuario } = await request.json();
 		const result = await pool
 			.request()
 			.input("CODIGO", codigo)
 			.input("DESCRIPCION", descripcion)
 			.input("USUARIO_CREACION", usuario)
 			.input("USUARIO_MODIFICACION", usuario)
+			.input("probabilidad", probabilidad)
+			.input("impacto", impacto)
+
 			.query(
-				"INSERT INTO SUB_AREA (CODIGO, DESCRIPCION, USUARIO_CREACION, USUARIO_MODIFICACION, FECHA_CREACION, FECHA_MODIFICACION, ESTADO) VALUES (@CODIGO, @DESCRIPCION, @USUARIO_CREACION, @USUARIO_MODIFICACION, GETDATE(), GETDATE(), 1)"
+				"INSERT INTO SUB_AREA (CODIGO, DESCRIPCION, USUARIO_CREACION, USUARIO_MODIFICACION, FECHA_CREACION, FECHA_MODIFICACION, ESTADO, PROBABILIDAD, IMPACTO) VALUES (@CODIGO, @DESCRIPCION, @USUARIO_CREACION, @USUARIO_MODIFICACION, GETDATE(), GETDATE(), 1, @probabilidad, @impacto)"
 			);
 
 		if (result.rowsAffected[0] > 0) {
@@ -75,14 +80,18 @@ export async function DELETE(request: Request) {
 export async function PUT(request: Request) {
 	try {
 		const pool = await poolPromise;
-		const { id, codigo, descripcion, usuario } = await request.json();
+		const { id, codigo, descripcion, probabilidad, impacto, usuario } = await request.json();
 		const result = await pool
 			.request()
 			.input("ID", id)
 			.input("CODIGO", codigo)
 			.input("DESCRIPCION", descripcion)
+			.input("PROBABILIDAD", probabilidad)
+			.input("IMPACTO", impacto)
 			.input("USUARIO_MODIFICACION", usuario)
-			.query("UPDATE SUB_AREA SET CODIGO = @CODIGO, DESCRIPCION = @DESCRIPCION, USUARIO_MODIFICACION = @USUARIO_MODIFICACION, FECHA_MODIFICACION = GETDATE() WHERE SUBAREA_ID = @ID");
+			.query(
+				"UPDATE SUB_AREA SET CODIGO = @CODIGO, DESCRIPCION = @DESCRIPCION, PROBABILIDAD = @PROBABILIDAD, IMPACTO = @IMPACTO, USUARIO_MODIFICACION = @USUARIO_MODIFICACION, FECHA_MODIFICACION = GETDATE() WHERE SUBAREA_ID = @ID"
+			);
 
 		if (result.rowsAffected[0] > 0) {
 			return NextResponse.json({ success: true, message: "Record updated successfully" });
