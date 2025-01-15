@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { aprobadores, ejecutores } from "@/hooks/rolesPermitidos";
 import useUserSession from "@/hooks/useSession";
-import { nivelRiesgoDePersonasId, rolAprobadorInterlockId } from "@/hooks/variablesHardcodeadas";
+import { nivelRiesgoDePersonasId, rolAprobadorInterlockId, nombreReglaNivelBajo } from "@/hooks/variablesHardcodeadas";
 
 interface StepThreeProps {
 	aprobador: string;
@@ -25,6 +25,7 @@ const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor
 	const [tiposForzado, setTiposForzado] = useState<TipoForzado[]>([]);
 	const [aprobadoresList, setAprobadoresList] = useState<{ id: string; nombre: string; apePaterno: string; apeMaterno: string }[]>([]);
 	const [ejecutoresList, setEjecutoresList] = useState<{ id: string; nombre: string; apePaterno: string; apeMaterno: string }[]>([]);
+	const [aplicaReglaRiesgoBajo, setAplicaReglaRiesgoBajo] = useState<boolean>(false);
 
 	const { user } = useUserSession();
 
@@ -66,8 +67,8 @@ const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor
 					}
 					filteredAprobadores = newFilteredAprobadores;
 				} else {
-					// TODO: cambiar esto a variables hardcodeadas
-					if (nivelRiesgo === "BAJO" || nivelRiesgo === "MODERADO") {
+					console.log(aplicaReglaRiesgoBajo, "aplica regla nivel de reisgo");
+					if (aplicaReglaRiesgoBajo && (nivelRiesgo === "BAJO" || nivelRiesgo === "MODERADO")) {
 						const solicitantex = findUserById(Number(solicitante));
 
 						filteredAprobadores.push({
@@ -89,7 +90,7 @@ const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor
 			}
 		};
 		fetchUsuarios();
-	}, [interlockSeguridad, nivelRiesgo, user, riesgo, solicitante]);
+	}, [interlockSeguridad, nivelRiesgo, user, riesgo, solicitante, aplicaReglaRiesgoBajo]);
 
 	useEffect(() => {
 		const fetchSolicitudData = async () => {
@@ -116,6 +117,21 @@ const StepThree: React.FC<StepThreeProps> = ({ aprobador, setAprobador, ejecutor
 		};
 		fetchSolicitudData();
 	}, [setAprobador, setEjecutor, setTipoForzado]);
+
+	useEffect(() => {
+		const fetchParametrosGlobales = async () => {
+			try {
+				const response = await fetch("/api/parametros-globales");
+				const data = await response.json();
+				if (!data || data.values.length == 0 || !data.values) return;
+				setAplicaReglaRiesgoBajo(data.values[nombreReglaNivelBajo]);
+			} catch (error) {
+				console.error("Error fetching regla de riesgo bajo:", error);
+			}
+		};
+
+		fetchParametrosGlobales();
+	});
 
 	return (
 		<form className="space-y-6">

@@ -560,6 +560,16 @@ create table RIESGO (
 )
 go
 
+create table MAE_PARAMETROS_GLOBALES (
+   ID            int                  identity,
+   CODIGO        varchar(30)          null,  
+   VALOR          varchar(30)          null,
+   VALOR_BOOLEANO bit                  null,
+   ESTADO               int                  null,
+   constraint PK_PARAMETROS_GLOBALES primary key (ID)
+)
+go
+
 create table SUB_AREA (
    SUBAREA_ID           int                  identity,
    CODIGO               varchar(30)         null,
