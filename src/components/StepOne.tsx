@@ -22,6 +22,7 @@ interface Option {
 	descripcion: string;
 	probabilidad?: string;
 	impacto?: string;
+	codigo?: string;
 }
 
 const StepOne: React.FC<StepOneProps> = ({
@@ -128,7 +129,7 @@ const StepOne: React.FC<StepOneProps> = ({
 					<option value="">Prefijo del Tag o Sub Area</option>
 					{tagPrefijos.map((option) => (
 						<option key={option.id} value={option.id}>
-							{option.descripcion}
+							{option.codigo + " | " + option.descripcion}
 						</option>
 					))}
 				</select>
@@ -146,7 +147,7 @@ const StepOne: React.FC<StepOneProps> = ({
 					<option value="">Parte central del Tag asociado al Instrumento o Equipo</option>
 					{tagCentros.map((option) => (
 						<option key={option.id} value={option.id}>
-							{option.descripcion}
+							{option.codigo + " | " + option.descripcion}
 						</option>
 					))}
 				</select>

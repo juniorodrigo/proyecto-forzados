@@ -140,7 +140,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
 					if (result.success && result.data.length > 0) {
 						const solicitud = result.data[0];
 
-						setInterlockSeguridad(String(solicitud.interlockSeguridad)); // Convertimos a string porque el value del select es string
+						setInterlockSeguridad(solicitud.interlockSeguridad == 0 ? "NO" : "SI"); // Convertimos a string porque el value del select es string
 						setResponsable(String(solicitud.responsable));
 						setRiesgo(String(solicitud.riesgo));
 						setProbabilidad(String(solicitud.probabilidad));
@@ -224,14 +224,14 @@ const StepTwo: React.FC<StepTwoProps> = ({
 			{/* Interlock Seguridad */}
 			<div>
 				<h2 className="text-center font-semibold text-2xl mb-2">Responsable y Riesgo</h2>
-				<label className="block text-sm font-medium text-gray-600 mb-2">¿Requiere Interlock de Seguridad?</label>
+				<label className="block text-sm font-medium text-gray-600 mb-2">¿Es Interlock?</label>
 				<select
 					value={interlockSeguridad}
 					onChange={(e) => setInterlockSeguridad(e.target.value)}
 					className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
 					required
 				>
-					<option value="">¿Requiere Interlock?</option>
+					<option value="">Seleccione un valor</option>
 					<option value="SÍ">SÍ</option>
 					<option value="NO">NO</option>
 				</select>
@@ -310,7 +310,13 @@ const StepTwo: React.FC<StepTwoProps> = ({
 			{nivelRiesgo && (
 				<div>
 					<label className="block text-sm font-medium text-gray-600 mb-2">Nivel de Riesgo</label>
-					<p>{nivelRiesgo}</p>
+					<p
+						className={`px-4 py-2 rounded-lg font-bold ${
+							nivelRiesgo === "BAJO" ? "bg-green-600 text-gray-700" : nivelRiesgo === "MODERADO" ? "bg-yellow-600" : nivelRiesgo === "ALTO" ? "bg-red-500 text-white " : ""
+						}`}
+					>
+						{nivelRiesgo}
+					</p>
 				</div>
 			)}
 

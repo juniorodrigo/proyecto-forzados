@@ -12,6 +12,7 @@ export interface Role {
 interface Option {
 	id: number;
 	descripcion: string;
+	codigo?: string;
 }
 
 export interface Row {
@@ -184,7 +185,7 @@ const Page = () => {
 			</div>
 
 			{isModalOpen && (
-				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+				<div className="fixed inset-0 bg-gray-400 bg-opacity-50 flex items-center justify-center p-4">
 					<div className="absolute inset-0 bg-black bg-opacity-50"></div>
 					<div className="relative bg-white p-6 rounded-lg shadow-lg w-1/3 z-60">
 						<h2 className="text-lg font-semibold mb-4">{isEditing ? "Editar registro" : "Crear nuevo registro"}</h2>
@@ -196,7 +197,7 @@ const Page = () => {
 									<option value="">Seleccionar opción</option>
 									{tagPrefijos.map((option) => (
 										<option key={option.id} value={option.id}>
-											{option.descripcion}
+											{option.codigo + " | " + option.descripcion}
 										</option>
 									))}
 								</select>
@@ -207,7 +208,7 @@ const Page = () => {
 									<option value="">Seleccionar opción</option>
 									{tagCentros.map((option) => (
 										<option key={option.id} value={option.id}>
-											{option.descripcion}
+											{option.codigo + " | " + option.descripcion}
 										</option>
 									))}
 								</select>
