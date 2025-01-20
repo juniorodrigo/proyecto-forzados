@@ -46,6 +46,7 @@ const StepOne: React.FC<StepOneProps> = ({
 	const [disciplinas, setDisciplinas] = useState<Option[]>([]);
 	const [turnos, setTurnos] = useState<Option[]>([]);
 	const [proyectosList, setProyectosList] = useState<Option[]>([]);
+	const [observadoAlta, setObservadoAlta] = useState(false);
 
 	useEffect(() => {
 		const fetchData = async (url: string, setState: React.Dispatch<React.SetStateAction<Option[]>>) => {
@@ -83,6 +84,8 @@ const StepOne: React.FC<StepOneProps> = ({
 					if (result.success && result.data.length > 0) {
 						const solicitud = result.data[0];
 
+						console.log(solicitud.observadoAlta, "_____________________________XXXXXXX");
+
 						setTagPrefijo(String(solicitud.tagPrefijo));
 						setTagCentro(String(solicitud.tagCentro));
 						setTagSubfijo(solicitud.tagSubfijo || ""); // Asegurarse de que no sea null/undefined
@@ -90,6 +93,7 @@ const StepOne: React.FC<StepOneProps> = ({
 						setDisciplina(String(solicitud.disciplina));
 						setProyecto(String(solicitud.proyecto));
 						setTurno(String(solicitud.turno));
+						setObservadoAlta(solicitud.observadoAlta);
 					} else {
 						console.error("No se encontraron datos para la solicitud.");
 					}
@@ -106,6 +110,14 @@ const StepOne: React.FC<StepOneProps> = ({
 			{/* Proyecto */}
 			<div>
 				<h2 className="text-center font-semibold text-2xl mb-2">Datos generales</h2>
+				{/* Observado en ejecución */}
+				{observadoAlta && (
+					<div className="flex items-center space-x-2 mb-6">
+						<input type="checkbox" checked={observadoAlta} readOnly className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
+						<label className="text-sm font-medium text-gray-600">Solicitud reiniciada por observación en ejecución</label>
+					</div>
+				)}
+
 				<label className="block text-sm font-medium text-gray-600 mb-2">Área de forzado</label>
 				<select value={proyecto} onChange={(e) => setProyecto(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
 					<option value="">Nombre del área de forzado</option>

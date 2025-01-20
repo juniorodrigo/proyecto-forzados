@@ -42,7 +42,8 @@ const getSingleSolicitud = async (id: string) => {
             ESTADOSOLICITUD,
 			APROBADOR_A_ID,
 			EJECUTOR_A_ID,
-			SOLICITANTE_A_ID
+			SOLICITANTE_A_ID,
+			OBSERVADO_A
         FROM 
             TRS_SOLICITUD_FORZADO
         WHERE 
@@ -69,5 +70,6 @@ const getSingleSolicitud = async (id: string) => {
 
 		autorizacion: record.ESTADOSOLICITUD,
 		tipoForzado: record.TIPOFORZADO_ID,
+		observadoAlta: record.OBSERVADO_A,
 	}));
 };

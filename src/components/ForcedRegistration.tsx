@@ -59,7 +59,7 @@ const ForcedRegistration: React.FC = () => {
 					if (result.success && result.data.length > 0) {
 						const solicitud = result.data[0];
 
-						setInterlockSeguridad(String(solicitud.interlockSeguridad)); // Convertimos a string porque el value del select es string
+						setInterlockSeguridad(String(solicitud.interlockSeguridad));
 						setResponsable(String(solicitud.responsable));
 						setRiesgo(String(solicitud.riesgo));
 						setProbabilidad(String(solicitud.probabilidad));
