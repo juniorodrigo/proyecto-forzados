@@ -99,6 +99,7 @@ export async function PUT(request: Request) {
 			.input("prefijoId", prefijoId)
 			.input("centroId", centroId)
 			.input("sufijo", sufijo)
+			.input("id", id)
 			.query("SELECT * FROM MAE_TAGS_MATRIZ_RIESGO WHERE SUB_AREA_ID = @prefijoId AND TAG_CENTRO_ID = @centroId AND SUFIJO = @sufijo AND ESTADO = 1 AND ID != @id");
 
 		if (existingRecords.length > 0) {

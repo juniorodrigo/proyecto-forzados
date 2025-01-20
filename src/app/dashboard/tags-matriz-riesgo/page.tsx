@@ -67,6 +67,7 @@ const Page = () => {
 
 	const getDescriptionById = (id: number, options: Option[]): string => {
 		const option = options.find((opt) => opt.id === id);
+		if (option.codigo) return option ? option.codigo + " | " + option.descripcion : "N/A";
 		return option ? option.descripcion : "N/A";
 	};
 
