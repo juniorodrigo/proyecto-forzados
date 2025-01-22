@@ -312,7 +312,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
 					<label className="block text-sm font-medium text-gray-600 mb-2">Nivel de Riesgo</label>
 					<p
 						className={`px-4 py-2 rounded-lg font-bold ${
-							nivelRiesgo === "BAJO" ? "bg-green-600 text-gray-700" : nivelRiesgo === "MODERADO" ? "bg-yellow-600" : nivelRiesgo === "ALTO" ? "bg-red-500 text-white " : ""
+							nivelRiesgo === "BAJO" ? "bg-green-600 text-gray-200" : nivelRiesgo === "MODERADO" ? "bg-yellow-600" : nivelRiesgo === "ALTO" ? "bg-red-500 text-white " : ""
 						}`}
 					>
 						{nivelRiesgo}

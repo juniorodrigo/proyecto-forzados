@@ -99,12 +99,11 @@ const Login = () => {
 				<div className="w-full max-w-md space-y-6 bg-white p-8 rounded-lg shadow-lg">
 					{/* Logo */}
 					<div className="flex justify-center">
-						<Image src="/images/logo.png" alt="Logo" width={150} height={85} />
+						<Image src="/images/logo.svg" alt="Logo" width={100} height={85} />
 					</div>
 
 					<h2 className="text-2xl font-semibold text-center text-gray-800">
-						Bienvenido al <br />
-						<span className="text-[#001D39] text-3xl">Sistema de gestión de forzados</span>
+						<span className="text-[#001D39] text-3xl">Forzados GOSOFT</span>
 					</h2>
 
 					<form className="space-y-6" onSubmit={handleLogin}>

@@ -47,7 +47,7 @@ const Navbar: FC = () => {
 		<nav className="sticky top-0 z-30 flex h-14 w-full items-center justify-between border-b border-gray-200 bg-gray-50 px-4 shadow-sm">
 			<div className="flex items-center gap-4">
 				<button onClick={toggleSidebar} className="flex h-8 w-8 items-center justify-center rounded-md text-gray-700 transition-colors hover:bg-gray-200" aria-label="Toggle Sidebar">
-					<RiMenuFoldLine className={`h-5 w-5 transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
+					<RiMenuFoldLine className={`h-5 w-5 transition-transform duration-300 rotate-180${open ? "rotate-180" : ""}`} />
 				</button>
 				<h1 className="text-base font-medium text-gray-700">Sistema de Gestión de Forzados</h1>
 			</div>

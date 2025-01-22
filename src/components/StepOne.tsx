@@ -113,8 +113,10 @@ const StepOne: React.FC<StepOneProps> = ({
 				{/* Observado en ejecución */}
 				{observadoAlta && (
 					<div className="flex items-center space-x-2 mb-6">
-						<input type="checkbox" checked={observadoAlta} readOnly className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
-						<label className="text-sm font-medium text-gray-600">Solicitud reiniciada por observación en ejecución</label>
+						<svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+						</svg>
+						<label className="text-sm font-bold text-gray-600 ">Solicitud observada por el ejecutor</label>
 					</div>
 				)}
 

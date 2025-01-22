@@ -92,7 +92,10 @@ const Sidebar: React.FC = () => {
 			<div className={`p-1 text-center bg-white ${open ? "" : "px-2"}`}>
 				<div className="text-2xl font-bold flex items-center justify-center space-x-2">
 					{open ? (
-						<Image src="/images/logo2.png" height={120} width={180} alt="Logo" className="object-contain h-auto max-h-[60px]" priority />
+						<div className="flex items-center whitespace-nowrap text-start text-xl">
+							<Image src="/images/logo.svg" height={20} width={40} alt="Logo" />
+							<p className="ml-2">Forzados GOSOFT</p>
+						</div>
 					) : (
 						<div className="w-8 h-8 bg-[#001d39] rounded-full flex items-center justify-center">
 							<span className="text-white text-xs font-bold">GF</span>
