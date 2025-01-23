@@ -41,31 +41,6 @@ export interface Row {
 	[key: string]: string | number | boolean;
 }
 
-export const formatStatus = (status: string) => {
-	switch (status) {
-		case "PENDIENTE-ALTA":
-			return "Forzado Pendiente";
-		case "APROBADO-ALTA":
-			return "Forzado Aprobado";
-		case "EJECUTADO-ALTA":
-			return "Forzado Ejecutado";
-		case "RECHAZADO-ALTA":
-			return "Forzado Rechazado";
-		case "PENDIENTE-BAJA":
-			return "Retiro Pendiente";
-		case "APROBADO-BAJA":
-			return "Retiro Aprobado";
-		case "EJECUTADO-BAJA":
-			return "Retiro Ejecutado";
-		case "RECHAZADO-BAJA":
-			return "Retiro Rechazado";
-		case "FINALIZADO":
-			return "Finalizado";
-		default:
-			return status;
-	}
-};
-
 const Page: React.FC = () => {
 	const [selectedRange, setSelectedRange] = useState<DateRange | undefined>();
 	const [selectedSolicitante, setSelectedSolicitante] = useState("");
@@ -503,6 +478,31 @@ const Page: React.FC = () => {
 		setShowPopover(true);
 		setTimeout(() => setShowPopover(false), 3000);
 		setIsPasswordModalOpen(false);
+	};
+
+	const formatStatus = (status: string) => {
+		switch (status) {
+			case "PENDIENTE-ALTA":
+				return "Forzado Pendiente";
+			case "APROBADO-ALTA":
+				return "Forzado Aprobado";
+			case "EJECUTADO-ALTA":
+				return "Forzado Ejecutado";
+			case "RECHAZADO-ALTA":
+				return "Forzado Rechazado";
+			case "PENDIENTE-BAJA":
+				return "Retiro Pendiente";
+			case "APROBADO-BAJA":
+				return "Retiro Aprobado";
+			case "EJECUTADO-BAJA":
+				return "Retiro Ejecutado";
+			case "RECHAZADO-BAJA":
+				return "Retiro Rechazado";
+			case "FINALIZADO":
+				return "Finalizado";
+			default:
+				return status;
+		}
 	};
 
 	console.log(filteredRows, "_______________________XXXXXXXXXXX");

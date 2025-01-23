@@ -17,8 +17,8 @@ export async function PUT(request: Request) {
 				return NextResponse.json({ success: false, message: "No se puede reiniciar la contraseña de un usuario que no tiene DNI" }, { status: 404 });
 			}
 
-			const { APEPATERNO, DNI } = userDni.recordset[0];
-			const newPassword = (APEPATERNO + DNI).replace(/ /g, "").toLowerCase();
+			const { DNI } = userDni.recordset[0];
+			const newPassword = DNI.replace(/ /g, "").toLowerCase();
 
 			hashedPassword = await bcrypt.hash(newPassword, 10); // Hashea el DNI
 		}

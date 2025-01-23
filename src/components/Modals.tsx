@@ -1,5 +1,5 @@
 import React from "react";
-import { Row, formatStatus } from "@/app/dashboard/consultas/page";
+import { Row } from "@/app/dashboard/consultas/page";
 
 interface ModalsProps {
 	isModalOpen: boolean;
@@ -66,6 +66,31 @@ const Modals: React.FC<ModalsProps> = ({
 	const [isRejectExecutionModalOpen, setIsRejectExecutionModalOpen] = React.useState(false);
 
 	const [observation, setObservation] = React.useState("");
+
+	const formatStatus = (status: string) => {
+		switch (status) {
+			case "PENDIENTE-ALTA":
+				return "Forzado Pendiente";
+			case "APROBADO-ALTA":
+				return "Forzado Aprobado";
+			case "EJECUTADO-ALTA":
+				return "Forzado Ejecutado";
+			case "RECHAZADO-ALTA":
+				return "Forzado Rechazado";
+			case "PENDIENTE-BAJA":
+				return "Retiro Pendiente";
+			case "APROBADO-BAJA":
+				return "Retiro Aprobado";
+			case "EJECUTADO-BAJA":
+				return "Retiro Ejecutado";
+			case "RECHAZADO-BAJA":
+				return "Retiro Rechazado";
+			case "FINALIZADO":
+				return "Finalizado";
+			default:
+				return status;
+		}
+	};
 
 	const handleObservationSubmit = async () => {
 		setIsSubmitting(true);
