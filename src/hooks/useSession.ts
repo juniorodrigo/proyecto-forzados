@@ -59,5 +59,18 @@ export default function useUserSession() {
 		}
 	};
 
-	return { user, saveUser, clearUser, fetchUserFromServer, disableFlagNuevoIngreso };
+	const validateUserSession = (): boolean => {
+		if (typeof window !== "undefined") {
+			const storedUser = localStorage.getItem("user");
+			return !!storedUser;
+		}
+		return false;
+	};
+
+	const doLogout = () => {
+		setUser(null);
+		localStorage.removeItem("user");
+	};
+
+	return { user, saveUser, clearUser, fetchUserFromServer, disableFlagNuevoIngreso, validateUserSession, doLogout };
 }

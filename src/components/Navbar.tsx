@@ -10,7 +10,7 @@ import { signOut } from "next-auth/react";
 
 const Navbar: FC = () => {
 	const context = useContext(UiContext) as UiContextType;
-	const { user } = useUserSession();
+	const { user, doLogout } = useUserSession();
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 	const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -40,6 +40,7 @@ const Navbar: FC = () => {
 	}, []);
 
 	const handleLogout = async () => {
+		doLogout();
 		await signOut({ callbackUrl: "/auth/ingresar" });
 	};
 
