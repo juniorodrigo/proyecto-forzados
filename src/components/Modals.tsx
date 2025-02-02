@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Row } from "@/app/dashboard/consultas/page";
 
 interface ModalsProps {
@@ -64,8 +64,8 @@ const Modals: React.FC<ModalsProps> = ({
 	const [isSubmitting, setIsSubmitting] = React.useState(false);
 	const [isObservationModalOpen, setIsObservationModalOpen] = React.useState(false);
 	const [isRejectExecutionModalOpen, setIsRejectExecutionModalOpen] = React.useState(false);
-
 	const [observation, setObservation] = React.useState("");
+	const [hasFiles, setHasFiles] = React.useState(false);
 
 	const formatStatus = (status: string) => {
 		switch (status) {
@@ -128,6 +128,60 @@ const Modals: React.FC<ModalsProps> = ({
 			setIsSubmitting(false);
 		}
 	};
+
+	const fetchFiles = async () => {
+		setIsSubmitting(true);
+		try {
+			if (selectedRow) {
+				const response = await fetch(`/api/archivos/${selectedRow.id}`);
+				const data = await response.json();
+				if (response.ok) {
+					setHasFiles(data.length > 0);
+				} else {
+					setHasFiles(false);
+				}
+			}
+		} catch (error) {
+			console.error("Error fetching files:", error);
+			setHasFiles(false);
+		} finally {
+			setIsSubmitting(false);
+		}
+	};
+
+	const handleDownloadFiles = async () => {
+		setIsSubmitting(true);
+		try {
+			if (selectedRow) {
+				const response = await fetch(`/api/archivos/${selectedRow.id}`);
+				const data = await response.json();
+				if (response.ok) {
+					if (data.length === 0) {
+						alert("No tiene archivos adjuntos");
+					} else {
+						data.forEach((file: any) => {
+							const downloadLink = document.createElement("a");
+							downloadLink.href = `data:application/octet-stream;base64,${file.archivo}`;
+							downloadLink.download = file.nombreArchivo;
+							downloadLink.click();
+						});
+					}
+				} else {
+					alert("No existen archivos adjuntos para esta solicitud");
+				}
+			}
+		} catch (error) {
+			console.error("Error downloading files:", error);
+		} finally {
+			setIsSubmitting(false);
+		}
+	};
+
+	useEffect(() => {
+		if (isModalOpen && selectedRow) {
+			fetchFiles();
+		}
+	}, [isModalOpen, selectedRow]);
 
 	return (
 		<>
@@ -194,6 +248,24 @@ const Modals: React.FC<ModalsProps> = ({
 									</p>
 								</div>
 								<div className="flex justify-end gap-4">
+									{hasFiles && (
+										<button
+											onClick={handleDownloadFiles}
+											className={`px-4 py-2 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+												isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600 focus:ring-blue-500"
+											}`}
+											disabled={isSubmitting}
+										>
+											{isSubmitting ? (
+												<svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+													<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+													<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+												</svg>
+											) : (
+												"Descargar archivos"
+											)}
+										</button>
+									)}
 									<button onClick={closeModal} className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
 										Cerrar
 									</button>
@@ -231,6 +303,24 @@ const Modals: React.FC<ModalsProps> = ({
 								</p>
 							</div>
 							<div className="flex justify-end gap-4">
+								{hasFiles && (
+									<button
+										onClick={handleDownloadFiles}
+										className={`px-4 py-2 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+											isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600 focus:ring-blue-500"
+										}`}
+										disabled={isSubmitting}
+									>
+										{isSubmitting ? (
+											<svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+												<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+												<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+											</svg>
+										) : (
+											"Descargar archivos"
+										)}
+									</button>
+								)}
 								<button onClick={closeModal} className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
 									Cerrar
 								</button>
